@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/app_image.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
@@ -102,10 +103,9 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.asset(
-                      place.heroImageUrl,
+                    AppImage(
+                      path: place.heroImageUrl,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(color: AppColors.paper2),
                     ),
                     // Gradient overlay
                     Container(
@@ -434,7 +434,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                             child: SizedBox(
                               height: 120,
                               width: double.infinity,
-                              child: Image.asset(post.mediaUrl!, fit: BoxFit.cover),
+                              child: AppImage(path: post.mediaUrl!, fit: BoxFit.cover),
                             ),
                           ),
                         ],

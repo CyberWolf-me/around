@@ -1,0 +1,85 @@
+import 'dart:io' show File;
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import '../constants/app_colors.dart';
+
+class AppImage extends StatelessWidget {
+  final String path;
+  final double? width;
+  final double? height;
+  final BoxFit fit;
+  final BorderRadius? borderRadius;
+
+  const AppImage({
+    super.key,
+    required this.path,
+    this.width,
+    this.height,
+    this.fit = BoxFit.cover,
+    this.borderRadius,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget imageWidget;
+
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      imageWidget = Image.network(
+        path,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (_, __, ___) => _errorPlaceholder(),
+        loadingBuilder: (context, child, progress) {
+          if (progress == null) return child;
+          return Container(
+            width: width,
+            height: height,
+            color: AppColors.paper2,
+            child: const Center(
+              child: SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.ink),
+              ),
+            ),
+          );
+        },
+      );
+    } else if (!kIsWeb && (path.startsWith('/') || path.contains(':\\') || path.startsWith('file://'))) {
+      final cleanPath = path.replaceFirst('file://', '');
+      imageWidget = Image.file(
+        File(cleanPath),
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (_, __, ___) => _errorPlaceholder(),
+      );
+    } else {
+      // Asset fallback
+      imageWidget = Image.asset(
+        path,
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (_, __, ___) => _errorPlaceholder(),
+      );
+    }
+
+    if (borderRadius != null) {
+      return ClipRRect(borderRadius: borderRadius!, child: imageWidget);
+    }
+    return imageWidget;
+  }
+
+  Widget _errorPlaceholder() {
+    return Container(
+      width: width,
+      height: height,
+      color: AppColors.paper2,
+      child: const Center(
+        child: Icon(Icons.image_outlined, color: AppColors.ink3, size: 28),
+      ),
+    );
+  }
+}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/app_image.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
@@ -21,7 +22,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   bool _isMapView = true;
   String _selectedCategory = 'All';
   String _searchQuery = '';
-  String _selectedPlaceId = 'kettle';
+  String _selectedPlaceId = 'breadly';
 
   @override
   Widget build(BuildContext context) {
@@ -180,10 +181,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                           border: Border.all(color: AppColors.ink, width: 1.5),
                                         ),
                                         clipBehavior: Clip.antiAlias,
-                                        child: Image.asset(
-                                          selectedPlace.heroImageUrl,
+                                        child: AppImage(
+                                          path: selectedPlace.heroImageUrl,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) => Container(color: AppColors.paper2),
                                         ),
                                       ),
                                       const SizedBox(width: 12),

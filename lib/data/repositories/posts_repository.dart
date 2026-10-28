@@ -2,167 +2,178 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/post_model.dart';
 import '../../core/constants/app_colors.dart';
+import '../services/storage_service.dart';
 import '../services/supabase_service.dart';
 
 final postsRepositoryProvider = NotifierProvider<PostsNotifier, List<PostModel>>(PostsNotifier.new);
 
 class PostsNotifier extends Notifier<List<PostModel>> {
   @override
-  List<PostModel> build() => _initialSeedPosts;
+  List<PostModel> build() {
+    // Merge stored drops with initial seed drops
+    final storedDrops = StorageService.getStoredDrops();
+    if (storedDrops.isNotEmpty) {
+      // Remove any stored drops that duplicate seed IDs, and prepend stored drops
+      final storedIds = storedDrops.map((d) => d.id).toSet();
+      final filteredSeeds = _initialSeedPosts.where((s) => !storedIds.contains(s.id)).toList();
+      return [...storedDrops, ...filteredSeeds];
+    }
+    return _initialSeedPosts;
+  }
 
   static final List<PostModel> _initialSeedPosts = [
     PostModel(
-      id: 'd1',
-      authorId: 'noor',
-      authorName: 'Noor Haddad',
-      authorUsername: 'noorh',
-      authorAvatar: 'NH',
-      placeId: 'kettle',
-      placeName: 'Kettle & Loaf',
-      placeCategory: 'Bakery · Café',
-      placeAddress: '14 Ledger Street',
-      note: 'Cortado is the good one here. The back room stays quiet until about eleven, then the whole street comes in at once.',
+      id: 'drop_tash_1',
+      authorId: 'kamila',
+      authorName: 'Kamila Rahimova',
+      authorUsername: 'kamilar',
+      authorAvatar: 'KR',
+      placeId: 'breadly',
+      placeName: 'Breadly Bakery & Café',
+      placeCategory: 'Bakery · Specialty Café',
+      placeAddress: '24 Taras Shevchenko Street, Mirabad',
+      note: 'The lavender matcha and warm sourdough here are unrivaled. Courtyard gets morning sun until 11am.',
       rating: 5,
       audience: PostAudience.friends,
       size: PostSize.hero,
-      tags: const ['quiet mornings', 'good cortado'],
-      mediaUrl: 'assets/kettle-hero.jpg',
-      savesCount: 12,
+      tags: const ['artisan sourdough', 'courtyard', 'specialty coffee'],
+      mediaUrl: 'assets/bakery-counter.jpg',
+      savesCount: 42,
       createdAt: DateTime.now().subtract(const Duration(hours: 2)),
     ),
     PostModel(
-      id: 'd2',
-      authorId: 'teo',
-      authorName: 'Teo Vasquez',
-      authorUsername: 'teovas',
-      authorAvatar: 'TV',
-      placeId: 'fern',
-      placeName: 'The Fern Room',
-      placeCategory: 'Study café',
-      placeAddress: '2 Ostrander Avenue',
-      note: 'Six hours on my thesis. Nobody looked at me once.',
+      id: 'drop_tash_2',
+      authorId: 'bekzod',
+      authorName: 'Bekzod Alimov',
+      authorUsername: 'bekalimov',
+      authorAvatar: 'BA',
+      placeId: 'bnb',
+      placeName: 'B&B Coffee House',
+      placeCategory: 'Study Café · Roastery',
+      placeAddress: '24 Shota Rustaveli Street, Yakkasaray',
+      note: 'Completed my full architectural render in one sitting. High-speed Wi-Fi, plugs at every booth, quiet corner.',
       rating: 5,
       audience: PostAudience.friends,
       size: PostSize.half,
-      tags: const ['outlets', 'long stays'],
+      tags: const ['power outlets', 'study-friendly', 'chemex'],
       mediaUrl: 'assets/study-desk.jpg',
-      savesCount: 31,
-      createdAt: DateTime.now().subtract(const Duration(hours: 5)),
+      savesCount: 68,
+      createdAt: DateTime.now().subtract(const Duration(hours: 4)),
     ),
     PostModel(
-      id: 'd3',
-      authorId: 'mina',
-      authorName: 'Mina Osei',
-      authorUsername: 'minaosei',
-      authorAvatar: 'MO',
-      placeId: 'sable',
-      placeName: 'Sable Records',
-      placeCategory: 'Record shop',
-      placeAddress: '63 Kestrel Lane',
-      note: 'Shellac bin is unreasonably deep.',
+      id: 'drop_tash_3',
+      authorId: 'aziza',
+      authorName: 'Aziza Tursunova',
+      authorUsername: 'azizatur',
+      authorAvatar: 'AT',
+      placeId: 'ecorn',
+      placeName: 'Ecorn Patisserie',
+      placeCategory: 'French Patisserie · Bistro',
+      placeAddress: '32 Amir Timur Avenue, Yunusabad',
+      note: 'Pistachio eclair here is legitimate Parisian level. Second-floor balcony overlooking Amir Timur Ave.',
       rating: 5,
       audience: PostAudience.public,
       size: PostSize.half,
-      tags: const ['crate digging'],
-      mediaUrl: 'assets/records-crates.jpg',
-      savesCount: 8,
+      tags: const ['pistachio eclair', 'terrace', 'date spot'],
+      mediaUrl: 'assets/patisserie.jpg',
+      savesCount: 53,
       createdAt: DateTime.now().subtract(const Duration(hours: 6)),
     ),
     PostModel(
-      id: 'd4',
-      authorId: 'ari',
-      authorName: 'Ari Lindqvist',
-      authorUsername: 'arilind',
-      authorAvatar: 'AL',
-      placeId: 'castellan',
-      placeName: 'Castellan',
-      placeCategory: 'Wine bar',
-      placeAddress: '8 Prine Row',
-      note: 'Ask for something orange and cold and let them choose. It has never once gone badly.',
-      rating: null,
-      audience: PostAudience.friends,
-      size: PostSize.note,
-      tags: const ['date night'],
-      mediaUrl: null,
-      tint: AppColors.butter,
-      savesCount: 19,
-      createdAt: DateTime.now().subtract(const Duration(hours: 9)),
-    ),
-    PostModel(
-      id: 'd5',
-      authorId: 'priya',
-      authorName: 'Priya Raman',
-      authorUsername: 'priyar',
-      authorAvatar: 'PR',
-      placeId: 'volta',
-      placeName: 'Volta Books',
-      placeCategory: 'Bookshop',
-      placeAddress: '21 Fenwick Walk',
-      note: 'The €4 shelf by the door is a trap. I lost an hour.',
-      rating: 4,
-      audience: PostAudience.public,
-      size: PostSize.half,
-      tags: const ['€4 shelf'],
-      mediaUrl: 'assets/bookshop-tall.jpg',
-      savesCount: 24,
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    PostModel(
-      id: 'd6',
-      authorId: 'jonah',
-      authorName: 'Jonah Beck',
-      authorUsername: 'jonahb',
-      authorAvatar: 'JB',
-      placeId: 'noodle',
-      placeName: 'Noodle Union',
-      placeCategory: 'Ramen',
-      placeAddress: '40 Halloway Street',
-      note: 'Spicy miso, counter seat, out in twenty.',
+      id: 'drop_tash_4',
+      authorId: 'jasur',
+      authorName: 'Jasur Kadirov',
+      authorUsername: 'jasur_k',
+      authorAvatar: 'JK',
+      placeId: 'chorsu',
+      placeName: 'Chorsu Milliy Taomlar',
+      placeCategory: 'Uzbek Cuisine · Open Kitchen',
+      placeAddress: 'Beruni Avenue, Chorsu Old City',
+      note: 'Come right at 11:30 AM when the Wedding Osh comes off the fire. Saffron rice, tender lamb, quail eggs.',
       rating: 5,
       audience: PostAudience.public,
-      size: PostSize.half,
-      tags: const ['counter seats'],
-      mediaUrl: 'assets/ramen.jpg',
-      savesCount: 44,
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+      size: PostSize.hero,
+      tags: const ['wedding plov', 'tandir somsa', 'authentic'],
+      mediaUrl: 'assets/street.jpg',
+      savesCount: 114,
+      createdAt: DateTime.now().subtract(const Duration(hours: 8)),
     ),
     PostModel(
-      id: 'd7',
-      authorId: 'mina',
-      authorName: 'Mina Osei',
-      authorUsername: 'minaosei',
-      authorAvatar: 'MO',
-      placeId: 'marigold',
-      placeName: 'Marigold Patisserie',
-      placeCategory: 'Patisserie',
-      placeAddress: '5 Duarte Court',
-      note: 'Kouign-amann sells out before ten. I have learned this the hard way four times now.',
-      rating: 4,
-      audience: PostAudience.friends,
-      size: PostSize.wide,
-      tags: const ['kouign-amann'],
-      mediaUrl: 'assets/patisserie.jpg',
-      savesCount: 37,
-      createdAt: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    PostModel(
-      id: 'd8',
-      authorId: 'teo',
-      authorName: 'Teo Vasquez',
-      authorUsername: 'teovas',
-      authorAvatar: 'TV',
-      placeId: 'longtable',
-      placeName: 'The Long Table',
-      placeCategory: 'Work space',
-      placeAddress: '11 Marrow Lane',
-      note: 'Outlets at every single seat. I did not believe it either.',
-      rating: null,
+      id: 'drop_tash_5',
+      authorId: 'diyor',
+      authorName: 'Diyor Usmanov',
+      authorUsername: 'diyor_u',
+      authorAvatar: 'DU',
+      placeId: 'tims',
+      placeName: 'Tim’s Coffee & Roastery',
+      placeCategory: 'Specialty Roastery',
+      placeAddress: '40 Taras Shevchenko Street, Mirabad',
+      note: 'Natural processed Ethiopian batch brew is fruity and super clean. Roaster running right behind the bar.',
+      rating: 5,
       audience: PostAudience.friends,
       size: PostSize.note,
-      tags: const ['outlets'],
+      tags: const ['single origin', 'v60 pour-over', 'tech crowd'],
+      mediaUrl: null,
+      tint: AppColors.butter,
+      savesCount: 29,
+      createdAt: DateTime.now().subtract(const Duration(hours: 11)),
+    ),
+    PostModel(
+      id: 'drop_tash_6',
+      authorId: 'madina',
+      authorName: 'Madina Karimova',
+      authorUsername: 'madinakar',
+      authorAvatar: 'MK',
+      placeId: 'centralpark',
+      placeName: 'Central Park (Mirzo Ulugbek)',
+      placeCategory: 'Park · Green Promenade',
+      placeAddress: '21 Movaraunnahr Street',
+      note: 'Sunset light reflecting off the pond. Picked up iced matcha at the east gate kiosk.',
+      rating: 5,
+      audience: PostAudience.friends,
+      size: PostSize.wide,
+      tags: const ['evening strolls', 'lake', 'matcha kiosk'],
+      mediaUrl: 'assets/window-girl.jpg',
+      savesCount: 77,
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+    PostModel(
+      id: 'drop_tash_7',
+      authorId: 'rustam',
+      authorName: 'Rustam Mirzaev',
+      authorUsername: 'rustamm',
+      authorAvatar: 'RM',
+      placeId: 'steam',
+      placeName: 'Steam Bar & Lounge',
+      placeCategory: 'Cocktail Lounge · Vinyl Bar',
+      placeAddress: '29 Nukus Street, Mirabad',
+      note: 'Ask for the pomegranate smoked sour. Vinyl DJ sets start at 9.',
+      rating: 4,
+      audience: PostAudience.public,
+      size: PostSize.half,
+      tags: const ['craft cocktails', 'vinyl DJ', 'nightlife'],
+      mediaUrl: 'assets/wine-wide.jpg',
+      savesCount: 39,
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+    PostModel(
+      id: 'drop_tash_8',
+      authorId: 'shakhlo',
+      authorName: 'Shakhlo Nazarova',
+      authorUsername: 'shakhlo_n',
+      authorAvatar: 'SN',
+      placeId: 'kitobxon',
+      placeName: 'Kitobxon Book Café',
+      placeCategory: 'Bookstore · Literary Café',
+      placeAddress: '11 Alisher Navoi Avenue',
+      note: 'The quiet back room with the velvet armchairs is Tashkent’s best kept secret for reading.',
+      rating: 5,
+      audience: PostAudience.public,
+      size: PostSize.note,
+      tags: const ['bookstore', 'quiet nooks', 'aeropress'],
       mediaUrl: null,
       tint: AppColors.mint,
-      savesCount: 15,
+      savesCount: 61,
       createdAt: DateTime.now().subtract(const Duration(days: 2)),
     ),
   ];
@@ -181,8 +192,8 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     final newPost = PostModel(
       id: 'drop_${DateTime.now().millisecondsSinceEpoch}',
       authorId: 'you',
-      authorName: 'Yusuf Okonjo',
-      authorUsername: 'yusuf',
+      authorName: 'You (Explorer)',
+      authorUsername: 'you',
       authorAvatar: 'YO',
       placeId: placeId,
       placeName: placeName,
@@ -198,10 +209,14 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       createdAt: DateTime.now(),
     );
 
-    // Optimistic client update
-    state = [newPost, ...state];
+    // Update state
+    final updatedList = [newPost, ...state];
+    state = updatedList;
 
-    // Push to Supabase if initialized
+    // Persist to local storage
+    await StorageService.persistDrops(updatedList);
+
+    // Push to Supabase if connected
     if (SupabaseService.isInitialized) {
       try {
         await SupabaseService.client.from('posts').insert({
@@ -210,15 +225,17 @@ class PostsNotifier extends Notifier<List<PostModel>> {
           'rating': rating,
           'audience': audience.name,
           'tags': tags,
+          'media_url': mediaPath,
         });
       } catch (e) {
-        debugPrint('[PostsRepository] Error syncing drop: $e');
+        debugPrint('[PostsRepository] Supabase push note: $e');
       }
     }
   }
 
   void addDrop(PostModel post) {
     state = [post, ...state];
+    StorageService.persistDrops(state);
   }
 
   List<PostModel> getFriendsDrops(Set<String> followedIds) {

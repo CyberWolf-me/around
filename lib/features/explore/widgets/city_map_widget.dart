@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/services/haptic_service.dart';
 
-class CityMapWidget extends StatelessWidget {
+class CityMapWidget extends StatefulWidget {
   final List<PlaceModel> places;
   final String? selectedPlaceId;
   final Function(String placeId) onSelectPlace;
@@ -15,18 +17,41 @@ class CityMapWidget extends StatelessWidget {
     required this.onSelectPlace,
   });
 
-  // Relative pin coordinates normalized 0.0 to 1.0 for the Tashkent / Barlow Hill map
-  static const Map<String, Offset> pinPositions = {
-    'kettle': Offset(0.35, 0.58),
-    'fern': Offset(0.52, 0.33),
-    'sable': Offset(0.73, 0.62),
-    'castellan': Offset(0.12, 0.26),
-    'volta': Offset(0.44, 0.76),
-    'noodle': Offset(0.63, 0.43),
-    'marigold': Offset(0.86, 0.35),
-    'longtable': Offset(0.22, 0.77),
-    'quiet': Offset(0.31, 0.19),
-  };
+  @override
+  State<CityMapWidget> createState() => _CityMapWidgetState();
+}
+
+class _CityMapWidgetState extends State<CityMapWidget> {
+  final MapController _mapController = MapController();
+  static const LatLng _tashkentCenter = LatLng(41.3111, 69.2797);
+
+  @override
+  void didUpdateWidget(covariant CityMapWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedPlaceId != oldWidget.selectedPlaceId && widget.selectedPlaceId != null) {
+      final match = widget.places.where((p) => p.id == widget.selectedPlaceId).firstOrNull;
+      if (match != null) {
+        _mapController.move(LatLng(match.latitude, match.longitude), 14.5);
+      }
+    }
+  }
+
+  void _zoomIn() {
+    HapticService.light();
+    final zoom = _mapController.camera.zoom + 1.0;
+    _mapController.move(_mapController.camera.center, zoom.clamp(10.0, 18.0));
+  }
+
+  void _zoomOut() {
+    HapticService.light();
+    final zoom = _mapController.camera.zoom - 1.0;
+    _mapController.move(_mapController.camera.center, zoom.clamp(10.0, 18.0));
+  }
+
+  void _recenterTashkent() {
+    HapticService.medium();
+    _mapController.move(_tashkentCenter, 13.5);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,205 +63,186 @@ class CityMapWidget extends StatelessWidget {
         border: Border.all(color: AppColors.ink, width: 2),
         boxShadow: const [AppColors.shadow],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final w = constraints.maxWidth;
-            final h = constraints.maxHeight;
-
-            return Stack(
-              children: [
-                // Vector background canvas (City blocks, parks, diagonals)
-                CustomPaint(
-                  size: Size(w, h),
-                  painter: _MapCanvasPainter(),
-                ),
-
-                // Street labels
-                const Positioned(
-                  top: 24,
-                  left: 36,
-                  child: Text(
-                    'SHOTA RUSTAVELI AVE',
-                    style: TextStyle(
-                      fontFamily: 'SpaceMono',
-                      fontSize: 7.5,
-                      letterSpacing: 1.0,
-                      color: Color(0x7015130F),
-                    ),
-                  ),
-                ),
-                const Positioned(
-                  bottom: 30,
-                  right: 40,
-                  child: Text(
-                    'AMIR TIMUR STREET',
-                    style: TextStyle(
-                      fontFamily: 'SpaceMono',
-                      fontSize: 7,
-                      letterSpacing: 0.8,
-                      color: Color(0x6015130F),
-                    ),
-                  ),
-                ),
-
-                // User Location Dot
-                Positioned(
-                  left: w * 0.47 - 7,
-                  top: h * 0.52 - 7,
-                  child: Container(
-                    width: 14,
-                    height: 14,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.orange,
-                      border: Border.all(color: Colors.white, width: 2.5),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.orange.withOpacity(0.5),
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Venue Pins
-                ...places.map((place) {
-                  final pos = pinPositions[place.id] ?? const Offset(0.5, 0.5);
-                  final isSelected = selectedPlaceId == place.id;
-                  final double pinSize = isSelected ? 34.0 : 26.0;
-
-                  return Positioned(
-                    left: w * pos.dx - (pinSize / 2),
-                    top: h * pos.dy - (pinSize / 2),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          // Real OpenStreetMap Tile Layer
+          FlutterMap(
+            mapController: _mapController,
+            options: const MapOptions(
+              initialCenter: _tashkentCenter,
+              initialZoom: 13.5,
+              minZoom: 10.0,
+              maxZoom: 18.0,
+              interactionOptions: InteractionOptions(
+                flags: InteractiveFlag.all,
+              ),
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'com.around.around_app',
+                maxZoom: 19,
+              ),
+              MarkerLayer(
+                markers: widget.places.map((place) {
+                  final isSelected = place.id == widget.selectedPlaceId;
+                  return Marker(
+                    point: LatLng(place.latitude, place.longitude),
+                    width: isSelected ? 140 : 100,
+                    height: isSelected ? 50 : 36,
                     child: GestureDetector(
                       onTap: () {
                         HapticService.selection();
-                        onSelectPlace(place.id);
+                        widget.onSelectPlace(place.id);
+                        _mapController.move(LatLng(place.latitude, place.longitude), 14.5);
                       },
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: pinSize,
-                            height: pinSize,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                              border: Border.all(
-                                color: isSelected ? AppColors.orange : AppColors.ink,
-                                width: isSelected ? 2.5 : 2.0,
-                              ),
-                              boxShadow: const [AppColors.shadowSm],
+                      child: AnimatedScale(
+                        duration: const Duration(milliseconds: 200),
+                        scale: isSelected ? 1.08 : 0.95,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isSelected ? AppColors.orange : AppColors.paper,
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: AppColors.ink,
+                              width: isSelected ? 2.2 : 1.5,
                             ),
-                            clipBehavior: Clip.antiAlias,
-                            child: Image.asset(
-                              place.heroImageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Icon(Icons.place, size: 14),
-                            ),
+                            boxShadow: const [AppColors.shadowSm],
                           ),
-                          if (isSelected)
-                            Container(
-                              margin: const EdgeInsets.only(top: 3),
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: AppColors.ink,
-                                borderRadius: BorderRadius.circular(5),
-                                boxShadow: const [AppColors.shadowSm],
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                isSelected ? Icons.place : Icons.location_on_outlined,
+                                size: isSelected ? 16 : 13,
+                                color: isSelected ? Colors.white : AppColors.ink,
                               ),
-                              child: Text(
-                                place.name,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 8.5,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'SpaceMono',
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  place.name.split(' ').first,
+                                  style: TextStyle(
+                                    fontSize: isSelected ? 11.5 : 10.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected ? Colors.white : AppColors.ink,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            ),
-                        ],
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   );
-                }),
+                }).toList(),
+              ),
+            ],
+          ),
+
+          // Tashkent Live Indicator Pill (Top Left)
+          Positioned(
+            top: 10,
+            left: 10,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: AppColors.paper,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: AppColors.ink, width: 1.5),
+                boxShadow: const [AppColors.shadowSm],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.orange,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Text(
+                    'Tashkent, UZ · OpenStreetMap',
+                    style: TextStyle(
+                      fontFamily: 'SpaceMono',
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Zoom & Recenter Controls (Bottom Right)
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _MapControlButton(
+                  icon: Icons.add,
+                  tooltip: 'Zoom In',
+                  onTap: _zoomIn,
+                ),
+                const SizedBox(height: 6),
+                _MapControlButton(
+                  icon: Icons.remove,
+                  tooltip: 'Zoom Out',
+                  onTap: _zoomOut,
+                ),
+                const SizedBox(height: 6),
+                _MapControlButton(
+                  icon: Icons.my_location,
+                  tooltip: 'Recenter Tashkent',
+                  onTap: _recenterTashkent,
+                ),
               ],
-            );
-          },
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _MapCanvasPainter extends CustomPainter {
+class _MapControlButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _MapControlButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
   @override
-  void paint(Canvas canvas, Size size) {
-    final blockPaint = Paint()
-      ..color = const Color(0xFFE9E4D5)
-      ..style = PaintingStyle.fill;
-
-    final parkPaint = Paint()
-      ..color = const Color(0xFFCFE2C4)
-      ..style = PaintingStyle.fill;
-
-    final waterPaint = Paint()
-      ..color = const Color(0xFFCBDCE7)
-      ..style = PaintingStyle.fill;
-
-    final roadBorderPaint = Paint()
-      ..color = const Color(0x3015130F)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
-
-    // Draw blocks grid
-    const cols = 5;
-    const rows = 4;
-    final blockW = (size.width - 24) / cols;
-    final blockH = (size.height - 20) / rows;
-
-    for (int i = 0; i < cols; i++) {
-      for (int j = 0; j < rows; j++) {
-        final rect = Rect.fromLTWH(
-          4 + (i * (blockW + 4)),
-          4 + (j * (blockH + 4)),
-          blockW,
-          blockH,
-        );
-
-        Paint currentPaint = blockPaint;
-        if (i == 2 && j == 1) currentPaint = parkPaint; // Tashkent Central Park
-        if (i == 3 && j == 2) currentPaint = waterPaint; // Anhor Canal
-
-        canvas.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(3)), currentPaint);
-        canvas.drawRRect(RRect.fromRectAndRadius(rect, const Radius.circular(3)), roadBorderPaint);
-      }
-    }
-
-    // Diagonal arterial roads
-    final roadPaint = Paint()
-      ..color = const Color(0xFFFBFAF6)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 10.0
-      ..strokeCap = StrokeCap.round;
-
-    final roadBorder = Paint()
-      ..color = const Color(0x3515130F)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.4;
-
-    final path = Path()
-      ..moveTo(-4, size.height * 0.9)
-      ..lineTo(size.width * 0.42, size.height * 0.48)
-      ..lineTo(size.width * 0.8, size.height * 0.48);
-
-    canvas.drawPath(path, roadPaint);
-    canvas.drawPath(path, roadBorder);
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: AppColors.paper,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.ink, width: 1.8),
+            boxShadow: const [AppColors.shadowSm],
+          ),
+          child: Icon(icon, size: 18, color: AppColors.ink),
+        ),
+      ),
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

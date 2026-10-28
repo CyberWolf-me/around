@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/app_image.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
@@ -209,7 +210,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                                   child: SizedBox(
                                     width: 52,
                                     height: 52,
-                                    child: Image.asset(place.heroImageUrl, fit: BoxFit.cover),
+                                    child: AppImage(path: place.heroImageUrl, fit: BoxFit.cover),
                                   ),
                                 ),
                                 const SizedBox(width: 10),

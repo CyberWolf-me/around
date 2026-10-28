@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/app_image.dart';
 import '../../../data/models/post_model.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
@@ -159,15 +160,9 @@ class BentoCard extends ConsumerWidget {
                 SizedBox(
                   height: imgHeight,
                   width: double.infinity,
-                  child: Image.asset(
-                    post.mediaUrl!,
+                  child: AppImage(
+                    path: post.mediaUrl!,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: AppColors.paper2,
-                      child: const Center(
-                        child: Icon(Icons.photo, color: AppColors.ink3),
-                      ),
-                    ),
                   ),
                 ),
                 // Audience badge

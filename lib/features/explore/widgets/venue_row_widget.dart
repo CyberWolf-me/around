@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/app_image.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
@@ -44,10 +45,9 @@ class VenueRowWidget extends ConsumerWidget {
                 border: Border.all(color: AppColors.ink, width: 1.5),
               ),
               clipBehavior: Clip.antiAlias,
-              child: Image.asset(
-                place.heroImageUrl,
+              child: AppImage(
+                path: place.heroImageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(color: AppColors.paper2),
               ),
             ),
             const SizedBox(width: 10),

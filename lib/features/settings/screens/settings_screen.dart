@@ -4,12 +4,80 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/services/haptic_service.dart';
+import '../../../data/services/storage_service.dart';
+import '../../../data/services/supabase_service.dart';
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  final TextEditingController _urlCtrl = TextEditingController();
+  final TextEditingController _keyCtrl = TextEditingController();
+  bool _isConnecting = false;
+  String _statusMsg = SupabaseService.isInitialized
+      ? 'Connected to live Supabase backend'
+      : 'Using local persistence (SQLite / SharedPreferences)';
+
+  @override
+  void initState() {
+    super.initState();
+    _urlCtrl.text = StorageService.getSupabaseUrl() ?? '';
+    _keyCtrl.text = StorageService.getSupabaseAnonKey() ?? '';
+  }
+
+  @override
+  void dispose() {
+    _urlCtrl.dispose();
+    _keyCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _connectSupabase() async {
+    final url = _urlCtrl.text.trim();
+    final key = _keyCtrl.text.trim();
+
+    if (url.isEmpty || key.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter both Supabase URL and Anon Key')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isConnecting = true;
+    });
+
+    try {
+      await SupabaseService.initialize(url: url, anonKey: key);
+      await StorageService.saveSupabaseCredentials(url, key);
+      HapticService.heavy();
+      setState(() {
+        _statusMsg = SupabaseService.isInitialized
+            ? 'Connected successfully to live Supabase!'
+            : 'Could not connect. Reverted to local storage.';
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(_statusMsg)),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _statusMsg = 'Connection failed: $e';
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isConnecting = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final profile = ref.watch(currentProfileProvider);
     final profileNotifier = ref.read(currentProfileProvider.notifier);
 
@@ -27,7 +95,7 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           // Default audience selector
           Text(
-            'WHO SEES YOUR DROPS',
+            'WHO SEES YOUR DROPS BY DEFAULT',
             style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9.5),
           ),
           const SizedBox(height: 6),
@@ -116,7 +184,7 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Every new drop starts with this visibility. You can still customize it before publishing.',
+                  'Every new drop starts with this visibility. You can customize per drop anytime.',
                   style: TextStyle(fontSize: 11, color: AppColors.ink2),
                 ),
               ],
@@ -159,6 +227,85 @@ class SettingsScreen extends ConsumerWidget {
                     HapticService.light();
                     profileNotifier.updatePrivacySettings(quietHours: val);
                   },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+
+          // Backend & Cloud Database
+          Text(
+            'BACKEND & CLOUD SYNCHRONIZATION',
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9.5),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.paper,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.ink, width: 1.8),
+              boxShadow: const [AppColors.shadowSm],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: SupabaseService.isInitialized ? const Color(0xFF10B981) : AppColors.orange,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _statusMsg,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _urlCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Supabase Project URL',
+                    hintText: 'https://xyzcompany.supabase.co',
+                    isDense: true,
+                  ),
+                  style: const TextStyle(fontSize: 12),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _keyCtrl,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Supabase Anon Public Key',
+                    hintText: 'eyJhbGciOi...',
+                    isDense: true,
+                  ),
+                  style: const TextStyle(fontSize: 12),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _isConnecting ? null : _connectSupabase,
+                    icon: _isConnecting
+                        ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.cloud_sync, size: 16),
+                    label: Text(_isConnecting ? 'Testing Connection...' : 'Connect Supabase Cloud'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.ink,
+                      foregroundColor: AppColors.paper,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
                 ),
               ],
             ),
