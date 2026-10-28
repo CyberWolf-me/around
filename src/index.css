@@ -1,0 +1,490 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --paper: #FBFAF6;
+  --paper-2: #F1EEE4;
+  --paper-3: #E6E1D3;
+  --ink: #15130F;
+  --ink-2: #575247;
+  --ink-3: #8E8877;
+  --orange: #FF5A1F;
+  --cobalt: #2B4CFF;
+  --butter: #FFE07A;
+  --mint: #D5E8CB;
+  --water: #D7E3EC;
+  --blush: #F6D2C4;
+  --sh: 3px 3px 0 var(--ink);
+  --sh-lg: 5px 5px 0 var(--ink);
+  --display: 'Bricolage Grotesque', 'Instrument Sans', system-ui, sans-serif;
+  --body: 'Instrument Sans', system-ui, -apple-system, sans-serif;
+  --mono: 'Space Mono', ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper-3);
+  background-image: radial-gradient(rgba(21, 19, 15, 0.14) 1px, transparent 0);
+  background-size: 22px 22px;
+  font-family: var(--body);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── typography classes ────────────────────────────────────── */
+.display {
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.d-xl { font-size: 32px; letter-spacing: -0.04em; }
+.d-lg { font-size: 24px; letter-spacing: -0.03em; }
+.d-md { font-size: 20px; letter-spacing: -0.025em; }
+.d-sm { font-size: 15px; letter-spacing: -0.02em; }
+
+.mono {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.mono-sm {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+.wordmark {
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+}
+
+/* ── buttons ───────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-family: var(--body);
+  font-weight: 700;
+  font-size: 13px;
+  padding: 0 16px;
+  height: 44px;
+  border-radius: 12px;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  user-select: none;
+}
+.btn:active {
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 1px 1px 0 var(--ink) !important;
+}
+.btn-primary {
+  background: var(--orange);
+  color: #FFFFFF;
+  box-shadow: var(--sh);
+}
+.btn-ghost {
+  background: transparent;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.btn-danger {
+  background: #B3261E;
+  color: #FFFFFF;
+  box-shadow: var(--sh);
+}
+.btn-sm {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+.btn-block {
+  width: 100%;
+}
+
+.iconbtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  border: 1.8px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--ink);
+  transition: transform 0.1s ease;
+  flex-shrink: 0;
+}
+.iconbtn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+.iconbtn.sm {
+  width: 32px;
+  height: 32px;
+}
+.iconbtn.plain {
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.iconbtn.plain:active {
+  transform: scale(0.94);
+}
+
+/* ── pills & badges ────────────────────────────────────────── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1.4px solid var(--ink);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.pill.lg {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+.pill.fill-bu {
+  background: var(--butter);
+  color: var(--ink);
+}
+.pill.fill-ink {
+  background: var(--ink);
+  color: var(--paper);
+}
+.pill.fill-or {
+  background: var(--orange);
+  color: #FFFFFF;
+}
+.pill.ghost {
+  background: var(--paper-2);
+  color: var(--ink-2);
+  border-color: rgba(21, 19, 15, 0.22);
+}
+
+/* ── stage & layout ────────────────────────────────────────── */
+.stage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 56px;
+  padding: 32px 40px;
+  position: relative;
+}
+
+@media (max-width: 900px) {
+  .stage {
+    gap: 0;
+    padding: 0;
+  }
+  .rail {
+    display: none !important;
+  }
+}
+
+/* ── device shell ──────────────────────────────────────────── */
+.device-hold {
+  perspective: 1200px;
+  display: flex;
+  justify-content: center;
+}
+.device {
+  width: 390px;
+  height: 844px;
+  border-radius: 46px;
+  border: 8px solid var(--ink);
+  box-shadow: 0 25px 60px rgba(21, 19, 15, 0.28), 0 0 0 1px rgba(255,255,255,0.4);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.device-pixel {
+  border-radius: 36px;
+  border-width: 7px;
+}
+
+.island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 118px;
+  height: 32px;
+  background: var(--ink);
+  border-radius: 999px;
+  z-index: 100;
+}
+.pixel-camera {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  background: var(--ink);
+  border-radius: 50%;
+  z-index: 100;
+}
+
+.statusbar {
+  height: 48px;
+  padding: 0 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 50;
+  flex-shrink: 0;
+}
+
+.viewport {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  scroll-behavior: smooth;
+  padding-bottom: 74px;
+}
+.viewport.no-tab {
+  padding-bottom: 24px;
+}
+
+.homebar {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  pointer-events: none;
+}
+.homebar div {
+  width: 134px;
+  height: 4.5px;
+  background: var(--ink);
+  border-radius: 99px;
+}
+
+/* ── bottom tab bar ────────────────────────────────────────── */
+.tabbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  padding-bottom: 12px;
+  background: rgba(251, 250, 246, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1.5px solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 40;
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: 0;
+  padding: 4px 10px;
+  cursor: pointer;
+  color: var(--ink-3);
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: color 0.15s ease;
+  position: relative;
+}
+.tab.on {
+  color: var(--ink);
+  font-weight: 700;
+}
+.tab .tab-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--orange);
+  position: absolute;
+  bottom: -4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.tab.on .tab-dot {
+  opacity: 1;
+}
+
+.tab-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  margin-top: -18px;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.tab-drop .orb {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--orange);
+  color: #FFFFFF;
+  border: 2px solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2.5px 2.5px 0 var(--ink);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.tab-drop:active .orb {
+  transform: translate(1px, 1px) scale(0.96);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+/* ── feed cards ────────────────────────────────────────────── */
+.drop-card {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: var(--sh);
+  overflow: hidden;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.drop-card:active {
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+.drop-card.span2 {
+  grid-column: span 2;
+}
+
+.dc-img {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  background: var(--paper-2);
+}
+.dc-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.dc-aud {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 5;
+}
+.dc-save {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(251, 250, 246, 0.9);
+  border: 1.5px solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  box-shadow: 1.5px 1.5px 0 var(--ink);
+  transition: all 0.15s ease;
+}
+.dc-save.on {
+  background: var(--orange);
+  color: #FFFFFF;
+}
+
+.note-card {
+  padding: 14px;
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  box-shadow: var(--sh);
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.note-card:active {
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
+/* ── scroll horizontal ─────────────────────────────────────── */
+.scroll-x {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 14px;
+}
+.scroll-x::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── animation helpers ─────────────────────────────────────── */
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

@@ -1,0 +1,47 @@
+name: Mobile Release Train
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      release_channel:
+        description: 'Release track'
+        required: true
+        default: 'internal-testflight'
+        type: choice
+        options:
+          - internal-testflight
+          - closed-beta
+          - production-staged-10pct
+
+jobs:
+  build-and-package:
+    name: Build & Package Mobile Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run verification tests
+        run: npm test
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: around-mobile-build
+          path: dist/
+          retention-days: 14
