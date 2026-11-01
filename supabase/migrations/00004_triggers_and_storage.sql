@@ -2,6 +2,8 @@
 -- Around Platform: Database Migration 00004 - Rate Limits, Quarantine, Triggers & Storage
 -- ==============================================================================
 
+SET search_path TO public, extensions;
+
 -- 1. Automatic Profile Creation Trigger on Supabase Auth Signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER

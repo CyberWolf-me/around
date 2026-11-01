@@ -2,6 +2,8 @@
 -- Around Platform: Database Migration 00003 - PostGIS Geospatial & Feed Queries
 -- ==============================================================================
 
+SET search_path TO public, extensions;
+
 -- 1. Function: Nearby Places by GPS Coordinates & Search Query
 CREATE OR REPLACE FUNCTION get_nearby_places(
   user_lat DOUBLE PRECISION DEFAULT 41.3111,
@@ -36,6 +38,7 @@ RETURNS TABLE (
 LANGUAGE sql
 STABLE
 SECURITY INVOKER
+SET search_path = public, extensions
 AS $$
   SELECT
     p.id,
@@ -114,6 +117,7 @@ RETURNS TABLE (
 LANGUAGE sql
 STABLE
 SECURITY INVOKER
+SET search_path = public, extensions
 AS $$
   SELECT
     po.id AS post_id,
@@ -166,6 +170,7 @@ RETURNS SETOF posts
 LANGUAGE sql
 STABLE
 SECURITY INVOKER
+SET search_path = public, extensions
 AS $$
   SELECT po.*
   FROM posts po

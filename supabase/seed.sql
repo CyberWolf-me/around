@@ -4,6 +4,8 @@
 -- Aligned 100% with 00001_initial_schema.sql columns and 00004 UUIDs/slugs.
 -- ============================================================================
 
+SET search_path TO public, extensions;
+
 INSERT INTO public.places (
   id, slug, name, category, street_address, district, city, location,
   price_tier, hours, status_line, description, hero_image_url,

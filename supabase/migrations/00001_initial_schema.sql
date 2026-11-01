@@ -6,6 +6,8 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
 CREATE EXTENSION IF NOT EXISTS "postgis" WITH SCHEMA extensions;
 
+SET search_path TO public, extensions;
+
 -- 2. Enums
 CREATE TYPE audience_type AS ENUM ('friends', 'public');
 CREATE TYPE friendship_status AS ENUM ('pending', 'accepted', 'declined');
@@ -56,7 +58,7 @@ CREATE TABLE IF NOT EXISTS places (
   district TEXT NOT NULL DEFAULT 'Mirabad' CHECK (char_length(trim(district)) BETWEEN 1 AND 80),
   city TEXT NOT NULL DEFAULT 'Tashkent' CHECK (char_length(trim(city)) BETWEEN 1 AND 80),
   -- Geographic point: SRID 4326 (WGS 84 GPS standard: Longitude, Latitude)
-  location GEOGRAPHY(Point, 4326) NOT NULL,
+  location extensions.geography(Point, 4326) NOT NULL,
   price_tier TEXT NOT NULL DEFAULT '$$' CHECK (char_length(price_tier) <= 10),
   hours TEXT NOT NULL DEFAULT '8:00 AM – 10:00 PM' CHECK (char_length(hours) <= 100),
   status_line TEXT NOT NULL DEFAULT 'Open today' CHECK (char_length(status_line) <= 120),
