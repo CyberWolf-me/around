@@ -5,7 +5,7 @@
 
 -- 1. Custom & Collaborative Collections (Phase 3.6 & Phase 4.5 — Collections Domain)
 CREATE TABLE IF NOT EXISTS public.collections (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   owner_id UUID NOT NULL DEFAULT auth.uid() REFERENCES public.profiles(id) ON DELETE CASCADE,
   title TEXT NOT NULL CHECK (char_length(trim(title)) BETWEEN 1 AND 80),
   description TEXT NOT NULL DEFAULT '' CHECK (char_length(description) <= 300),
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS public.collections (
 );
 
 CREATE TABLE IF NOT EXISTS public.collection_items (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   collection_id UUID NOT NULL REFERENCES public.collections(id) ON DELETE CASCADE,
   place_id UUID NOT NULL REFERENCES public.places(id) ON DELETE CASCADE,
   added_by UUID NOT NULL DEFAULT auth.uid() REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -95,7 +95,7 @@ CREATE POLICY "collection_items_delete_policy"
 
 -- 2. Friend Plan Invitations & RSVPs (Phase 4.1 — Collections / Social Ecosystem)
 CREATE TABLE IF NOT EXISTS public.friend_plan_participants (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   plan_id UUID NOT NULL REFERENCES public.friend_plans(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   rsvp_status TEXT NOT NULL DEFAULT 'invited' CHECK (rsvp_status IN ('invited', 'going', 'declined')),
@@ -156,7 +156,7 @@ CREATE POLICY "plan_participants_delete"
 
 -- 3. 24-Hour Venue Stories (Phase 4.2 — Engagement Domain)
 CREATE TABLE IF NOT EXISTS public.place_stories (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   author_id UUID NOT NULL DEFAULT auth.uid() REFERENCES public.profiles(id) ON DELETE CASCADE,
   place_id UUID NOT NULL REFERENCES public.places(id) ON DELETE CASCADE,
   media_url TEXT NOT NULL CHECK (char_length(trim(media_url)) BETWEEN 1 AND 500),
@@ -197,7 +197,7 @@ CREATE POLICY "place_stories_delete_own"
 
 -- 4. Drop Reactions & Comments (Phase 4.3 — Engagement Domain, SEC-13 Remediated)
 CREATE TABLE IF NOT EXISTS public.post_reactions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
   user_id UUID NOT NULL DEFAULT auth.uid() REFERENCES public.profiles(id) ON DELETE CASCADE,
   reaction TEXT NOT NULL DEFAULT 'heart' CHECK (reaction IN ('heart', 'fire', 'bookmark_nod', 'coffee')),
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS public.post_reactions (
 );
 
 CREATE TABLE IF NOT EXISTS public.post_comments (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
   author_id UUID NOT NULL DEFAULT auth.uid() REFERENCES public.profiles(id) ON DELETE CASCADE,
   body TEXT NOT NULL CHECK (char_length(trim(body)) BETWEEN 1 AND 300),
@@ -308,7 +308,7 @@ CREATE POLICY "post_comments_delete_own"
 
 -- 5. Moderation Audit Logs (Phase 5.3 — Trust & Safety Operations)
 CREATE TABLE IF NOT EXISTS public.moderation_audit_logs (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   target_type TEXT NOT NULL CHECK (target_type IN ('post', 'place', 'profile', 'comment')),
   target_id TEXT NOT NULL,
   action TEXT NOT NULL CHECK (action IN ('report_logged', 'auto_quarantined', 'restored', 'removed')),

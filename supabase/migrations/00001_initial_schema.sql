@@ -3,8 +3,8 @@
 -- ==============================================================================
 
 -- 1. Enable Required Extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "postgis";
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS "postgis" WITH SCHEMA extensions;
 
 -- 2. Enums
 CREATE TYPE audience_type AS ENUM ('friends', 'public');
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS profiles (
 
 -- 4. Friendships Table (Social Graph)
 CREATE TABLE IF NOT EXISTS friendships (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   friend_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   status friendship_status NOT NULL DEFAULT 'pending',
@@ -48,7 +48,7 @@ CREATE INDEX idx_friendships_friend ON friendships(friend_id, status);
 
 -- 5. Canonical Places Table (Own Place Database + PostGIS)
 CREATE TABLE IF NOT EXISTS places (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   slug TEXT UNIQUE NOT NULL CHECK (char_length(trim(slug)) BETWEEN 2 AND 100),
   name TEXT NOT NULL CHECK (char_length(trim(name)) BETWEEN 1 AND 120),
   category TEXT NOT NULL CHECK (char_length(trim(category)) BETWEEN 1 AND 80),
@@ -82,7 +82,7 @@ CREATE INDEX idx_places_tags ON places USING GIN(tags);
 
 -- 6. Posts Table (Place Drops) with input validation and moderation quarantine fields
 CREATE TABLE IF NOT EXISTS posts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   author_id UUID NOT NULL DEFAULT auth.uid() REFERENCES profiles(id) ON DELETE CASCADE,
   place_id UUID NOT NULL REFERENCES places(id) ON DELETE CASCADE,
   note TEXT NOT NULL CHECK (char_length(trim(note)) BETWEEN 1 AND 500),
@@ -105,7 +105,7 @@ CREATE INDEX idx_posts_created_at ON posts(created_at DESC);
 
 -- 7. Post Media Table with strict MIME type and dimension validation
 CREATE TABLE IF NOT EXISTS post_media (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
   storage_path TEXT NOT NULL CHECK (char_length(trim(storage_path)) BETWEEN 1 AND 500),
   media_url TEXT NOT NULL CHECK (char_length(trim(media_url)) BETWEEN 1 AND 500),
@@ -121,7 +121,7 @@ CREATE INDEX idx_post_media_post ON post_media(post_id);
 
 -- 8. Saved Places (Shortlists & Statuses)
 CREATE TABLE IF NOT EXISTS saved_places (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL DEFAULT auth.uid() REFERENCES profiles(id) ON DELETE CASCADE,
   place_id UUID NOT NULL REFERENCES places(id) ON DELETE CASCADE,
   status save_status NOT NULL DEFAULT 'want_to_go',
@@ -136,7 +136,7 @@ CREATE INDEX idx_saved_places_place ON saved_places(place_id);
 
 -- 9. Friend Plans Table (Collaborative Plans at Venues)
 CREATE TABLE IF NOT EXISTS friend_plans (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL DEFAULT auth.uid() REFERENCES profiles(id) ON DELETE CASCADE,
   place_id UUID NOT NULL REFERENCES places(id) ON DELETE CASCADE,
   schedule_time TEXT NOT NULL CHECK (char_length(trim(schedule_time)) BETWEEN 1 AND 80),
@@ -150,7 +150,7 @@ CREATE INDEX idx_friend_plans_place ON friend_plans(place_id);
 
 -- 10. Activity Notifications Table
 CREATE TABLE IF NOT EXISTS notifications (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   recipient_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   actor_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   kind notification_kind NOT NULL,
@@ -164,7 +164,7 @@ CREATE INDEX idx_notifications_recipient ON notifications(recipient_id, unread, 
 
 -- 11. User Blocks (Safety)
 CREATE TABLE IF NOT EXISTS blocks (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   blocker_id UUID NOT NULL DEFAULT auth.uid() REFERENCES profiles(id) ON DELETE CASCADE,
   blocked_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -177,7 +177,7 @@ CREATE INDEX idx_blocks_blocked ON blocks(blocked_id);
 
 -- 12. Content & Account Reports (Moderation)
 CREATE TABLE IF NOT EXISTS reports (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   reporter_id UUID NOT NULL DEFAULT auth.uid() REFERENCES profiles(id) ON DELETE CASCADE,
   target_type report_target NOT NULL,
   target_id TEXT NOT NULL CHECK (char_length(trim(target_id)) BETWEEN 1 AND 128),
