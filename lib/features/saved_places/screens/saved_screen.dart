@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../data/models/place_model.dart';
+import '../../../data/repositories/collections_repository.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
@@ -87,6 +88,72 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
     );
   }
 
+  void _showCreateCollectionDialog() {
+    final titleCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+    String selectedAudience = 'friends';
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: AppColors.paper,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: AppColors.ink, width: 2),
+          ),
+          title: Text('New Custom Collection', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleCtrl,
+                decoration: const InputDecoration(labelText: 'Collection Title', hintText: 'e.g. Tashkent Matcha Spots'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: descCtrl,
+                decoration: const InputDecoration(labelText: 'Description', hintText: 'e.g. Best ceremonial matcha in town'),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                initialValue: selectedAudience,
+                items: const [
+                  DropdownMenuItem(value: 'friends', child: Text('Friends Only')),
+                  DropdownMenuItem(value: 'public', child: Text('Public')),
+                  DropdownMenuItem(value: 'private', child: Text('Private (Only Me)')),
+                ],
+                onChanged: (val) {
+                  if (val != null) setDialogState(() => selectedAudience = val);
+                },
+                decoration: const InputDecoration(labelText: 'Audience'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: AppColors.ink3)),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (titleCtrl.text.trim().isEmpty) return;
+                await ref.read(collectionsRepositoryProvider.notifier).createCollection(
+                      title: titleCtrl.text.trim(),
+                      description: descCtrl.text.trim(),
+                      audience: selectedAudience,
+                    );
+                if (ctx.mounted) Navigator.pop(ctx);
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.ink, foregroundColor: Colors.white),
+              child: const Text('Create'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final savedPlaces = ref.watch(savedPlacesProvider);
@@ -94,6 +161,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
     final statusNotifier = ref.read(savedPlaceStatusesProvider.notifier);
     final placesRepo = ref.watch(placesRepositoryProvider);
     final friendPlans = ref.watch(friendPlansProvider);
+    final collections = ref.watch(collectionsRepositoryProvider);
 
     final List<PlaceModel> allSavedVenues = savedPlaces
         .map((id) => placesRepo.getPlaceById(id))
@@ -216,41 +284,136 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                   const SizedBox(height: 8),
                   ...friendPlans.map((plan) => Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: GestureDetector(
-                          onTap: () => context.push('/places/${plan.placeId}'),
-                          child: Row(
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.paper,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: AppColors.ink.withValues(alpha: 0.15)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              GestureDetector(
+                                onTap: () => context.push('/places/${plan.placeId}'),
+                                child: Row(
+                                  children: [
+                                    Row(
+                                      children: plan.attendeeInitials
+                                          .map(
+                                            (init) => Padding(
+                                              padding: const EdgeInsets.only(right: 4),
+                                              child: CircleAvatar(
+                                                radius: 9,
+                                                backgroundColor: AppColors.ink,
+                                                child: Text(init, style: const TextStyle(color: Colors.white, fontSize: 7)),
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Expanded(
+                                      child: Text(
+                                        plan.placeName,
+                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.ink,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        plan.scheduleTime,
+                                        style: const TextStyle(color: Colors.white, fontSize: 9.5),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (plan.note.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  plan.note,
+                                  style: const TextStyle(fontSize: 10.5, color: AppColors.ink2),
+                                ),
+                              ],
+                              const SizedBox(height: 6),
                               Row(
-                                children: plan.attendeeInitials
-                                    .map(
-                                      (init) => Padding(
-                                        padding: const EdgeInsets.only(right: 4),
-                                        child: CircleAvatar(
-                                          radius: 9,
-                                          backgroundColor: AppColors.ink,
-                                          child: Text(init, style: const TextStyle(color: Colors.white, fontSize: 7)),
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      HapticService.selection();
+                                      ref.read(friendPlansProvider.notifier).rsvpToPlan(plan.id, 'going');
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: plan.myRsvp == 'going' ? AppColors.mint : AppColors.paper2,
+                                        borderRadius: BorderRadius.circular(999),
+                                        border: Border.all(
+                                          color: plan.myRsvp == 'going' ? AppColors.ink : AppColors.ink.withValues(alpha: 0.2),
+                                          width: plan.myRsvp == 'going' ? 1.5 : 1,
                                         ),
                                       ),
-                                    )
-                                    .toList(),
-                              ),
-                              const SizedBox(width: 6),
-                              Expanded(
-                                child: Text(
-                                  plan.placeName,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: AppColors.ink,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  plan.scheduleTime,
-                                  style: const TextStyle(color: Colors.white, fontSize: 9.5),
-                                ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            plan.myRsvp == 'going' ? Icons.check_circle : Icons.check,
+                                            size: 11,
+                                            color: AppColors.ink,
+                                          ),
+                                          const SizedBox(width: 3),
+                                          const Text(
+                                            'Going',
+                                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.ink),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  GestureDetector(
+                                    onTap: () {
+                                      HapticService.selection();
+                                      ref.read(friendPlansProvider.notifier).rsvpToPlan(plan.id, 'declined');
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: plan.myRsvp == 'declined' ? AppColors.danger.withValues(alpha: 0.2) : AppColors.paper2,
+                                        borderRadius: BorderRadius.circular(999),
+                                        border: Border.all(
+                                          color: plan.myRsvp == 'declined' ? AppColors.danger : AppColors.ink.withValues(alpha: 0.2),
+                                          width: plan.myRsvp == 'declined' ? 1.5 : 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.close,
+                                            size: 11,
+                                            color: plan.myRsvp == 'declined' ? AppColors.danger : AppColors.ink3,
+                                          ),
+                                          const SizedBox(width: 3),
+                                          Text(
+                                            'Decline',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: plan.myRsvp == 'declined' ? AppColors.danger : AppColors.ink3,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -259,6 +422,131 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                 ],
               ),
             ),
+          const SizedBox(height: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Curated Collections',
+                style: GoogleFonts.bricolageGrotesque(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                ),
+              ),
+              GestureDetector(
+                onTap: _showCreateCollectionDialog,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.paper2,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppColors.ink, width: 1.2),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.add, size: 12, color: AppColors.ink),
+                      SizedBox(width: 2),
+                      Text('New', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.ink)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 104,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: collections.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (ctx, idx) {
+                final col = collections[idx];
+                return Container(
+                  width: 220,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColors.paper,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.ink, width: 1.5),
+                    boxShadow: const [AppColors.shadowSm],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              col.title,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                            decoration: BoxDecoration(
+                              color: col.audience == 'public' ? AppColors.ink : AppColors.butter,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              col.audience,
+                              style: TextStyle(
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.bold,
+                                color: col.audience == 'public' ? Colors.white : AppColors.ink,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        col.description,
+                        style: const TextStyle(fontSize: 10, color: AppColors.ink2),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Text(
+                            '${col.placeIds.length} spots',
+                            style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppColors.orange),
+                          ),
+                          const Spacer(),
+                          Wrap(
+                            spacing: 4,
+                            children: col.placeIds.take(2).map((pid) {
+                              final p = placesRepo.getPlaceById(pid);
+                              return GestureDetector(
+                                onTap: () => context.push('/places/$pid'),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.paper2,
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+                                  ),
+                                  child: Text(
+                                    p?.name.split(' ').first ?? pid,
+                                    style: const TextStyle(fontSize: 8.5, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
           const SizedBox(height: 16),
           if (filteredSavedVenues.isEmpty)
             Container(

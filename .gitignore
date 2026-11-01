@@ -29,6 +29,7 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+android/build/
 
 # Node
 node_modules/
@@ -41,3 +42,9 @@ dist-ssr/
 around-fixes/
 around-fixed.zip
 supabase/.temp/
+
+# Android Keystore & Signing Secrets
+android/key.properties
+**/android/key.properties
+*.jks
+*.keystore

@@ -15,6 +15,7 @@ import '../../../data/services/haptic_service.dart';
 import '../../../data/services/storage_service.dart';
 import '../../../data/services/supabase_service.dart';
 import '../../create_post/screens/create_drop_sheet.dart';
+import '../../feed/widgets/comments_sheet.dart';
 
 class PlaceDetailScreen extends ConsumerStatefulWidget {
   final String placeId;
@@ -627,6 +628,66 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                         Text(
                           '“${post.note}”',
                           style: const TextStyle(fontSize: 12.5, color: AppColors.ink),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                HapticService.selection();
+                                ref.read(postsRepositoryProvider.notifier).reactToPost(post.id, reaction: 'heart');
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppColors.paper2,
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.favorite, size: 12, color: AppColors.danger),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${post.savesCount}',
+                                      style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.ink),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            GestureDetector(
+                              onTap: () {
+                                HapticService.selection();
+                                CommentsSheet.show(
+                                  context,
+                                  postId: post.id,
+                                  postTitle: '${post.authorName} at ${post.placeName}',
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: AppColors.paper2,
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.chat_bubble_outline, size: 12, color: AppColors.ink2),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Comment',
+                                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.ink),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

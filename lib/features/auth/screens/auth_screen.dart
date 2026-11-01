@@ -121,6 +121,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         readableError = 'Invalid email or password. Please try again.';
       } else if (readableError.contains('User already registered')) {
         readableError = 'An account with this email already exists. Please Sign In.';
+      } else if (readableError.toLowerCase().contains('email not confirmed')) {
+        readableError = 'Please verify your email address before signing in. Check your inbox for the confirmation link.';
       }
       setState(() => _errorMessage = readableError);
     } finally {

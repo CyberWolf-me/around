@@ -5,6 +5,7 @@ import '../models/post_model.dart';
 import '../models/place_model.dart';
 import '../models/profile_model.dart';
 import '../models/saved_place_model.dart';
+import '../models/notification_model.dart';
 
 class StorageService {
   static const _savedPlacesKey = 'around_saved_places_v1';
@@ -20,6 +21,7 @@ class StorageService {
   static const _onboardedKey = 'around_onboarded_v1';
   static const _authUserEmailKey = 'around_auth_user_email_v1';
   static const _guestModeKey = 'around_guest_mode_v1';
+  static const _notificationsKey = 'around_notifications_v1';
 
   static SharedPreferences? _prefs;
   static final Map<String, Object> _memoryFallback = {};
@@ -252,6 +254,25 @@ class StorageService {
     final encoded = jsonEncode(plans.map((p) => p.toJson()).toList());
     _memoryFallback[_plansKey] = encoded;
     await _prefs?.setString(_plansKey, encoded);
+  }
+
+  // Activity notifications
+  static List<NotificationModel>? getStoredNotifications() {
+    final raw = _prefs?.getString(_notificationsKey) ?? (_memoryFallback[_notificationsKey] as String?);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final List list = jsonDecode(raw);
+      return list.map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e))).toList();
+    } catch (e) {
+      AppLogger.warn('StorageService', 'Failed decoding stored notifications', e);
+      return null;
+    }
+  }
+
+  static Future<void> persistNotifications(List<NotificationModel> notifications) async {
+    final encoded = jsonEncode(notifications.map((n) => n.toJson()).toList());
+    _memoryFallback[_notificationsKey] = encoded;
+    await _prefs?.setString(_notificationsKey, encoded);
   }
 
   static Future<void> clearAll() async {

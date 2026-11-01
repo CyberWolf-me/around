@@ -1,4 +1,4 @@
-package com.around.app.around_app
+package uz.around.mobile
 
 import io.flutter.embedding.android.FlutterActivity
 

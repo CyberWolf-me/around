@@ -40,6 +40,7 @@ class FriendPlanModel {
   final List<String> attendeeInitials;
   final String scheduleTime;
   final String note;
+  final String? myRsvp; // 'going', 'declined', or null
 
   const FriendPlanModel({
     required this.id,
@@ -48,7 +49,28 @@ class FriendPlanModel {
     required this.attendeeInitials,
     required this.scheduleTime,
     this.note = '',
+    this.myRsvp,
   });
+
+  FriendPlanModel copyWith({
+    String? id,
+    String? placeId,
+    String? placeName,
+    List<String>? attendeeInitials,
+    String? scheduleTime,
+    String? note,
+    String? myRsvp,
+  }) {
+    return FriendPlanModel(
+      id: id ?? this.id,
+      placeId: placeId ?? this.placeId,
+      placeName: placeName ?? this.placeName,
+      attendeeInitials: attendeeInitials ?? this.attendeeInitials,
+      scheduleTime: scheduleTime ?? this.scheduleTime,
+      note: note ?? this.note,
+      myRsvp: myRsvp ?? this.myRsvp,
+    );
+  }
 
   factory FriendPlanModel.fromJson(Map<String, dynamic> json) {
     return FriendPlanModel(
@@ -58,6 +80,7 @@ class FriendPlanModel {
       attendeeInitials: (json['attendee_initials'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? ['YO'],
       scheduleTime: json['schedule_time'] as String? ?? 'Sat 10:30 AM',
       note: json['note'] as String? ?? '',
+      myRsvp: json['my_rsvp'] as String?,
     );
   }
 
@@ -69,6 +92,7 @@ class FriendPlanModel {
       'attendee_initials': attendeeInitials,
       'schedule_time': scheduleTime,
       'note': note,
+      'my_rsvp': myRsvp,
     };
   }
 }

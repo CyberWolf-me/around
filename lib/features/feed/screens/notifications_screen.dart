@@ -1,31 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../data/repositories/notifications_repository.dart';
 import '../../../data/services/haptic_service.dart';
 
-class NotificationsScreen extends StatefulWidget {
+class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
-}
-
-class _NotificationsScreenState extends State<NotificationsScreen> {
-  final List<Map<String, dynamic>> _notifications = [];
-
-  void _markAllRead() {
-    HapticService.selection();
-    setState(() {
-      for (final n in _notifications) {
-        n['unread'] = false;
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final unreadCount = _notifications.where((n) => n['unread'] == true).length;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final notifications = ref.watch(notificationsProvider);
+    final unreadCount = notifications.where((n) => n.unread).length;
 
     return Scaffold(
       backgroundColor: AppColors.paper,
@@ -40,7 +27,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: TextButton(
-                onPressed: _markAllRead,
+                onPressed: () {
+                  HapticService.selection();
+                  ref.read(notificationsProvider.notifier).markAllRead();
+                },
                 child: Text(
                   'Mark all read ($unreadCount)',
                   style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.bold, fontSize: 12),
@@ -49,7 +39,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
         ],
       ),
-      body: _notifications.isEmpty
+      body: notifications.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(32),
@@ -86,45 +76,76 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             )
           : ListView.separated(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              itemCount: _notifications.length,
+              itemCount: notifications.length,
               separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0x2015130F)),
               itemBuilder: (context, i) {
-                final n = _notifications[i];
-                final placeId = n['placeId'] as String?;
-                final isUnread = n['unread'] == true;
+                final n = notifications[i];
+                final placeId = n.placeId;
+                final isUnread = n.unread;
 
                 return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 2),
                   decoration: BoxDecoration(
                     color: isUnread ? AppColors.butter.withValues(alpha: 0.28) : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    leading: CircleAvatar(
-                      backgroundColor: AppColors.butter,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    leading: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isUnread ? AppColors.orange : AppColors.butter,
+                        border: Border.all(color: AppColors.ink, width: 1.5),
+                      ),
+                      alignment: Alignment.center,
                       child: Text(
-                        n['init'] as String,
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 11),
+                        n.actorInitials,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isUnread ? Colors.white : AppColors.ink,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                     title: RichText(
                       text: TextSpan(
                         style: const TextStyle(fontSize: 12.5, color: AppColors.ink),
                         children: [
-                          TextSpan(text: '${n['who']} ', style: const TextStyle(fontWeight: FontWeight.bold)),
-                          TextSpan(text: n['txt'] as String, style: const TextStyle(color: AppColors.ink2)),
+                          TextSpan(text: '${n.actorName} ', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          TextSpan(text: n.message, style: const TextStyle(color: AppColors.ink2)),
                         ],
                       ),
                     ),
-                    subtitle: Text(n['when'] as String, style: Theme.of(context).textTheme.labelSmall),
-                    trailing: placeId != null
-                        ? const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3)
-                        : null,
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Text(n.timeAgo, style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 10)),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (isUnread)
+                          Container(
+                            width: 8,
+                            height: 8,
+                            margin: const EdgeInsets.only(right: 6),
+                            decoration: const BoxDecoration(
+                              color: AppColors.orange,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        if (placeId != null || n.actorId.isNotEmpty)
+                          const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3),
+                      ],
+                    ),
                     onTap: () {
                       HapticService.light();
-                      setState(() => n['unread'] = false);
-                      if (placeId != null) {
+                      ref.read(notificationsProvider.notifier).markAsRead(n.id);
+                      if (placeId != null && placeId.isNotEmpty) {
                         context.push('/places/$placeId');
+                      } else if (n.actorId.isNotEmpty && n.actorId != 'you') {
+                        context.push('/users/${n.actorId}');
                       }
                     },
                   ),

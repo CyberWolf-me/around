@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../models/comment_model.dart';
 import '../models/post_model.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/errors/app_failure.dart';
@@ -488,17 +489,59 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     }
   }
 
+  final Map<String, List<CommentModel>> _commentsCache = {};
+
+  /// Fetches comments for an authorized Drop (Phase 4.3).
+  Future<List<CommentModel>> fetchCommentsForPost(String postId) async {
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      try {
+        final res = await SupabaseService.client
+            .from('post_comments')
+            .select('*, profiles(full_name, username, avatar_initials)')
+            .eq('post_id', postId)
+            .order('created_at', ascending: true);
+
+        if (res.isNotEmpty) {
+          final comments = res
+              .whereType<Map<String, dynamic>>()
+              .map(CommentModel.fromJson)
+              .toList();
+          _commentsCache[postId] = comments;
+          return comments;
+        }
+      } catch (e) {
+        AppLogger.warn('PostsRepository', 'Supabase post_comments fetch skipped', e);
+      }
+    }
+    return _commentsCache[postId] ?? [];
+  }
+
   /// Adds a comment (1–300 chars) to an authorized Drop (Phase 4.3).
   Future<AppFailure?> addCommentToPost(String postId, String body) async {
     final trimmed = body.trim();
     if (trimmed.isEmpty || trimmed.length > 300) {
       return const AppFailure('Comment must be between 1 and 300 characters.', code: 'INVALID_COMMENT');
     }
+
+    final authorId = SupabaseService.currentUser?.id ?? '00000000-0000-0000-0000-000000000001';
+    final newComment = CommentModel(
+      id: 'cmt_${DateTime.now().millisecondsSinceEpoch}',
+      postId: postId,
+      authorId: authorId,
+      authorName: 'You',
+      authorAvatar: 'YOU',
+      body: trimmed,
+      createdAt: DateTime.now(),
+    );
+
+    final current = _commentsCache[postId] ?? [];
+    _commentsCache[postId] = [...current, newComment];
+
     if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
       try {
         await SupabaseService.client.from('post_comments').insert({
           'post_id': postId,
-          'author_id': SupabaseService.currentUser!.id,
+          'author_id': authorId,
           'body': trimmed,
         });
       } catch (e) {

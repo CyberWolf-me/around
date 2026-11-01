@@ -1,0 +1,8 @@
+# Around Mobile — Production Release Keystore Template
+# Copy this file to android/key.properties and set your keystore values.
+# DO NOT commit android/key.properties or your .jks files to version control.
+
+storePassword=your-keystore-password
+keyPassword=your-key-password
+keyAlias=around-release
+storeFile=../app/upload-keystore.jks

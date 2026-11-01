@@ -3,7 +3,7 @@
   "strategy": "Comprehensive Product & Platform Development (Phases 0–8)",
   "canonicalFrontend": "flutter",
   "architectureDecisionRecord": "docs/adr/003-frontend-stack-decision.md",
-  "updatedAt": "2026-11-02T00:55:00+05:00",
+  "updatedAt": "2026-11-02T03:15:00+05:00",
   "domains": [
     "Identity",
     "Social Graph",
@@ -353,30 +353,35 @@
       "id": "P3-05",
       "title": "Collections Domain: Saved Places (Want to go / Been) & Custom Lists",
       "domain": "Collections",
-      "description": "Implement SavedPlaceStatusesNotifier (want_to_go, been), segmented filtering on SavedScreen, and public.collections + collection_items schema.",
+      "description": "Implement SavedPlacesNotifier, SavedPlaceStatusesNotifier, CollectionsNotifier, saved_places RLS, collections / collection_items tables, and SavedScreen UI with shortlist filtering and custom curated collections.",
       "ownerRole": "Mobile Engineering & Backend Engineering",
       "priority": "P1",
       "status": "DONE",
       "dependencies": ["P3-01"],
       "affectedPaths": [
-        "lib/features/saved_places/screens/saved_screen.dart",
+        "supabase/migrations/00001_initial_schema.sql",
+        "supabase/migrations/00006_platform_domains_and_discovery.sql",
+        "lib/data/models/saved_place_model.dart",
+        "lib/data/models/collection_model.dart",
         "lib/data/repositories/saved_places_repository.dart",
-        "supabase/migrations/00006_platform_domains_and_discovery.sql"
+        "lib/data/repositories/collections_repository.dart",
+        "lib/features/saved_places/screens/saved_screen.dart"
       ],
       "acceptanceCriteria": [
-        "Want to go and Been filters work and persist across sessions.",
-        "Custom and collaborative collections schema and RLS policies active in 00006."
+        "Places can be saved/unsaved with want_to_go or been statuses.",
+        "Custom curated collections can be created with title, description, and audience controls.",
+        "Collections and saved places sync seamlessly with offline storage fallbacks."
       ],
       "verificationCommands": [
         "flutter test test/unit/saved_places_test.dart"
       ],
-      "riskAssessment": "Low: Synced with public.saved_places and trg_saved_places_count."
+      "riskAssessment": "Low: Synced with public.saved_places and public.collections."
     },
     {
       "id": "P4-01",
       "title": "Social Ecosystem: Friend Plans, 24h Stories, Reactions, Comments & Notifications",
       "domain": "Engagement",
-      "description": "Implement FriendPlansNotifier, NotificationsScreen, and database schemas/RLS for friend_plan_participants (RSVP), place_stories (24h expiration), post_reactions, and post_comments.",
+      "description": "Implement FriendPlansNotifier, StoriesRepository, NotificationsRepository, NotificationsScreen, StoryRail interactive viewer/creator, CommentsSheet modal, BentoCard reactions, and database schemas/RLS for friend_plan_participants, place_stories, post_reactions, and post_comments.",
       "ownerRole": "Backend Engineering & Mobile Engineering",
       "priority": "P1",
       "status": "DONE",
@@ -384,11 +389,23 @@
       "affectedPaths": [
         "supabase/migrations/00001_initial_schema.sql",
         "supabase/migrations/00006_platform_domains_and_discovery.sql",
+        "lib/data/models/notification_model.dart",
+        "lib/data/models/story_model.dart",
+        "lib/data/models/comment_model.dart",
+        "lib/data/repositories/notifications_repository.dart",
+        "lib/data/repositories/stories_repository.dart",
         "lib/data/repositories/saved_places_repository.dart",
-        "lib/features/feed/screens/notifications_screen.dart"
+        "lib/features/feed/screens/notifications_screen.dart",
+        "lib/features/feed/widgets/bento_card.dart",
+        "lib/features/feed/widgets/story_rail.dart",
+        "lib/features/feed/widgets/comments_sheet.dart"
       ],
       "acceptanceCriteria": [
-        "Friend plans, notifications, stories, reactions, and comments persist in PostgreSQL and honor dual-layer RLS and blocking."
+        "Activity center and notifications connected to live NotificationsRepository and public.notifications.",
+        "Post reactions (heart, save count) interactive on BentoCard and synced via reactToPost().",
+        "24-hour ephemeral venue stories interactive via StoryRail modal viewer and creation sheet.",
+        "Post comments interactive via CommentsSheet with 1-300 char validation.",
+        "Friend plans, stories, and engagement schemas enforce dual-layer RLS and blocking."
       ],
       "verificationCommands": [
         "flutter test"
@@ -423,17 +440,19 @@
       "id": "P6-01",
       "title": "Intelligent Discovery: Explainable Privacy-Preserving Recommendations",
       "domain": "Discovery",
-      "description": "Implement get_recommended_places() PostGIS/SQL RPC and PlacesRepository.getRecommendedPlaces scoring venues by accepted friends' drops, saved category affinity, and rating.",
+      "description": "Implement get_recommended_places() PostGIS/SQL RPC, PlacesRepository.getRecommendedPlaces, and ExploreScreen 'For You' recommendations view scoring venues by accepted friends' drops, saved category affinity, and rating.",
       "ownerRole": "Backend Engineering & Product Engineering",
       "priority": "P2",
       "status": "DONE",
       "dependencies": ["P3-04", "P3-05"],
       "affectedPaths": [
         "supabase/migrations/00006_platform_domains_and_discovery.sql",
-        "lib/data/repositories/places_repository.dart"
+        "lib/data/repositories/places_repository.dart",
+        "lib/features/explore/screens/explore_screen.dart"
       ],
       "acceptanceCriteria": [
         "Every recommendation includes a human-readable explanation and numeric relevanceScore.",
+        "Recommendations surfaced in ExploreScreen under dedicated 'For You' view mode.",
         "Private visits from non-friends are never used as global ranking signals."
       ],
       "verificationCommands": [
@@ -445,26 +464,47 @@
       "id": "P7-01",
       "title": "Platform Maturity, Automated Regression Suites & CI/CD Release Gates",
       "domain": "Platform",
-      "description": "Maintain unit, widget, and SQL RLS regression tests, GitHub Actions CI/CD pipelines, rate-limiting triggers, and RELEASE_CHECKLIST.md / SECURITY_CHECKLIST.md.",
+      "description": "Maintain unit, widget, and SQL RLS regression tests, GitHub Actions CI/CD pipelines, rate-limiting triggers, sanitized .env, test teardown cleanup, and RELEASE_CHECKLIST.md / SECURITY_CHECKLIST.md.",
       "ownerRole": "QA Engineering & CTO / Orchestrator",
       "priority": "P1",
       "status": "DONE",
       "dependencies": ["P4-01", "P5-01", "P6-01"],
       "affectedPaths": [
+        ".env",
+        ".env.example",
         "RELEASE_CHECKLIST.md",
         "SECURITY_CHECKLIST.md",
+        "android/app/build.gradle.kts",
+        "android/key.properties.example",
+        "android/app/src/main/AndroidManifest.xml",
+        "ios/Runner.xcodeproj/project.pbxproj",
+        "supabase/migrations/00008_security_and_guest_discovery.sql",
+        "integration_test/live_staging_smoke_test.dart",
         "test/unit/places_repository_test.dart",
         "test/unit/post_privacy_test.dart",
         "test/unit/saved_places_test.dart",
+        "test/widget/bento_card_test.dart",
+        "test/widget/onboarding_auth_flow_test.dart",
         "supabase/tests/rls_authorization_test.sql",
-        ".github/workflows/ci.yml"
+        ".github/workflows/ci.yml",
+        "docs/reports/PHASE_7A_IMPLEMENTATION_REPORT.md",
+        "docs/reports/SECURITY_REMEDIATION_REPORT.md",
+        "docs/reports/TESTING_AND_CI_REPORT.md",
+        "docs/reports/PRODUCT_INTEGRATION_REPORT.md"
       ],
       "acceptanceCriteria": [
-        "All 8 domains verified at Product Integrated / Platform Ready maturity.",
-        "CI/CD and SQL security test suites pass with zero open Critical/High issues."
+        "Root .env sanitized of all administrative secret keys with runtime service_role guard.",
+        "Testing isolation enforced: flutter test runs hermetic offline unit/widget suite (24/24 pass).",
+        "Cloud smoke test isolated in integration_test/ with reliable multi-user cleanup.",
+        "Production auto-confirmation guard and account deletion RPC hardened in migration 00008.",
+        "Mobile release IDs configured as uz.around.mobile with keystore signing configuration.",
+        "Phase 7A reports ratified across Security, Testing, Product Integration, and CTO governance."
       ],
       "verificationCommands": [
-        "flutter test && npx tsc --noEmit"
+        "flutter test",
+        "dart analyze",
+        "npm test",
+        "npm run lint"
       ],
       "riskAssessment": "Low: Continuous regression gates active on every pull request."
     }

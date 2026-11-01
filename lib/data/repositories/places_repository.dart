@@ -304,7 +304,7 @@ class PlacesRepository {
     String category = 'All',
     String searchQuery = '',
   }) async {
-    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+    if (SupabaseService.isInitialized) {
       try {
         final res = await SupabaseService.client.rpc(
           'get_nearby_places',

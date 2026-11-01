@@ -227,6 +227,12 @@ class FriendPlansNotifier extends Notifier<List<FriendPlanModel>> {
 
   /// Updates the authenticated user's RSVP status (`going` or `declined`) on a shared plan (Phase 4.1).
   Future<void> rsvpToPlan(String planId, String rsvpStatus) async {
+    state = [
+      for (final p in state)
+        if (p.id == planId) p.copyWith(myRsvp: rsvpStatus) else p,
+    ];
+    await StorageService.persistPlans(state);
+
     if (!SupabaseService.isInitialized || !SupabaseService.isAuthenticated) return;
     try {
       await SupabaseService.client

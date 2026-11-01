@@ -5,8 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../data/models/post_model.dart';
+import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
+import 'comments_sheet.dart';
 
 class BentoCard extends ConsumerWidget {
   final PostModel post;
@@ -98,6 +100,7 @@ class BentoCard extends ConsumerWidget {
               Wrap(
                 spacing: 6,
                 runSpacing: 4,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -132,6 +135,56 @@ class BentoCard extends ConsumerWidget {
                       child: Text(
                         '#$tag',
                         style: const TextStyle(fontSize: 9.5, color: AppColors.ink2),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      HapticService.selection();
+                      ref.read(postsRepositoryProvider.notifier).reactToPost(post.id, reaction: 'heart');
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.favorite, size: 11, color: AppColors.danger),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${post.savesCount}',
+                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.ink),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      HapticService.selection();
+                      CommentsSheet.show(context, postId: post.id, postTitle: '${post.authorName} at ${post.placeName}');
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.8),
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.chat_bubble_outline, size: 11, color: AppColors.ink2),
+                          SizedBox(width: 3),
+                          Text(
+                            'Comment',
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.ink),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -265,6 +318,67 @@ class BentoCard extends ConsumerWidget {
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          HapticService.selection();
+                          ref.read(postsRepositoryProvider.notifier).reactToPost(post.id, reaction: 'heart');
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.paper2,
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.favorite, size: 12, color: AppColors.danger),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${post.savesCount}',
+                                style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.ink),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      GestureDetector(
+                        onTap: () {
+                          HapticService.selection();
+                          CommentsSheet.show(context, postId: post.id, postTitle: '${post.authorName} at ${post.placeName}');
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.paper2,
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.chat_bubble_outline, size: 12, color: AppColors.ink2),
+                              SizedBox(width: 4),
+                              Text(
+                                'Comment',
+                                style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.ink),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        post.placeCategory.split('·').first.trim(),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9.5),
+                      ),
+                    ],
                   ),
                 ],
               ),
