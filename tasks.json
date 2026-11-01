@@ -3,7 +3,7 @@
   "strategy": "Comprehensive Product & Platform Development (Phases 0–8)",
   "canonicalFrontend": "flutter",
   "architectureDecisionRecord": "docs/adr/003-frontend-stack-decision.md",
-  "updatedAt": "2026-10-30T23:30:00+05:00",
+  "updatedAt": "2026-11-02T00:55:00+05:00",
   "domains": [
     "Identity",
     "Social Graph",
