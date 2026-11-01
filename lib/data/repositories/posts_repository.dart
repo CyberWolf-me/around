@@ -18,6 +18,8 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     final storedDrops = StorageService.getStoredDrops();
     if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
       Future.microtask(syncRemoteFeed);
+      if (storedDrops.isNotEmpty) return storedDrops;
+      return [];
     }
     if (storedDrops.isNotEmpty) {
       final storedIds = storedDrops.map((d) => d.id).toSet();

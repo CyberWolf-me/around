@@ -23,6 +23,9 @@ class SavedPlaceStatusesNotifier extends Notifier<Map<String, String>> {
   Map<String, String> build() {
     final stored = StorageService.getSavedPlaceStatuses();
     if (stored.isNotEmpty) return stored;
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      return {};
+    }
     return Map<String, String>.from(_defaultStatuses);
   }
 
@@ -55,14 +58,18 @@ class SavedPlaceStatusesNotifier extends Notifier<Map<String, String>> {
 }
 
 class SavedPlacesNotifier extends Notifier<List<String>> {
+  static const List<String> defaultTashkentSaved = ['breadly', 'bnb', 'ecorn', 'steam', 'kitobxon'];
+
   @override
   List<String> build() {
     if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
       Future.microtask(syncRemoteSavedPlaces);
+      final stored = StorageService.getSavedPlaceIds();
+      return stored ?? [];
     }
     final stored = StorageService.getSavedPlaceIds();
     if (stored != null) return stored;
-    return ['breadly', 'bnb', 'ecorn', 'steam', 'kitobxon'];
+    return List<String>.from(defaultTashkentSaved);
   }
 
   /// Hydrates `public.saved_places` from Supabase upon login (`INT-01` / `INT-02`).
@@ -156,7 +163,10 @@ class FriendPlansNotifier extends Notifier<List<FriendPlanModel>> {
   @override
   List<FriendPlanModel> build() {
     final stored = StorageService.getStoredPlans();
-    if (stored != null) return stored;
+    if (stored != null && stored.isNotEmpty) return stored;
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      return [];
+    }
     final placesRepo = ref.watch(placesRepositoryProvider);
     return [
       FriendPlanModel(

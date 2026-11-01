@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/services/haptic_service.dart';
 
@@ -11,48 +12,7 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  final List<Map<String, dynamic>> _notifications = [
-    {
-      'who': 'Kamila Rahimova',
-      'init': 'KR',
-      'txt': 'dropped Breadly Bakery & Café in Mirabad',
-      'when': '2h ago',
-      'placeId': 'breadly',
-      'unread': true,
-    },
-    {
-      'who': 'Bekzod Alimov',
-      'init': 'BA',
-      'txt': 'saved your drop at B&B Coffee House',
-      'when': '4h ago',
-      'placeId': 'bnb',
-      'unread': true,
-    },
-    {
-      'who': 'Aziza Tursunova',
-      'init': 'AT',
-      'txt': 'started following you',
-      'when': '6h ago',
-      'placeId': null,
-      'unread': true,
-    },
-    {
-      'who': 'Rustam Mirzaev',
-      'init': 'RM',
-      'txt': 'added Steam Bar & Lounge to your Friday plan',
-      'when': '1d ago',
-      'placeId': 'steam',
-      'unread': false,
-    },
-    {
-      'who': 'Diyor Usmanov',
-      'init': 'DU',
-      'txt': 'dropped Tim’s Coffee & Roastery',
-      'when': '1d ago',
-      'placeId': 'tims',
-      'unread': false,
-    },
-  ];
+  final List<Map<String, dynamic>> _notifications = [];
 
   void _markAllRead() {
     HapticService.selection();
@@ -89,53 +49,88 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
         ],
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        itemCount: _notifications.length,
-        separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0x2015130F)),
-        itemBuilder: (context, i) {
-          final n = _notifications[i];
-          final placeId = n['placeId'] as String?;
-          final isUnread = n['unread'] == true;
-
-          return Container(
-            decoration: BoxDecoration(
-              color: isUnread ? AppColors.butter.withValues(alpha: 0.28) : Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              leading: CircleAvatar(
-                backgroundColor: AppColors.butter,
-                child: Text(
-                  n['init'] as String,
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 11),
-                ),
-              ),
-              title: RichText(
-                text: TextSpan(
-                  style: const TextStyle(fontSize: 12.5, color: AppColors.ink),
+      body: _notifications.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextSpan(text: '${n['who']} ', style: const TextStyle(fontWeight: FontWeight.bold)),
-                    TextSpan(text: n['txt'] as String, style: const TextStyle(color: AppColors.ink2)),
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: const BoxDecoration(
+                        color: AppColors.paper2,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.notifications_none, size: 28, color: AppColors.ink3),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'No new activity',
+                      style: GoogleFonts.bricolageGrotesque(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'When friends drop places or invite you to plans in Tashkent, notifications will appear here.',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12),
+                      textAlign: TextAlign.center,
+                    ),
                   ],
                 ),
               ),
-              subtitle: Text(n['when'] as String, style: Theme.of(context).textTheme.labelSmall),
-              trailing: placeId != null
-                  ? const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3)
-                  : null,
-              onTap: () {
-                HapticService.light();
-                setState(() => n['unread'] = false);
-                if (placeId != null) {
-                  context.push('/places/$placeId');
-                }
+            )
+          : ListView.separated(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              itemCount: _notifications.length,
+              separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0x2015130F)),
+              itemBuilder: (context, i) {
+                final n = _notifications[i];
+                final placeId = n['placeId'] as String?;
+                final isUnread = n['unread'] == true;
+
+                return Container(
+                  decoration: BoxDecoration(
+                    color: isUnread ? AppColors.butter.withValues(alpha: 0.28) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    leading: CircleAvatar(
+                      backgroundColor: AppColors.butter,
+                      child: Text(
+                        n['init'] as String,
+                        style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 11),
+                      ),
+                    ),
+                    title: RichText(
+                      text: TextSpan(
+                        style: const TextStyle(fontSize: 12.5, color: AppColors.ink),
+                        children: [
+                          TextSpan(text: '${n['who']} ', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          TextSpan(text: n['txt'] as String, style: const TextStyle(color: AppColors.ink2)),
+                        ],
+                      ),
+                    ),
+                    subtitle: Text(n['when'] as String, style: Theme.of(context).textTheme.labelSmall),
+                    trailing: placeId != null
+                        ? const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3)
+                        : null,
+                    onTap: () {
+                      HapticService.light();
+                      setState(() => n['unread'] = false);
+                      if (placeId != null) {
+                        context.push('/places/$placeId');
+                      }
+                    },
+                  ),
+                );
               },
             ),
-          );
-        },
-      ),
     );
   }
 }

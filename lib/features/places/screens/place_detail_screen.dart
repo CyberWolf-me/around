@@ -13,6 +13,7 @@ import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
 import '../../../data/services/storage_service.dart';
+import '../../../data/services/supabase_service.dart';
 import '../../create_post/screens/create_drop_sheet.dart';
 
 class PlaceDetailScreen extends ConsumerStatefulWidget {
@@ -109,6 +110,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
 
   void _showReportOrBlockSheet({required String targetType, required String targetId, String? authorId, String? authorName}) {
     HapticService.medium();
+    final myId = SupabaseService.currentUser?.id ?? ref.read(currentProfileProvider).id;
     final reasons = [
       'Inappropriate photo or text',
       'Spam or promotional shilling',
@@ -166,7 +168,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                     }
                   },
                 )),
-            if (authorId != null && authorId != 'you') ...[
+            if (authorId != null && authorId != myId && authorId != 'you') ...[
               const Divider(),
               ListTile(
                 dense: true,
@@ -665,6 +667,32 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               child: ElevatedButton.icon(
                 onPressed: () {
                   HapticService.medium();
+                  if (!SupabaseService.isAuthenticated) {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        backgroundColor: AppColors.paper,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: const BorderSide(color: AppColors.ink, width: 2),
+                        ),
+                        title: Text('Account Required', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800)),
+                        content: const Text('Sign in or create an account to drop recommendations and share spots with friends.'),
+                        actions: [
+                          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel', style: TextStyle(color: AppColors.ink3))),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(ctx);
+                              context.push('/auth');
+                            },
+                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
+                            child: const Text('Sign In'),
+                          ),
+                        ],
+                      ),
+                    );
+                    return;
+                  }
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,

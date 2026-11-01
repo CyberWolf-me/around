@@ -167,6 +167,35 @@ class ScaffoldWithNavBar extends StatelessWidget {
     HapticService.selection();
     if (index == 2) {
       HapticService.medium();
+      if (!SupabaseService.isAuthenticated) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: AppColors.paper,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: const BorderSide(color: AppColors.ink, width: 2),
+            ),
+            title: Text('Account Required', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800)),
+            content: const Text('You are browsing as a Guest. Sign in or create an account to drop recommendations and share spots with your circle.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancel', style: TextStyle(color: AppColors.ink3)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  context.push('/auth');
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
+                child: const Text('Sign In'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
       showModalBottomSheet(
         context: context,
         isScrollControlled: true,

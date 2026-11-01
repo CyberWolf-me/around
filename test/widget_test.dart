@@ -6,7 +6,7 @@ import 'package:around_app/data/services/storage_service.dart';
 void main() {
   setUp(() async {
     await StorageService.setOnboarded(true);
-    await StorageService.setGuestMode(true);
+    await StorageService.setAuthUserEmail('explorer@tashkent.uz');
   });
   testWidgets('AroundApp smoke test - verifies non-empty feed and bottom navigation tabs', (WidgetTester tester) async {
     await tester.pumpWidget(

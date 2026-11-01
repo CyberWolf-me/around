@@ -6,6 +6,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/repositories/places_repository.dart';
+import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
 
@@ -67,11 +68,12 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
             ElevatedButton(
               onPressed: () async {
                 final place = ref.read(placesRepositoryProvider).getPlaceById(selectedPlaceId);
+                final myInitials = ref.read(currentProfileProvider).initials;
                 await ref.read(friendPlansProvider.notifier).addPlan(
                       placeId: selectedPlaceId,
                       placeName: place?.name ?? 'Tashkent Venue',
                       scheduleTime: timeCtrl.text.trim().isEmpty ? 'Sat 11:00 AM' : timeCtrl.text.trim(),
-                      attendeeInitials: const ['YO', 'KR'],
+                      attendeeInitials: [myInitials],
                       note: noteCtrl.text.trim(),
                     );
                 if (ctx.mounted) Navigator.pop(ctx);

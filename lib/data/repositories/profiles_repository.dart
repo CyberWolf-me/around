@@ -126,6 +126,41 @@ CommunityMember? getCommunityMemberById(String id) {
   return null;
 }
 
+Future<CommunityMember?> fetchCommunityMember(String id) async {
+  final local = getCommunityMemberById(id);
+  if (local != null) return local;
+
+  if (SupabaseService.isInitialized) {
+    try {
+      final row = await SupabaseService.client
+          .from('profiles')
+          .select('id, username, full_name, avatar_url, neighborhood, bio, drops_count, hide_visits_history, allow_friend_requests')
+          .eq('id', id)
+          .maybeSingle();
+
+      if (row != null) {
+        final fullName = (row['full_name'] as String?) ?? 'Explorer';
+        final username = (row['username'] as String?) ?? 'explorer';
+        final initials = fullName.split(' ').map((n) => n.isNotEmpty ? n[0] : '').take(2).join().toUpperCase();
+        return CommunityMember(
+          id: row['id']?.toString() ?? id,
+          name: fullName,
+          handle: username,
+          initials: initials.isEmpty ? 'EX' : initials,
+          neighborhood: (row['neighborhood'] as String?) ?? 'Mirabad',
+          bio: (row['bio'] as String?) ?? 'Exploring Tashkent spots.',
+          dropsCount: (row['drops_count'] as int?) ?? 0,
+          hideVisitsHistory: (row['hide_visits_history'] as bool?) ?? false,
+          allowFriendRequests: (row['allow_friend_requests'] as bool?) ?? true,
+        );
+      }
+    } catch (e) {
+      AppLogger.warn('ProfilesRepository', 'Remote member lookup skipped for $id', e);
+    }
+  }
+  return null;
+}
+
 /// Enforces the 'Keep my visits private' (hideVisitsHistory) invariant when viewing a profile.
 bool canViewMemberVisitHistory({
   required String viewerId,
@@ -312,6 +347,17 @@ class FriendshipStatusesNotifier extends Notifier<Map<String, FriendshipRelation
   Map<String, FriendshipRelation> build() {
     if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
       Future.microtask(syncRemoteFriendships);
+      final stored = StorageService.getFriendshipStatuses();
+      if (stored != null) {
+        return stored.map((k, v) {
+          final rel = FriendshipRelation.values.where((e) => e.name == v).firstOrNull ?? FriendshipRelation.none;
+          return MapEntry(k, rel);
+        });
+      }
+      return {};
+    }
+    if (StorageService.isGuestMode()) {
+      return {};
     }
     final stored = StorageService.getFriendshipStatuses();
     if (stored != null && stored.isNotEmpty) {
@@ -332,26 +378,24 @@ class FriendshipStatusesNotifier extends Notifier<Map<String, FriendshipRelation
           .from('friendships')
           .select('user_id, friend_id, status')
           .or('user_id.eq.$myUid,friend_id.eq.$myUid');
-      if (rows.isNotEmpty) {
-        final merged = Map<String, FriendshipRelation>.from(state);
-        for (final raw in rows.whereType<Map<String, dynamic>>()) {
-          final uid = raw['user_id']?.toString() ?? '';
-          final fid = raw['friend_id']?.toString() ?? '';
-          final st = raw['status']?.toString() ?? '';
-          final otherId = uid == myUid ? fid : uid;
-          if (otherId.isEmpty) continue;
-          if (st == 'accepted') {
-            merged[otherId] = FriendshipRelation.accepted;
-          } else if (st == 'pending') {
-            merged[otherId] = uid == myUid
-                ? FriendshipRelation.pendingOutgoing
-                : FriendshipRelation.pendingIncoming;
-          }
+      final remote = <String, FriendshipRelation>{};
+      for (final raw in rows.whereType<Map<String, dynamic>>()) {
+        final uid = raw['user_id']?.toString() ?? '';
+        final fid = raw['friend_id']?.toString() ?? '';
+        final st = raw['status']?.toString() ?? '';
+        final otherId = uid == myUid ? fid : uid;
+        if (otherId.isEmpty) continue;
+        if (st == 'accepted') {
+          remote[otherId] = FriendshipRelation.accepted;
+        } else if (st == 'pending') {
+          remote[otherId] = uid == myUid
+              ? FriendshipRelation.pendingOutgoing
+              : FriendshipRelation.pendingIncoming;
         }
-        state = merged;
-        await _persist(merged);
-        ref.read(followedFriendsProvider.notifier).syncFromRelations(merged);
       }
+      state = remote;
+      await _persist(remote);
+      ref.read(followedFriendsProvider.notifier).syncFromRelations(remote);
     } catch (e) {
       AppLogger.warn('FriendshipStatusesNotifier', 'Remote friendships hydration skipped', e);
     }
@@ -451,6 +495,12 @@ class FollowedFriendsNotifier extends Notifier<Set<String>> {
 
   @override
   Set<String> build() {
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      return StorageService.getFollowedFriends() ?? <String>{};
+    }
+    if (StorageService.isGuestMode()) {
+      return <String>{};
+    }
     return StorageService.getFollowedFriends() ?? Set<String>.from(defaultTashkentFriends);
   }
 
