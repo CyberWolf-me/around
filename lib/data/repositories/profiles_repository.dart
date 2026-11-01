@@ -141,20 +141,20 @@ bool canViewMemberVisitHistory({
 final currentProfileProvider = NotifierProvider<ProfileNotifier, ProfileModel>(ProfileNotifier.new);
 
 class ProfileNotifier extends Notifier<ProfileModel> {
-  static const ProfileModel _defaultProfile = ProfileModel(
-    id: 'you',
-    username: 'yusuf',
-    fullName: 'Yusuf Okonjo',
-    bio: 'Looking for sourdough and quiet corners to read in Tashkent.',
-    neighborhood: 'Mirabad',
-    dropsCount: 24,
-    friendsCount: 5,
-    savedCount: 18,
+  static const ProfileModel _guestProfile = ProfileModel(
+    id: 'guest',
+    username: 'guest',
+    fullName: 'Guest Explorer',
+    bio: 'Exploring Tashkent spots. Sign in to share drops and connect with friends.',
+    neighborhood: 'Tashkent',
+    dropsCount: 0,
+    friendsCount: 0,
+    savedCount: 0,
     hideVisitsHistory: true,
-    defaultAudience: 'friends',
-    discoverableByFriends: true,
+    defaultAudience: 'public',
+    discoverableByFriends: false,
     quietHours: false,
-    allowFriendRequests: true,
+    allowFriendRequests: false,
   );
 
   @override
@@ -162,7 +162,37 @@ class ProfileNotifier extends Notifier<ProfileModel> {
     if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
       Future.microtask(syncRemoteProfile);
     }
-    return StorageService.getStoredProfile() ?? _defaultProfile;
+    final stored = StorageService.getStoredProfile();
+    if (stored != null) return stored;
+
+    if (SupabaseService.isAuthenticated) {
+      final user = SupabaseService.currentUser!;
+      final meta = user.userMetadata ?? {};
+      final name = (meta['full_name'] as String?) ?? (user.email != null ? user.email!.split('@').first : 'Explorer');
+      final handle = (meta['username'] as String?) ?? (user.email != null ? user.email!.split('@').first : 'explorer');
+      return ProfileModel(
+        id: user.id,
+        username: handle,
+        fullName: name,
+        bio: 'Exploring Tashkent spots with friends.',
+        neighborhood: (meta['neighborhood'] as String?) ?? 'Mirabad',
+        dropsCount: 0,
+        friendsCount: 0,
+        savedCount: 0,
+        hideVisitsHistory: true,
+        defaultAudience: 'friends',
+        discoverableByFriends: true,
+        quietHours: false,
+        allowFriendRequests: true,
+      );
+    }
+
+    return _guestProfile;
+  }
+
+  Future<void> resetToGuest() async {
+    await StorageService.clearAuthSession();
+    state = _guestProfile;
   }
 
   /// Hydrates the authenticated user's `public.profiles` row from Supabase (INT-01 fix).

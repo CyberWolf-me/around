@@ -14,6 +14,8 @@ import '../../features/create_post/screens/create_drop_sheet.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/auth/screens/onboarding_screen.dart';
 import '../../features/auth/screens/auth_screen.dart';
+import '../../data/services/storage_service.dart';
+import '../../data/services/supabase_service.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _feedNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'feed');
@@ -25,6 +27,28 @@ final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/feed',
   debugLogDiagnostics: false,
+  redirect: (context, state) {
+    final isOnboarded = StorageService.isOnboarded();
+    final isAuthenticated = SupabaseService.isAuthenticated || StorageService.getAuthUserEmail() != null;
+    final isGuest = StorageService.isGuestMode();
+
+    final isGoingToOnboarding = state.matchedLocation == '/onboarding';
+    final isGoingToAuth = state.matchedLocation == '/auth';
+
+    if (!isOnboarded) {
+      return isGoingToOnboarding ? null : '/onboarding';
+    }
+
+    if (!isAuthenticated && !isGuest) {
+      return (isGoingToAuth || isGoingToOnboarding) ? null : '/auth';
+    }
+
+    if (isAuthenticated && (isGoingToAuth || isGoingToOnboarding)) {
+      return '/feed';
+    }
+
+    return null;
+  },
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/services/haptic_service.dart';
 import '../../../data/services/storage_service.dart';
@@ -62,49 +63,78 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       }
     }
 
+    if (!SupabaseService.isInitialized) {
+      setState(() => _errorMessage = 'Backend connection is offline. Please rebuild the app with valid Supabase cloud configuration.');
+      return;
+    }
+
     setState(() {
       _errorMessage = null;
       _isLoading = true;
     });
 
     try {
-      if (SupabaseService.isInitialized) {
-        if (_isSignUp) {
-          await SupabaseService.signUpWithEmail(
-            email: email,
-            password: password,
-            username: _usernameCtrl.text.trim(),
-            fullName: _fullNameCtrl.text.trim(),
-            neighborhood: _neighborhoodCtrl.text.trim(),
-          );
-        } else {
+      if (_isSignUp) {
+        final authRes = await SupabaseService.signUpWithEmail(
+          email: email,
+          password: password,
+          username: _usernameCtrl.text.trim(),
+          fullName: _fullNameCtrl.text.trim(),
+          neighborhood: _neighborhoodCtrl.text.trim(),
+        );
+
+        if (authRes == null || authRes.user == null) {
+          throw 'Failed to create user account. Please check your credentials.';
+        }
+
+        // If session was not automatically established, perform explicit sign in
+        if (authRes.session == null) {
           await SupabaseService.signInWithEmail(email, password);
+        }
+      } else {
+        final authRes = await SupabaseService.signInWithEmail(email, password);
+        if (authRes == null || authRes.user == null) {
+          throw 'Invalid email or password. Please verify your credentials.';
         }
       }
 
       await StorageService.setAuthUserEmail(email);
-      if (_isSignUp) {
-        await ref.read(currentProfileProvider.notifier).updateProfileDetails(
-              fullName: _fullNameCtrl.text.trim(),
-              username: _usernameCtrl.text.trim(),
-              bio: 'Exploring Tashkent spots with friends.',
-              neighborhood: _neighborhoodCtrl.text.trim(),
-            );
-      }
+      await StorageService.setGuestMode(false);
+
+      // Hydrate live profile & feed from Supabase
+      await ref.read(currentProfileProvider.notifier).syncRemoteProfile();
+      await ref.read(postsRepositoryProvider.notifier).syncRemoteFeed();
 
       HapticService.heavy();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(_isSignUp ? 'Account created & signed in as $email' : 'Signed in as $email')),
+          SnackBar(
+            content: Text(_isSignUp ? 'Account created! Welcome to Around, $email' : 'Signed in as $email'),
+            backgroundColor: AppColors.ink,
+          ),
         );
         context.go('/feed');
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Authentication failed: $e');
+      String readableError = e.toString().replaceFirst('Exception: ', '');
+      if (readableError.contains('Invalid login credentials')) {
+        readableError = 'Invalid email or password. Please try again.';
+      } else if (readableError.contains('User already registered')) {
+        readableError = 'An account with this email already exists. Please Sign In.';
+      }
+      setState(() => _errorMessage = readableError);
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+  Future<void> _continueAsGuest() async {
+    HapticService.light();
+    await StorageService.setGuestMode(true);
+    if (mounted) {
+      context.go('/feed');
     }
   }
 
@@ -115,7 +145,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.canPop() ? context.pop() : context.go('/feed'),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              _continueAsGuest();
+            }
+          },
         ),
         title: Text(
           _isSignUp ? 'Create Account' : 'Sign In',
@@ -219,6 +255,22 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     child: Text(
                       _isSignUp ? 'Already have an account? Sign In' : 'Need an account? Create one',
                       style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 12.5),
+                    ),
+                  ),
+                ),
+                const Divider(height: 28, color: Color(0x3015130F)),
+                Center(
+                  child: OutlinedButton.icon(
+                    onPressed: _continueAsGuest,
+                    icon: const Icon(Icons.explore_outlined, size: 16, color: AppColors.ink),
+                    label: const Text(
+                      'Continue as Guest (Read-Only)',
+                      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.ink, width: 1.5),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     ),
                   ),
                 ),

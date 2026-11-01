@@ -19,6 +19,7 @@ class StorageService {
   static const _plansKey = 'around_friend_plans_v1';
   static const _onboardedKey = 'around_onboarded_v1';
   static const _authUserEmailKey = 'around_auth_user_email_v1';
+  static const _guestModeKey = 'around_guest_mode_v1';
 
   static SharedPreferences? _prefs;
   static final Map<String, Object> _memoryFallback = {};
@@ -33,12 +34,22 @@ class StorageService {
 
   // Onboarding state
   static bool isOnboarded() {
-    return _prefs?.getBool(_onboardedKey) ?? (_memoryFallback[_onboardedKey] as bool? ?? true);
+    return _prefs?.getBool(_onboardedKey) ?? (_memoryFallback[_onboardedKey] as bool? ?? false);
   }
 
   static Future<void> setOnboarded(bool value) async {
     _memoryFallback[_onboardedKey] = value;
     await _prefs?.setBool(_onboardedKey, value);
+  }
+
+  // Guest browsing mode
+  static bool isGuestMode() {
+    return _prefs?.getBool(_guestModeKey) ?? (_memoryFallback[_guestModeKey] as bool? ?? false);
+  }
+
+  static Future<void> setGuestMode(bool value) async {
+    _memoryFallback[_guestModeKey] = value;
+    await _prefs?.setBool(_guestModeKey, value);
   }
 
   // Authenticated session email
@@ -54,6 +65,15 @@ class StorageService {
       _memoryFallback[_authUserEmailKey] = email;
       await _prefs?.setString(_authUserEmailKey, email);
     }
+  }
+
+  static Future<void> clearAuthSession() async {
+    _memoryFallback.remove(_authUserEmailKey);
+    await _prefs?.remove(_authUserEmailKey);
+    _memoryFallback.remove(_profileKey);
+    await _prefs?.remove(_profileKey);
+    _memoryFallback.remove(_guestModeKey);
+    await _prefs?.remove(_guestModeKey);
   }
 
   // Saved places IDs

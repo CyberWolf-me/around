@@ -41,7 +41,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Future<void> _finishOnboarding() async {
     await StorageService.setOnboarded(true);
     if (mounted) {
-      context.go('/feed');
+      context.go('/auth');
     }
   }
 

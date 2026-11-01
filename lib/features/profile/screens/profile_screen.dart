@@ -8,6 +8,7 @@ import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
+import '../../../data/services/supabase_service.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -90,7 +91,8 @@ class ProfileScreen extends ConsumerWidget {
     final followedFriends = ref.watch(followedFriendsProvider);
     final savedPlaces = ref.watch(savedPlacesProvider);
 
-    final myDrops = posts.where((p) => p.authorId == 'you').toList();
+    final currentUserId = SupabaseService.currentUser?.id ?? profile.id;
+    final myDrops = posts.where((p) => p.authorId == currentUserId || p.authorId == profile.id || p.authorId == 'you').toList();
 
     return Scaffold(
       backgroundColor: AppColors.paper,
@@ -106,6 +108,41 @@ class ProfileScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         children: [
+          if (profile.id == 'guest')
+            Container(
+              margin: const EdgeInsets.only(bottom: 14),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.paper2,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.ink, width: 2),
+                boxShadow: const [AppColors.shadowSm],
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline, color: AppColors.ink),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('You are browsing as Guest', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const Text('Sign in to publish drops, save places, and add friends.', style: TextStyle(fontSize: 11, color: AppColors.ink2)),
+                      ],
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => context.push('/auth'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.orange,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    ),
+                    child: const Text('Sign In', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                  ),
+                ],
+              ),
+            ),
           Row(
             children: [
               Container(

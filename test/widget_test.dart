@@ -1,8 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:around_app/main.dart';
+import 'package:around_app/data/services/storage_service.dart';
 
 void main() {
+  setUp(() async {
+    await StorageService.setOnboarded(true);
+    await StorageService.setGuestMode(true);
+  });
   testWidgets('AroundApp smoke test - verifies non-empty feed and bottom navigation tabs', (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(
