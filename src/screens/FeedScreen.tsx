@@ -16,6 +16,7 @@ export const FeedScreen: React.FC = () => {
     savedPlaceIds,
     toggleSavePlace,
     openPlace,
+    pushScreen,
     getPlaceById,
     getUserById,
     switchTab,
@@ -29,14 +30,14 @@ export const FeedScreen: React.FC = () => {
     new Set(privacySettings.blockedUsers)
   );
 
-  const storiesPlaceIds = ['kettle', 'castellan', 'sable', 'volta', 'marigold'];
+  const storiesPlaceIds = ['breadly', 'bnb', 'ecorn', 'tims', 'chorsu', 'centralpark', 'steam', 'kitobxon'];
 
   const renderDropCard = (d: PlaceDrop) => {
     const place = getPlaceById(d.place);
     const author = getUserById(d.who);
     if (!place) return null;
 
-    const isSaved = savedPlaceIds.includes(d.place);
+    const isSaved = savedPlaceIds.includes(place.id) || savedPlaceIds.includes(d.place);
 
     // Note card (text-first)
     if (d.size === 'note') {
@@ -44,13 +45,22 @@ export const FeedScreen: React.FC = () => {
         <button
           key={d.id}
           className="note-card span2"
-          onClick={(e) => openPlace(d.place, e.currentTarget)}
+          onClick={(e) => openPlace(place.id, e.currentTarget)}
           style={{ background: d.tint || 'var(--butter)', gridColumn: 'span 2' }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
-            <Avatar id={d.who} size={22} ring={true} />
-            <span style={{ fontSize: 11, fontWeight: 700 }}>
-              {author?.name.split(' ')[0]}
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                pushScreen({ kind: 'profile', userId: d.who });
+              }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+              title={`View @${author?.handle}'s profile`}
+            >
+              <Avatar id={d.who} size={22} ring={true} />
+              <span style={{ fontSize: 11, fontWeight: 700 }}>
+                {author?.name.split(' ')[0]}
+              </span>
             </span>
             <AudienceBadge aud={d.aud} />
             <span className="mono-sm" style={{ color: 'var(--ink-2)', marginLeft: 'auto', fontSize: 10 }}>
@@ -87,7 +97,7 @@ export const FeedScreen: React.FC = () => {
       <button
         key={d.id}
         className={`drop-card ${isHero || isWide ? 'span2' : ''}`}
-        onClick={(e) => openPlace(d.place, e.currentTarget)}
+        onClick={(e) => openPlace(place.id, e.currentTarget)}
       >
         <div className="dc-img" style={{ height: imgHeight, position: 'relative' }}>
           {d.img ? (
@@ -104,7 +114,7 @@ export const FeedScreen: React.FC = () => {
             className={`dc-save ${isSaved ? 'on' : ''}`}
             onClick={(e) => {
               e.stopPropagation();
-              toggleSavePlace(d.place);
+              toggleSavePlace(place.id);
             }}
             title={isSaved ? 'Remove from saved' : 'Save to shortlist'}
           >
@@ -119,9 +129,18 @@ export const FeedScreen: React.FC = () => {
 
         <div className="dc-body" style={{ padding: '8px 9px 10px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
-            <Avatar id={d.who} size={18} ring={false} />
-            <span style={{ fontSize: 10.5, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {author?.name.split(' ')[0]}
+            <span
+              onClick={(e) => {
+                e.stopPropagation();
+                pushScreen({ kind: 'profile', userId: d.who });
+              }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+              title={`View @${author?.handle}'s profile`}
+            >
+              <Avatar id={d.who} size={18} ring={false} />
+              <span style={{ fontSize: 10.5, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {author?.name.split(' ')[0]}
+              </span>
             </span>
             <span className="mono-sm" style={{ color: 'var(--ink-3)', marginLeft: 'auto', fontSize: 9 }}>
               {d.when}
@@ -154,7 +173,7 @@ export const FeedScreen: React.FC = () => {
           return (
             <button
               key={placeId}
-              onClick={(e) => openPlace(placeId, e.currentTarget)}
+              onClick={(e) => openPlace(place.id, e.currentTarget)}
               style={{
                 border: 0,
                 background: 'none',
@@ -227,14 +246,14 @@ export const FeedScreen: React.FC = () => {
           You're all caught up.
         </div>
         <div className="mono-sm" style={{ color: 'var(--ink-3)', fontSize: 10.5, marginBottom: 12 }}>
-          That’s every drop from your friends in Barlow Hill today.
+          That’s every drop from your friends in Tashkent today.
         </div>
         <button
           className="btn btn-primary btn-sm"
           onClick={() => switchTab('explore')}
           style={{ height: 36, margin: '0 auto' }}
         >
-          <Icon name="compass" size={13} sw={2.2} /> Explore Public Barlow Hill
+          <Icon name="compass" size={13} sw={2.2} /> Explore Public Tashkent
         </button>
       </div>
     </div>

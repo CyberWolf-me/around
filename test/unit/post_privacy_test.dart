@@ -2,13 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:around_app/data/models/post_model.dart';
 import 'package:around_app/data/repositories/posts_repository.dart';
+import 'package:around_app/data/repositories/profiles_repository.dart';
+import 'package:around_app/data/services/storage_service.dart';
 
 void main() {
-  group('Post Privacy & Audience Filtering Tests', () {
+  group('Post Privacy, Mutual Friendship & Auto-Quarantine Tests', () {
     late ProviderContainer container;
     late PostsNotifier notifier;
 
-    setUp(() {
+    setUp(() async {
+      await StorageService.clearAll();
       container = ProviderContainer();
       notifier = container.read(postsRepositoryProvider.notifier);
     });
@@ -17,9 +20,9 @@ void main() {
       container.dispose();
     });
 
-    test('Initial seed posts contain both friends-only and public posts', () {
+    test('Initial seed posts contain both friends-only and public Tashkent posts', () {
       final posts = container.read(postsRepositoryProvider);
-      expect(posts.isNotEmpty, isTrue);
+      expect(posts.length, greaterThanOrEqualTo(8));
 
       final hasFriendsOnly = posts.any((p) => p.audience == PostAudience.friends);
       final hasPublic = posts.any((p) => p.audience == PostAudience.public);
@@ -28,31 +31,93 @@ void main() {
       expect(hasPublic, isTrue, reason: 'Must have public posts seeded');
     });
 
-    test('getFriendsDrops only returns posts from followed friends or the current user', () {
-      final followedIds = {'noor', 'teo'}; // Noor Haddad, Teo Vasquez
-      final drops = notifier.getFriendsDrops(followedIds);
+    test('Default followedFriendsProvider matches seeded Tashkent friend authors (non-empty feed)', () {
+      final defaultFollowed = container.read(followedFriendsProvider);
+      final drops = notifier.getFriendsDrops(defaultFollowed);
 
+      expect(drops.isNotEmpty, isTrue, reason: 'Friends feed must not be empty with default followed friends');
       for (final drop in drops) {
-        final isFollowedOrSelf = followedIds.contains(drop.authorId) || drop.authorId == 'you';
-        expect(
-          isFollowedOrSelf,
-          isTrue,
-          reason: 'Post by author ${drop.authorId} (${drop.authorName}) should not appear in friends feed without following',
-        );
+        final isFollowedOrSelf = defaultFollowed.contains(drop.authorId) || drop.authorId == 'you';
+        expect(isFollowedOrSelf, isTrue);
       }
     });
 
-    test('Stranger posts (e.g. mina if not followed) do not appear in friends feed', () {
-      final followedOnlyNoor = {'noor'}; // Only follow Noor
-      final drops = notifier.getFriendsDrops(followedOnlyNoor);
+    test('Pending outgoing friend request does NOT unlock friends-only drops until accepted (SEC-04)', () async {
+      final relNotifier = container.read(friendshipStatusesProvider.notifier);
+      // Rustam is not initially a friend
+      expect(relNotifier.getRelation('rustam'), equals(FriendshipRelation.none));
 
-      final containsMina = drops.any((p) => p.authorId == 'mina');
-      expect(containsMina, isFalse, reason: 'Unfollowed user mina must not appear in friends feed');
+      // Send friend request -> transitions to pendingOutgoing, NOT accepted
+      await relNotifier.requestOrToggleFriendship('rustam');
+      expect(relNotifier.getRelation('rustam'), equals(FriendshipRelation.pendingOutgoing));
+      expect(container.read(followedFriendsProvider).contains('rustam'), isFalse);
+
+      // Shakhlo has allowFriendRequests == false -> request is rejected
+      final msg = await relNotifier.requestOrToggleFriendship('shakhlo');
+      expect(msg, contains('disabled incoming friend requests'));
+      expect(relNotifier.getRelation('shakhlo'), equals(FriendshipRelation.none));
     });
 
-    test('getDropsForPlace with friendsOnly=true filters out stranger drops', () {
-      const placeId = 'kettle'; // Kettle & Loaf
-      final followedIds = {'noor'}; // Only noor is followed
+    test('3-report auto-quarantine removes reported drop from feeds (PRIVACY_AND_SAFETY_GOVERNANCE)', () async {
+      const targetPostId = 'drop_tash_1';
+      expect(
+        notifier.getFriendsDrops({'kamila'}).any((p) => p.id == targetPostId),
+        isTrue,
+      );
+
+      await notifier.reportPost(targetPostId, 'Spam 1');
+      await notifier.reportPost(targetPostId, 'Spam 2');
+      final quarantined = await notifier.reportPost(targetPostId, 'Spam 3');
+
+      expect(quarantined, isTrue);
+      expect(
+        notifier.getFriendsDrops({'kamila'}).any((p) => p.id == targetPostId),
+        isFalse,
+        reason: 'Quarantined post must be excluded from Friends Feed',
+      );
+    });
+
+    test('canViewMemberVisitHistory enforces Keep my visits private (hideVisitsHistory)', () {
+      // Diyor has hideVisitsHistory = true
+      expect(
+        canViewMemberVisitHistory(
+          viewerId: 'you',
+          targetUserId: 'diyor',
+          targetHideVisitsHistory: true,
+          areMutualFriends: true,
+        ),
+        isFalse,
+      );
+
+      // User can always view their own history
+      expect(
+        canViewMemberVisitHistory(
+          viewerId: 'diyor',
+          targetUserId: 'diyor',
+          targetHideVisitsHistory: true,
+          areMutualFriends: false,
+        ),
+        isTrue,
+      );
+    });
+
+    test('Blocked users are strictly excluded from both friends feed and public drops', () {
+      final followed = {'kamila', 'bekzod', 'aziza'};
+      final blocked = {'bekzod', 'aziza'};
+
+      final friendDrops = notifier.getFriendsDrops(followed, blockedIds: blocked);
+      expect(friendDrops.isNotEmpty, isTrue);
+      expect(friendDrops.any((p) => p.authorId == 'bekzod'), isFalse);
+      expect(friendDrops.any((p) => p.authorId == 'aziza'), isFalse);
+
+      final publicDrops = notifier.getPublicDrops(blockedIds: blocked);
+      expect(publicDrops.isNotEmpty, isTrue);
+      expect(publicDrops.any((p) => p.authorId == 'aziza'), isFalse);
+    });
+
+    test('getDropsForPlace with friendsOnly=true returns non-empty friend drops for Breadly', () {
+      const placeId = 'breadly';
+      final followedIds = {'kamila'};
 
       final friendDrops = notifier.getDropsForPlace(
         placeId,
@@ -60,58 +125,72 @@ void main() {
         followedIds: followedIds,
       );
 
+      expect(friendDrops.isNotEmpty, isTrue);
       for (final drop in friendDrops) {
-        expect(
-          followedIds.contains(drop.authorId) || drop.authorId == 'you',
-          isTrue,
-          reason: 'Only followed users or self can appear in friends drop tab',
-        );
+        expect(followedIds.contains(drop.authorId) || drop.authorId == 'you', isTrue);
       }
     });
 
-    test('getDropsForPlace with friendsOnly=false only returns public drops', () {
-      const placeId = 'kettle';
+    test('getDropsForPlace with friendsOnly=false strictly returns public drops', () {
+      const placeId = 'ecorn';
 
       final publicDrops = notifier.getDropsForPlace(
         placeId,
         friendsOnly: false,
       );
 
+      expect(publicDrops.isNotEmpty, isTrue);
       for (final drop in publicDrops) {
-        expect(
-          drop.audience,
-          equals(PostAudience.public),
-          reason: 'Public tab must strictly show PostAudience.public posts',
-        );
+        expect(drop.audience, equals(PostAudience.public));
       }
     });
 
-    test('addDrop prepends a new drop to state correctly', () {
+    test('addDrop, editDrop, and deleteDrop enforce ownership and update state (Phase 3.3)', () async {
       final initialCount = container.read(postsRepositoryProvider).length;
       final newPost = PostModel(
         id: 'test-post-1',
-        placeId: 'kettle',
-        placeName: 'Kettle & Loaf',
-        placeCategory: 'Bakery · Café',
-        placeAddress: '14 Ledger Street',
+        placeId: 'breadly',
+        placeName: 'Breadly Bakery & Café',
+        placeCategory: 'Bakery · Specialty Café',
+        placeAddress: '24 Taras Shevchenko Street',
         authorId: 'you',
         authorName: 'You',
         authorUsername: 'you',
         authorAvatar: 'YO',
         note: 'Testing fresh drop creation',
-        mediaUrl: 'assets/kettle-hero.jpg',
+        mediaUrl: 'assets/bakery-counter.jpg',
         rating: 5,
         audience: PostAudience.friends,
         createdAt: DateTime.now(),
-        tags: const ['cozy', 'espresso'],
+        tags: const ['sourdough', 'matcha'],
       );
 
       notifier.addDrop(newPost);
+      expect(container.read(postsRepositoryProvider).length, equals(initialCount + 1));
 
-      final updatedPosts = container.read(postsRepositoryProvider);
-      expect(updatedPosts.length, equals(initialCount + 1));
-      expect(updatedPosts.first.id, equals('test-post-1'));
-      expect(updatedPosts.first.note, equals('Testing fresh drop creation'));
+      // Edit own drop
+      final editErr = await notifier.editDrop(
+        postId: 'test-post-1',
+        note: 'Updated sourdough review note',
+        audience: PostAudience.public,
+      );
+      expect(editErr, isNull);
+      final edited = container.read(postsRepositoryProvider).firstWhere((p) => p.id == 'test-post-1');
+      expect(edited.note, equals('Updated sourdough review note'));
+      expect(edited.audience, equals(PostAudience.public));
+
+      // Cannot edit another user's drop
+      final forbiddenErr = await notifier.editDrop(
+        postId: 'drop_tash_1',
+        note: 'Attempted tamper',
+      );
+      expect(forbiddenErr, isNotNull);
+      expect(forbiddenErr!.code, equals('FORBIDDEN'));
+
+      // Delete own drop
+      final deleted = await notifier.deleteDrop('test-post-1');
+      expect(deleted, isTrue);
+      expect(container.read(postsRepositoryProvider).any((p) => p.id == 'test-post-1'), isFalse);
     });
   });
 }

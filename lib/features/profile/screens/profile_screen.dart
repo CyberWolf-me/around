@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../data/models/profile_model.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
@@ -9,6 +11,77 @@ import '../../../data/services/haptic_service.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
+
+  void _showEditProfileDialog(BuildContext context, WidgetRef ref, ProfileModel profile) {
+    final nameCtrl = TextEditingController(text: profile.fullName);
+    final usernameCtrl = TextEditingController(text: profile.username);
+    final neighborhoodCtrl = TextEditingController(text: profile.neighborhood);
+    final bioCtrl = TextEditingController(text: profile.bio);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.paper,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: const BorderSide(color: AppColors.ink, width: 2),
+        ),
+        title: Text('Edit Profile', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Full Name'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: usernameCtrl,
+                decoration: const InputDecoration(labelText: 'Username (@handle)'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: neighborhoodCtrl,
+                decoration: const InputDecoration(labelText: 'Neighborhood / District'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: bioCtrl,
+                maxLines: 2,
+                maxLength: 300,
+                decoration: const InputDecoration(labelText: 'Bio'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel', style: TextStyle(color: AppColors.ink3)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await ref.read(currentProfileProvider.notifier).updateProfileDetails(
+                    fullName: nameCtrl.text,
+                    username: usernameCtrl.text,
+                    bio: bioCtrl.text,
+                    neighborhood: neighborhoodCtrl.text,
+                  );
+              if (ctx.mounted) Navigator.pop(ctx);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Profile details saved')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,7 +106,6 @@ class ProfileScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         children: [
-          // User Avatar & Bio
           Row(
             children: [
               Container(
@@ -48,11 +120,10 @@ class ProfileScreen extends ConsumerWidget {
                 alignment: Alignment.center,
                 child: Text(
                   profile.initials,
-                  style: const TextStyle(
+                  style: GoogleFonts.bricolageGrotesque(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.w800,
-                    fontFamily: 'BricolageGrotesque',
                   ),
                 ),
               ),
@@ -69,6 +140,13 @@ class ProfileScreen extends ConsumerWidget {
                       '@${profile.username} · ${profile.neighborhood}',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
+                    if (profile.bio.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        profile.bio,
+                        style: const TextStyle(fontSize: 11.5, color: AppColors.ink2),
+                      ),
+                    ],
                     const SizedBox(height: 6),
                     Row(
                       children: [
@@ -85,17 +163,13 @@ class ProfileScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 14),
-
-          // Action buttons
           Row(
             children: [
               Expanded(
                 child: OutlinedButton(
                   onPressed: () {
                     HapticService.light();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Profile details updated')),
-                    );
+                    _showEditProfileDialog(context, ref, profile);
                   },
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.ink, width: 1.5),
@@ -126,17 +200,14 @@ class ProfileScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 20),
-
-          // Your Drops Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Your Drops',
-                style: TextStyle(
+                style: GoogleFonts.bricolageGrotesque(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
-                  fontFamily: 'BricolageGrotesque',
                 ),
               ),
               Text(
@@ -146,8 +217,6 @@ class ProfileScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 10),
-
-          // Drops list
           if (myDrops.isEmpty)
             Container(
               padding: const EdgeInsets.all(20),
@@ -204,65 +273,94 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   void _showFindFriendsDialog(BuildContext context, WidgetRef ref) {
-    final followedNotifier = ref.read(followedFriendsProvider.notifier);
-    final followedSet = ref.watch(followedFriendsProvider);
-
-    final suggested = [
-      {'id': 'noor', 'name': 'Noor Haddad', 'handle': 'noorh', 'drops': 18},
-      {'id': 'teo', 'name': 'Teo Vasquez', 'handle': 'teovas', 'drops': 14},
-      {'id': 'mina', 'name': 'Mina Osei', 'handle': 'minaosei', 'drops': 29},
-      {'id': 'ari', 'name': 'Ari Lindqvist', 'handle': 'arilind', 'drops': 11},
-      {'id': 'priya', 'name': 'Priya Raman', 'handle': 'priyar', 'drops': 33},
-    ];
-
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.paper,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-          side: const BorderSide(color: AppColors.ink, width: 2),
-        ),
-        title: const Text('Tashkent Community', style: TextStyle(fontFamily: 'BricolageGrotesque')),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: suggested.map((user) {
-              final id = user['id'] as String;
-              final isFollowing = followedSet.contains(id);
-              return ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: CircleAvatar(
-                  backgroundColor: AppColors.ink,
-                  child: Text(user['name'].toString()[0], style: const TextStyle(color: Colors.white)),
+      builder: (_) => Consumer(
+        builder: (ctx, dialogRef, __) {
+          final relations = dialogRef.watch(friendshipStatusesProvider);
+          final relationNotifier = dialogRef.read(friendshipStatusesProvider.notifier);
+
+          return AlertDialog(
+            backgroundColor: AppColors.paper,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: const BorderSide(color: AppColors.ink, width: 2),
+            ),
+            title: Text('Tashkent Community', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800)),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: kTashkentCommunityMembers.map((member) {
+                    final rel = relations[member.id] ?? FriendshipRelation.none;
+                    String label;
+                    Color labelColor;
+                    switch (rel) {
+                      case FriendshipRelation.accepted:
+                        label = 'Friends';
+                        labelColor = AppColors.ink3;
+                        break;
+                      case FriendshipRelation.pendingOutgoing:
+                        label = 'Requested';
+                        labelColor = AppColors.ink2;
+                        break;
+                      case FriendshipRelation.pendingIncoming:
+                        label = 'Accept';
+                        labelColor = AppColors.cobalt;
+                        break;
+                      case FriendshipRelation.none:
+                        label = member.allowFriendRequests ? '+ Request' : 'Private';
+                        labelColor = member.allowFriendRequests ? AppColors.orange : AppColors.ink3;
+                        break;
+                    }
+
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        context.push('/users/${member.id}');
+                      },
+                      leading: CircleAvatar(
+                        backgroundColor: AppColors.ink,
+                        child: Text(member.initials, style: const TextStyle(color: Colors.white, fontSize: 11)),
+                      ),
+                      title: Text(member.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      subtitle: Text(
+                        '@${member.handle} · ${member.neighborhood} · ${member.dropsCount} drops',
+                        style: const TextStyle(fontSize: 10),
+                      ),
+                      trailing: TextButton(
+                        onPressed: () async {
+                          HapticService.selection();
+                          final msg = await relationNotifier.requestOrToggleFriendship(member.id);
+                          if (msg != null && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+                          }
+                        },
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            color: labelColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11.5,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-                title: Text(user['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                subtitle: Text('@${user['handle']} · ${user['drops']} drops', style: const TextStyle(fontSize: 10)),
-                trailing: TextButton(
-                  onPressed: () {
-                    HapticService.selection();
-                    followedNotifier.toggleFollow(id);
-                  },
-                  child: Text(
-                    isFollowing ? 'Following' : '+ Follow',
-                    style: TextStyle(
-                      color: isFollowing ? AppColors.ink3 : AppColors.orange,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.ink),
-            child: const Text('Done', style: TextStyle(color: Colors.white)),
-          ),
-        ],
+              ),
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.ink),
+                child: const Text('Done', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

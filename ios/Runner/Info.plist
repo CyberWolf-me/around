@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Around App</string>
+	<string>Around</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -26,6 +26,12 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Around uses your camera only when you choose to take a photo for a Place Drop.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Around accesses your photo library only when you select a venue photo for a Place Drop.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Around uses your foreground location to show nearby places and walking distances in your neighborhood.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

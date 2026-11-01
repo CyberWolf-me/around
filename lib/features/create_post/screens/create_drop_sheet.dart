@@ -1,12 +1,16 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/services/app_logger.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/models/post_model.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/posts_repository.dart';
+import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/services/haptic_service.dart';
 
 class CreateDropSheet extends ConsumerStatefulWidget {
@@ -25,7 +29,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
   final TextEditingController _noteController = TextEditingController();
   int _rating = 5;
   final List<String> _selectedTags = ['specialty coffee'];
-  PostAudience _audience = PostAudience.friends;
+  late PostAudience _audience;
   String _venueSearch = '';
   final ImagePicker _picker = ImagePicker();
 
@@ -56,9 +60,11 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
   @override
   void initState() {
     super.initState();
-    _selectedPlaceId = widget.presetPlaceId ?? 'breadly';
+    _selectedPlaceId = PlacesRepository.resolveCanonicalId(widget.presetPlaceId ?? 'breadly');
+    final defaultAud = ref.read(currentProfileProvider).defaultAudience;
+    _audience = defaultAud == 'public' ? PostAudience.public : PostAudience.friends;
     if (widget.presetPlaceId != null) {
-      _currentStep = 2; // skip to note step if place preselected
+      _currentStep = 2;
     }
   }
 
@@ -73,17 +79,30 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
     try {
       final XFile? file = await _picker.pickImage(
         source: source,
-        maxWidth: 1600,
-        imageQuality: 85,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 78,
       );
       if (file != null) {
+        final bytes = await file.readAsBytes();
+        final err = AppLogger.validateImagePath(file.path, byteLength: bytes.length);
+        if (err != null) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(err.message)),
+            );
+          }
+          return;
+        }
+        // Persist as a base64 data URI so OS temporary cache purges never break local drops
+        final persistentDataUri = 'data:image/jpeg;base64,${base64Encode(bytes)}';
         setState(() {
-          _selectedPhoto = file.path;
+          _selectedPhoto = persistentDataUri;
         });
         HapticService.selection();
       }
     } catch (e) {
-      debugPrint('[CreateDropSheet] Photo pick error: $e');
+      AppLogger.error('CreateDropSheet', 'Photo pick error', e);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Could not open camera/gallery: $e')),
@@ -110,39 +129,54 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
     }
   }
 
-  void _submitDrop() {
+  Future<void> _submitDrop() async {
     final placesRepo = ref.read(placesRepositoryProvider);
     final place = placesRepo.getPlaceById(_selectedPlaceId);
+    final effectiveNote = _noteController.text.trim().isEmpty
+        ? 'Recommended spot in ${place?.district ?? 'Tashkent'}.'
+        : _noteController.text.trim();
 
-    ref.read(postsRepositoryProvider.notifier).publishDrop(
+    final failure = await ref.read(postsRepositoryProvider.notifier).publishDrop(
           placeId: _selectedPlaceId,
           placeName: place?.name ?? 'Tashkent Spot',
           placeCategory: place?.category ?? 'Café',
           placeAddress: place?.streetAddress ?? 'Tashkent, Uzbekistan',
-          note: _noteController.text.trim().isEmpty ? 'Recommended spot in Tashkent.' : _noteController.text.trim(),
+          note: effectiveNote,
           rating: _rating,
           audience: _audience,
           tags: _selectedTags,
           mediaPath: _selectedPhoto,
         );
 
+    if (failure != null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(failure.message)),
+        );
+      }
+      return;
+    }
+
     HapticService.heavy();
-    Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _audience == PostAudience.friends
-              ? '✓ Dropped for your friends only'
-              : '✓ Dropped publicly for Tashkent community',
+    if (mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            _audience == PostAudience.friends
+                ? '✓ Dropped for your friends only'
+                : '✓ Dropped publicly for Tashkent community',
+          ),
+          duration: const Duration(seconds: 3),
         ),
-        duration: const Duration(seconds: 3),
-      ),
-    );
+      );
+    }
   }
 
   void _showAddCustomPlaceDialog() {
     final nameCtrl = TextEditingController();
     final addressCtrl = TextEditingController();
+    final districtCtrl = TextEditingController(text: 'Mirabad');
     final categoryCtrl = TextEditingController(text: 'Café · Brunch');
 
     showDialog(
@@ -160,12 +194,19 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
             children: [
               TextField(
                 controller: nameCtrl,
+                maxLength: 120,
                 decoration: const InputDecoration(labelText: 'Venue Name *', hintText: 'e.g. Socials Cafe'),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: addressCtrl,
-                decoration: const InputDecoration(labelText: 'Address / Street *', hintText: 'e.g. 15 Navoi St, Yunusabad'),
+                maxLength: 200,
+                decoration: const InputDecoration(labelText: 'Address / Street *', hintText: 'e.g. 15 Taras Shevchenko St'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: districtCtrl,
+                decoration: const InputDecoration(labelText: 'District', hintText: 'e.g. Mirabad, Yakkasaray'),
               ),
               const SizedBox(height: 8),
               TextField(
@@ -190,7 +231,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                 name: nameCtrl.text.trim(),
                 category: categoryCtrl.text.trim().isEmpty ? 'Café' : categoryCtrl.text.trim(),
                 streetAddress: addressCtrl.text.trim().isEmpty ? 'Tashkent' : addressCtrl.text.trim(),
-                district: 'Tashkent',
+                district: districtCtrl.text.trim().isEmpty ? 'Mirabad' : districtCtrl.text.trim(),
                 city: 'Tashkent',
                 latitude: 41.3111,
                 longitude: 69.2797,
@@ -214,8 +255,8 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
   @override
   Widget build(BuildContext context) {
     final placesRepo = ref.watch(placesRepositoryProvider);
-    final currentPlace = placesRepo.getPlaceById(_selectedPlaceId);
-    final stepTitles = ['Select Photo', 'Choose Venue', 'Add Note & Tags', 'Audience & Privacy'];
+    final PlaceModel? currentPlace = placesRepo.getPlaceById(_selectedPlaceId);
+    const stepTitles = ['Select Photo', 'Choose Venue', 'Add Note & Tags', 'Audience & Privacy'];
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.88,
@@ -230,7 +271,6 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
       ),
       child: Column(
         children: [
-          // Drag handle
           Center(
             child: Container(
               margin: const EdgeInsets.only(top: 10, bottom: 6),
@@ -242,16 +282,13 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
               ),
             ),
           ),
-
-          // Header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             child: Row(
               children: [
                 Text(
                   'STEP ${_currentStep + 1} OF 4',
-                  style: const TextStyle(
-                    fontFamily: 'SpaceMono',
+                  style: GoogleFonts.spaceMono(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.0,
@@ -275,8 +312,6 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
               ],
             ),
           ),
-
-          // Step Progress Bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Row(
@@ -296,16 +331,12 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
             ),
           ),
           const SizedBox(height: 14),
-
-          // Content Area
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 14),
               child: _buildStepContent(currentPlace),
             ),
           ),
-
-          // Footer Action Bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: const BoxDecoration(
@@ -369,13 +400,12 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
     );
   }
 
-  Widget _buildStepContent(dynamic currentPlace) {
+  Widget _buildStepContent(PlaceModel? currentPlace) {
     switch (_currentStep) {
-      case 0: // Photo Selection with Live Camera & Gallery Pickers
+      case 0:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Live Preview of selected photo
             Container(
               height: 200,
               width: double.infinity,
@@ -390,8 +420,6 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                   : const Center(child: Text('No photo selected')),
             ),
             const SizedBox(height: 14),
-
-            // Live Camera & Gallery Action Buttons
             Row(
               children: [
                 Expanded(
@@ -423,11 +451,9 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
               ],
             ),
             const SizedBox(height: 16),
-
-            const Text(
+            Text(
               'OR SELECT CURATED TASHKENT PHOTO:',
-              style: TextStyle(
-                fontFamily: 'SpaceMono',
+              style: GoogleFonts.spaceMono(
                 fontSize: 10,
                 color: AppColors.ink3,
                 fontWeight: FontWeight.bold,
@@ -468,9 +494,9 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
           ],
         );
 
-      case 1: // Venue Search & Confirmation
+      case 1:
         final placesRepo = ref.watch(placesRepositoryProvider);
-        return FutureBuilder(
+        return FutureBuilder<List<PlaceModel>>(
           future: placesRepo.getNearbyPlaces(searchQuery: _venueSearch),
           builder: (context, snapshot) {
             final list = snapshot.data ?? [];
@@ -566,7 +592,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
           },
         );
 
-      case 2: // Note, Rating, Tags
+      case 2:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -662,7 +688,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
           ],
         );
 
-      case 3: // Audience & Privacy (NON-NEGOTIABLE PRIVACY INVARIANT)
+      case 3:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -671,7 +697,6 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.ink3),
             ),
             const SizedBox(height: 12),
-            // Friends Only
             GestureDetector(
               onTap: () {
                 HapticService.selection();
@@ -688,19 +713,19 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                   ),
                   boxShadow: _audience == PostAudience.friends ? const [AppColors.shadow] : null,
                 ),
-                child: Row(
+                child: const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       backgroundColor: AppColors.paper,
                       radius: 18,
                       child: Icon(Icons.lock, size: 18, color: AppColors.ink),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             'Friends Only (Recommended)',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
@@ -718,7 +743,6 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
               ),
             ),
             const SizedBox(height: 12),
-            // Public Discovery
             GestureDetector(
               onTap: () {
                 HapticService.selection();
@@ -735,19 +759,19 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                   ),
                   boxShadow: _audience == PostAudience.public ? const [AppColors.shadow] : null,
                 ),
-                child: Row(
+                child: const Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       backgroundColor: AppColors.paper,
                       radius: 18,
                       child: Icon(Icons.public, size: 18, color: AppColors.ink),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
                             'Public (Tashkent Community)',
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),

@@ -8,13 +8,7 @@ import 'data/services/supabase_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await StorageService.init();
-
-  // If user stored custom Supabase credentials, initialize with them
-  final customUrl = StorageService.getSupabaseUrl();
-  final customKey = StorageService.getSupabaseAnonKey();
-  if (customUrl != null && customKey != null && customUrl.isNotEmpty && customKey.isNotEmpty) {
-    await SupabaseService.initialize(url: customUrl, anonKey: customKey);
-  }
+  await SupabaseService.initialize();
 
   runApp(
     const ProviderScope(

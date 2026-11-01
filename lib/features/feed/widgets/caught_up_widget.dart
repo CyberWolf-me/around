@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 
 class CaughtUpWidget extends StatelessWidget {
@@ -14,16 +15,15 @@ class CaughtUpWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.paper2,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.ink.withOpacity(0.3), width: 1.5),
+        border: Border.all(color: AppColors.ink.withValues(alpha: 0.3), width: 1.5),
       ),
       child: Column(
         children: [
-          const Text(
+          Text(
             "You're all caught up.",
-            style: TextStyle(
+            style: GoogleFonts.bricolageGrotesque(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              fontFamily: 'BricolageGrotesque',
               color: AppColors.ink,
             ),
           ),

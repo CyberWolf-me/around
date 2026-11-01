@@ -3,8 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:around_app/main.dart';
 
 void main() {
-  testWidgets('AroundApp smoke test - verifies bottom nav and feed loading', (WidgetTester tester) async {
-    // Build AroundApp inside ProviderScope
+  testWidgets('AroundApp smoke test - verifies non-empty feed and bottom navigation tabs', (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(
         child: AroundApp(),
@@ -14,6 +13,9 @@ void main() {
 
     // Verify brand header in RichText
     expect(find.textContaining('Around', findRichText: true), findsOneWidget);
+
+    // Verify Friends Feed renders seeded Tashkent drops on launch
+    expect(find.text('Breadly Bakery & Café'), findsWidgets);
 
     // Verify navigation tabs
     expect(find.text('FEED'), findsOneWidget);

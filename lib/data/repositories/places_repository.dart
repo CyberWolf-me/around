@@ -1,4 +1,6 @@
+import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/services/app_logger.dart';
 import '../models/place_model.dart';
 import '../services/storage_service.dart';
 import '../services/supabase_service.dart';
@@ -7,11 +9,37 @@ final placesRepositoryProvider = Provider<PlacesRepository>((ref) {
   return PlacesRepository();
 });
 
+class RecommendedPlaceResult {
+  final PlaceModel place;
+  final double relevanceScore;
+  final int friendsRecommendCount;
+  final String explanation;
+
+  const RecommendedPlaceResult({
+    required this.place,
+    required this.relevanceScore,
+    required this.friendsRecommendCount,
+    required this.explanation,
+  });
+}
+
 class PlacesRepository {
-  // Canonical Tashkent venues
+  static const Map<String, String> _legacyAliases = {
+    'kettle': 'breadly',
+    'fern': 'bnb',
+    'sable': 'steam',
+    'castellan': 'steam',
+    'volta': 'kitobxon',
+    'marigold': 'ecorn',
+    'noodle': 'chorsu',
+    'longtable': 'bnb',
+    'quiet': 'tims',
+  };
+
   static final List<PlaceModel> _canonicalPlaces = [
     const PlaceModel(
       id: 'breadly',
+      canonicalUuid: '11111111-1111-4111-8111-111111111101',
       slug: 'breadly-bakery-cafe',
       name: 'Breadly Bakery & Café',
       category: 'Bakery · Specialty Café',
@@ -34,6 +62,7 @@ class PlacesRepository {
     ),
     const PlaceModel(
       id: 'bnb',
+      canonicalUuid: '11111111-1111-4111-8111-111111111102',
       slug: 'bnb-coffee-house',
       name: 'B&B Coffee House',
       category: 'Study Café · Roastery',
@@ -56,6 +85,7 @@ class PlacesRepository {
     ),
     const PlaceModel(
       id: 'ecorn',
+      canonicalUuid: '11111111-1111-4111-8111-111111111103',
       slug: 'ecorn-patisserie',
       name: 'Ecorn Patisserie',
       category: 'French Patisserie · Bistro',
@@ -78,6 +108,7 @@ class PlacesRepository {
     ),
     const PlaceModel(
       id: 'tims',
+      canonicalUuid: '11111111-1111-4111-8111-111111111104',
       slug: 'tims-coffee-roastery',
       name: 'Tim’s Coffee & Roastery',
       category: 'Specialty Roastery · Espresso Bar',
@@ -100,6 +131,7 @@ class PlacesRepository {
     ),
     const PlaceModel(
       id: 'chorsu',
+      canonicalUuid: '11111111-1111-4111-8111-111111111105',
       slug: 'chorsu-national-food',
       name: 'Chorsu Milliy Taomlar',
       category: 'Uzbek Cuisine · Open Kitchen',
@@ -117,11 +149,12 @@ class PlacesRepository {
       heroImageUrl: 'assets/street.jpg',
       ratingAvg: 4.9,
       ratingCount: 880,
-      tags: ['wedding plov', 'tandir somsa', 'kazan cooking', 'authentic'],
+      tags: ['wedding plov', 'tandir somsa', 'kazan cooking', 'authentic', 'ramen'],
       photos: ['assets/street.jpg', 'assets/ramen-bowl.jpg', 'assets/storefront.jpg'],
     ),
     const PlaceModel(
       id: 'centralpark',
+      canonicalUuid: '11111111-1111-4111-8111-111111111106',
       slug: 'central-park-tashkent',
       name: 'Central Park (Mirzo Ulugbek)',
       category: 'Park · Green Promenade',
@@ -144,9 +177,10 @@ class PlacesRepository {
     ),
     const PlaceModel(
       id: 'steam',
+      canonicalUuid: '11111111-1111-4111-8111-111111111107',
       slug: 'steam-bar-lounge',
       name: 'Steam Bar & Lounge',
-      category: 'Cocktail Lounge · Vinyl Bar',
+      category: 'Cocktail Lounge · Wine Bar · Vinyl Records',
       streetAddress: '29 Nukus Street',
       district: 'Mirabad',
       city: 'Tashkent',
@@ -161,14 +195,15 @@ class PlacesRepository {
       heroImageUrl: 'assets/wine-wide.jpg',
       ratingAvg: 4.6,
       ratingCount: 310,
-      tags: ['craft cocktails', 'vinyl DJ', 'late night', 'date spot'],
+      tags: ['craft cocktails', 'vinyl DJ', 'late night', 'date spot', 'records', 'wine bar'],
       photos: ['assets/wine-wide.jpg', 'assets/wine-tall.jpg', 'assets/records.jpg'],
     ),
     const PlaceModel(
       id: 'kitobxon',
+      canonicalUuid: '11111111-1111-4111-8111-111111111108',
       slug: 'kitobxon-book-cafe',
       name: 'Kitobxon Book Café',
-      category: 'Bookstore · Literary Café',
+      category: 'Bookshop · Literary Café',
       streetAddress: '11 Alisher Navoi Avenue',
       district: 'Yunusabad',
       city: 'Tashkent',
@@ -183,11 +218,12 @@ class PlacesRepository {
       heroImageUrl: 'assets/bookshop.jpg',
       ratingAvg: 4.8,
       ratingCount: 195,
-      tags: ['bookstore', 'quiet nooks', 'aeropress', 'reading'],
+      tags: ['bookstore', 'bookshop', 'quiet nooks', 'aeropress', 'reading'],
       photos: ['assets/bookshop.jpg', 'assets/bookshop-tall.jpg', 'assets/storefront.jpg'],
     ),
     const PlaceModel(
       id: 'broadway',
+      canonicalUuid: '11111111-1111-4111-8111-111111111109',
       slug: 'broadway-sayilgoh',
       name: 'Broadway (Sayilgoh Street)',
       category: 'Pedestrian Promenade · Arts',
@@ -208,68 +244,25 @@ class PlacesRepository {
       tags: ['street artists', 'souvenirs', 'night stroll', 'bustling'],
       photos: ['assets/storefront.jpg', 'assets/street.jpg', 'assets/ramen-bowl.jpg'],
     ),
-    // Backward compatibility aliases for previous test cases
-    const PlaceModel(
-      id: 'kettle',
-      slug: 'breadly-bakery-cafe',
-      name: 'Kettle & Loaf',
-      category: 'Bakery · Specialty Café',
-      streetAddress: '24 Taras Shevchenko Street',
-      district: 'Barlow Hill',
-      city: 'Tashkent',
-      latitude: 41.2996,
-      longitude: 69.2748,
-      heroImageUrl: 'assets/bakery-counter.jpg',
-      ratingAvg: 4.8,
-      ratingCount: 342,
-      tags: ['artisan sourdough', 'courtyard', 'specialty coffee', 'quiet mornings'],
-    ),
-    const PlaceModel(
-      id: 'fern',
-      slug: 'bnb-coffee-house',
-      name: 'The Fern Room',
-      category: 'Study Café · Roastery',
-      streetAddress: '24 Shota Rustaveli Street',
-      district: 'Barlow Hill',
-      city: 'Tashkent',
-      latitude: 41.2918,
-      longitude: 69.2619,
-      heroImageUrl: 'assets/study-desk.jpg',
-      ratingAvg: 4.6,
-      ratingCount: 512,
-      tags: ['power outlets', 'study-friendly', 'chemex', 'long stays'],
-    ),
-    const PlaceModel(
-      id: 'sable',
-      slug: 'steam-bar-lounge',
-      name: 'Sable Records',
-      category: 'Cocktail Lounge · Vinyl Bar',
-      streetAddress: '29 Nukus Street',
-      district: 'Barlow Hill',
-      city: 'Tashkent',
-      latitude: 41.2942,
-      longitude: 69.2694,
-      heroImageUrl: 'assets/records.jpg',
-      ratingAvg: 4.6,
-      ratingCount: 310,
-      tags: ['craft cocktails', 'vinyl DJ', 'crate digging'],
-    ),
-    const PlaceModel(
-      id: 'castellan',
-      slug: 'steam-bar-lounge',
-      name: 'Castellan Wine Bar',
-      category: 'Wine & Lounge',
-      streetAddress: '29 Nukus Street',
-      district: 'Barlow Hill',
-      city: 'Tashkent',
-      latitude: 41.2942,
-      longitude: 69.2694,
-      heroImageUrl: 'assets/wine-tall.jpg',
-      ratingAvg: 4.6,
-      ratingCount: 210,
-      tags: ['date night', 'natural wine'],
-    ),
   ];
+
+  static String resolveCanonicalId(String id) {
+    return _legacyAliases[id] ?? id;
+  }
+
+  /// Calculates Haversine great-circle distance in meters between two WGS84 coordinates.
+  static double calculateDistanceMeters(double lat1, double lng1, double lat2, double lng2) {
+    const double earthRadius = 6371000;
+    final dLat = (lat2 - lat1) * math.pi / 180.0;
+    final dLng = (lng2 - lng1) * math.pi / 180.0;
+    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(lat1 * math.pi / 180.0) *
+            math.cos(lat2 * math.pi / 180.0) *
+            math.sin(dLng / 2) *
+            math.sin(dLng / 2);
+    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+    return earthRadius * c;
+  }
 
   List<PlaceModel> getAllPlaces() {
     final custom = StorageService.getCustomPlaces();
@@ -280,6 +273,29 @@ class PlacesRepository {
     final existingCustom = StorageService.getCustomPlaces();
     final updated = [...existingCustom, place];
     await StorageService.persistCustomPlaces(updated);
+
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      try {
+        await SupabaseService.client.from('places').insert({
+          'slug': place.slug,
+          'name': place.name,
+          'category': place.category,
+          'street_address': place.streetAddress,
+          'district': place.district,
+          'city': place.city,
+          'location': 'POINT(${place.longitude} ${place.latitude})',
+          'price_tier': place.priceTier,
+          'hours': place.hours,
+          'status_line': place.statusLine,
+          'description': place.description,
+          'hero_image_url': place.heroImageUrl,
+          'tags': place.tags,
+          'created_by': SupabaseService.currentUser?.id,
+        });
+      } catch (e) {
+        AppLogger.warn('PlacesRepository', 'Supabase custom place sync error', e);
+      }
+    }
   }
 
   Future<List<PlaceModel>> getNearbyPlaces({
@@ -288,8 +304,7 @@ class PlacesRepository {
     String category = 'All',
     String searchQuery = '',
   }) async {
-    // Check Supabase if configured
-    if (SupabaseService.isInitialized) {
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
       try {
         final res = await SupabaseService.client.rpc(
           'get_nearby_places',
@@ -298,19 +313,19 @@ class PlacesRepository {
             'user_lng': lng,
             'radius_meters': 5000,
             'filter_category': category,
+            'search_query': searchQuery,
           },
         );
-        if (res is List && res.isNotEmpty) {
-          return res.map((e) => PlaceModel.fromJson(e)).toList();
+        if (res is List) {
+          return res.map((e) => PlaceModel.fromJson(Map<String, dynamic>.from(e))).toList();
         }
       } catch (err) {
-        // Fallback to local
+        AppLogger.warn('PlacesRepository', 'RPC fallback to local spatial calculation', err);
       }
     }
 
-    // Local filter across canonical and custom places
     final all = getAllPlaces();
-    return all.where((p) {
+    final filtered = all.where((p) {
       final matchesCat = category == 'All' ||
           p.category.toLowerCase().contains(category.toLowerCase()) ||
           p.tags.any((t) => t.toLowerCase().contains(category.toLowerCase()));
@@ -321,14 +336,66 @@ class PlacesRepository {
           p.tags.any((t) => t.toLowerCase().contains(searchQuery.toLowerCase()));
       return matchesCat && matchesSearch;
     }).toList();
+
+    return filtered;
+  }
+
+  /// Explainable, privacy-preserving recommendation engine (Phase 6 — Discovery Domain).
+  /// Scores venues by accepted friends' recommendations, saved-place category affinity,
+  /// and community rating without exposing private visit timelines.
+  List<RecommendedPlaceResult> getRecommendedPlaces({
+    required Set<String> acceptedFriendPlaceIds,
+    required Set<String> savedPlaceIds,
+    required Map<String, String> savedStatuses,
+  }) {
+    final all = getAllPlaces();
+    final savedCategories = <String>{};
+    for (final id in savedPlaceIds) {
+      final p = getPlaceById(id);
+      if (p != null) {
+        savedCategories.add(p.category.split(' · ').first.toLowerCase());
+      }
+    }
+
+    final results = <RecommendedPlaceResult>[];
+    for (final p in all) {
+      // Exclude places the user has already marked as 'been'
+      if (savedStatuses[p.id] == 'been') continue;
+
+      final friendMatch = acceptedFriendPlaceIds.contains(p.id) ? 1 : 0;
+      final primaryCat = p.category.split(' · ').first.toLowerCase();
+      final catAffinity = savedCategories.contains(primaryCat) ? 1.5 : 0.0;
+      final score = (friendMatch * 3.0) + catAffinity + (p.ratingAvg * 0.5);
+
+      final String reason;
+      if (friendMatch > 0) {
+        reason = 'Recommended by your accepted friends in ${p.district}';
+      } else if (catAffinity > 0) {
+        reason = 'Matches your saved ${p.category.split(' · ').first} spots';
+      } else {
+        reason = 'Top-rated in ${p.district} (${p.ratingAvg}★)';
+      }
+
+      results.add(RecommendedPlaceResult(
+        place: p,
+        relevanceScore: double.parse(score.toStringAsFixed(2)),
+        friendsRecommendCount: friendMatch,
+        explanation: reason,
+      ));
+    }
+
+    results.sort((a, b) => b.relevanceScore.compareTo(a.relevanceScore));
+    return results;
   }
 
   PlaceModel? getPlaceById(String id) {
+    final resolved = resolveCanonicalId(id);
     final all = getAllPlaces();
-    try {
-      return all.firstWhere((p) => p.id == id);
-    } catch (_) {
-      return null;
+    for (final p in all) {
+      if (p.id == resolved || p.id == id || p.slug == id || p.canonicalUuid == id) {
+        return p;
+      }
     }
+    return null;
   }
 }

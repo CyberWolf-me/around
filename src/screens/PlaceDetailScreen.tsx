@@ -19,16 +19,25 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
     savedPlaceIds,
     toggleSavePlace,
     popScreen,
+    pushScreen,
     openCreateDrop,
     showToast,
     drops,
     currentUserId,
     followedUserIds,
     privacySettings,
+    blockUser,
+    reportContent,
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'friends' | 'public'>('friends');
   const [directionsModal, setDirectionsModal] = useState<boolean>(false);
+  const [moderationTarget, setModerationTarget] = useState<{
+    type: 'drop' | 'place';
+    id: string;
+    authorId?: string;
+    authorHandle?: string;
+  } | null>(null);
 
   const place = getPlaceById(placeId);
   if (!place) {
@@ -43,9 +52,7 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
   }
 
   const isSaved = savedPlaceIds.includes(place.id);
-  const friendsCount = FRIENDS_BEEN_COUNT[place.id] || 3;
 
-  // Filter drops according to privacy rules
   const friendDrops = filterPlaceDrops(
     drops,
     place.id,
@@ -55,15 +62,17 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
     new Set(privacySettings.blockedUsers)
   );
 
-  const publicNotes = INITIAL_PUBLIC_NOTES[place.id] || [
+  const friendsCount = Math.max(friendDrops.length, FRIENDS_BEEN_COUNT[place.id] || 1);
+
+  const publicNotes = (INITIAL_PUBLIC_NOTES[place.id] || [
     {
       id: 'default-pn',
-      who: 'hana',
+      who: 'rustam',
       rating: 5,
       when: '2 days ago',
-      txt: 'Classic Barlow Hill staple. Best visited early morning before the crowd arrives.',
+      txt: 'Best visited early morning before the Mirabad crowd arrives.',
     },
-  ];
+  ]).filter(pn => !privacySettings.blockedUsers.includes(pn.who));
 
   const handleShare = () => {
     if (navigator.clipboard) {
@@ -81,7 +90,7 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
         </button>
 
         <span className="mono" style={{ color: 'var(--ink-3)', flex: 1, fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          Place · {place.cat.split(' · ')[0]}
+          Tashkent · {place.cat.split(' · ')[0]}
         </span>
 
         <button
@@ -95,6 +104,15 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
 
         <button className="iconbtn tap" onClick={handleShare} aria-label="Share venue">
           <Icon name="share" size={15} sw={2.2} />
+        </button>
+
+        <button
+          className="iconbtn tap"
+          onClick={() => setModerationTarget({ type: 'place', id: place.id })}
+          aria-label="Report venue"
+          title="Report venue"
+        >
+          <Icon name="flag" size={14} sw={2.2} />
         </button>
       </div>
 
@@ -229,6 +247,8 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
             padding: '7px 0',
             border: 0,
             borderRadius: 7,
+            background: activeTab === 'friends' ? 'var(--ink)' : 'transparent',
+            color: activeTab === 'friends' ? 'var(--paper)' : 'var(--ink)',
             fontFamily: 'var(--body)',
             fontWeight: 700,
             fontSize: 11.5,
@@ -245,6 +265,8 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
             padding: '7px 0',
             border: 0,
             borderRadius: 7,
+            background: activeTab === 'public' ? 'var(--ink)' : 'transparent',
+            color: activeTab === 'public' ? 'var(--paper)' : 'var(--ink)',
             fontFamily: 'var(--body)',
             fontWeight: 700,
             fontSize: 11.5,
@@ -264,7 +286,7 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
                 No friends have dropped here yet
               </div>
               <p className="mono-sm" style={{ fontSize: 10.5, color: 'var(--ink-3)', marginBottom: 12 }}>
-                Be the first person in your circle to share this spot!
+                Be the first person in your circle to share this Tashkent spot!
               </p>
               <button
                 className="btn btn-primary btn-sm"
@@ -290,14 +312,28 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                    <Avatar id={d.who} size={26} />
-                    <div style={{ flex: 1 }}>
+                    <Avatar
+                      id={d.who}
+                      size={26}
+                      onClick={() => pushScreen({ kind: 'profile', userId: d.who })}
+                    />
+                    <div
+                      style={{ flex: 1, cursor: 'pointer' }}
+                      onClick={() => pushScreen({ kind: 'profile', userId: d.who })}
+                    >
                       <div style={{ fontSize: 12, fontWeight: 700 }}>{author?.name}</div>
                       <div className="mono-sm" style={{ fontSize: 9.5, color: 'var(--ink-3)' }}>
                         @{author?.handle} · {d.when}
                       </div>
                     </div>
                     <AudienceBadge aud={d.aud} />
+                    <button
+                      style={{ background: 'none', border: 0, cursor: 'pointer', padding: 2, color: 'var(--ink-3)' }}
+                      onClick={() => setModerationTarget({ type: 'drop', id: d.id, authorId: d.who, authorHandle: author?.handle })}
+                      aria-label="Report or block"
+                    >
+                      <Icon name="dots" size={14} sw={2.5} />
+                    </button>
                   </div>
 
                   {d.img && (
@@ -321,7 +357,6 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
           )}
         </div>
       ) : (
-        /* Public Reviews */
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {publicNotes.map((pn: PublicReview) => {
             const author = getUserById(pn.who);
@@ -336,8 +371,18 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                  <Avatar id={pn.who} size={22} ring={false} />
-                  <span style={{ fontSize: 11.5, fontWeight: 700 }}>{author?.name}</span>
+                  <Avatar
+                    id={pn.who}
+                    size={22}
+                    ring={false}
+                    onClick={() => pushScreen({ kind: 'profile', userId: pn.who })}
+                  />
+                  <span
+                    style={{ fontSize: 11.5, fontWeight: 700, cursor: 'pointer' }}
+                    onClick={() => pushScreen({ kind: 'profile', userId: pn.who })}
+                  >
+                    {author?.name}
+                  </span>
                   <span className="mono-sm" style={{ color: 'var(--ink-3)', fontSize: 9.5, marginLeft: 'auto' }}>
                     {pn.when}
                   </span>
@@ -413,16 +458,88 @@ export const PlaceDetailScreen: React.FC<PlaceDetailScreenProps> = ({ placeId })
               Walk to {place.name}
             </div>
             <p className="mono-sm" style={{ fontSize: 11, color: 'var(--ink-2)', lineHeight: 1.5, marginBottom: 16 }}>
-              From Barlow Hill Center: Head south along Fenwick Walk, turn left onto Ledger Street ({place.dist}).
+              Address: {place.street}, Tashkent ({place.dist}). Hours: {place.hours}.
             </p>
             <button
               className="btn btn-primary btn-block"
               onClick={() => {
+                if (navigator.clipboard) {
+                  navigator.clipboard.writeText(`${place.name}, ${place.street}, Tashkent`);
+                }
                 setDirectionsModal(false);
-                showToast('Opened map navigation');
+                showToast('Copied Tashkent address for map navigation');
               }}
             >
-              Open in Apple / Google Maps
+              Copy Address & Open Maps
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Moderation / Block Modal */}
+      {moderationTarget && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(21,19,15,.6)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+          }}
+          onClick={() => setModerationTarget(null)}
+        >
+          <div
+            style={{
+              background: 'var(--paper)',
+              border: '2.5px solid var(--ink)',
+              borderRadius: 18,
+              padding: 18,
+              width: '100%',
+              maxWidth: 320,
+              boxShadow: 'var(--sh-lg)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="display d-sm" style={{ fontSize: 17, marginBottom: 10 }}>
+              Safety & Moderation
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 12 }}>
+              {[
+                'Inappropriate photo or text',
+                'Spam or promotional shilling',
+                'Wrong venue / inaccurate location',
+                'Harassment or privacy violation',
+              ].map(reason => (
+                <button
+                  key={reason}
+                  className="btn btn-ghost btn-sm"
+                  style={{ justifyContent: 'flex-start', textAlign: 'left' }}
+                  onClick={() => {
+                    reportContent(moderationTarget.type, moderationTarget.id, reason);
+                    setModerationTarget(null);
+                  }}
+                >
+                  <Icon name="flag" size={12} sw={2.2} /> {reason}
+                </button>
+              ))}
+              {moderationTarget.authorId && moderationTarget.authorId !== 'you' && (
+                <button
+                  className="btn btn-danger btn-sm"
+                  style={{ marginTop: 4 }}
+                  onClick={() => {
+                    blockUser(moderationTarget.authorId!);
+                    setModerationTarget(null);
+                  }}
+                >
+                  Block @{moderationTarget.authorHandle || moderationTarget.authorId}
+                </button>
+              )}
+            </div>
+            <button className="btn btn-ghost btn-block btn-sm" onClick={() => setModerationTarget(null)}>
+              Cancel
             </button>
           </div>
         </div>

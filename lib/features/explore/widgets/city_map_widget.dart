@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/place_model.dart';
@@ -24,6 +25,11 @@ class CityMapWidget extends StatefulWidget {
 class _CityMapWidgetState extends State<CityMapWidget> {
   final MapController _mapController = MapController();
   static const LatLng _tashkentCenter = LatLng(41.3111, 69.2797);
+
+  static const String _tileUrlTemplate = String.fromEnvironment(
+    'MAP_TILE_URL',
+    defaultValue: 'https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+  );
 
   @override
   void didUpdateWidget(covariant CityMapWidget oldWidget) {
@@ -66,7 +72,6 @@ class _CityMapWidgetState extends State<CityMapWidget> {
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          // Real OpenStreetMap Tile Layer
           FlutterMap(
             mapController: _mapController,
             options: const MapOptions(
@@ -80,7 +85,7 @@ class _CityMapWidgetState extends State<CityMapWidget> {
             ),
             children: [
               TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                urlTemplate: _tileUrlTemplate,
                 userAgentPackageName: 'com.around.around_app',
                 maxZoom: 19,
               ),
@@ -142,8 +147,6 @@ class _CityMapWidgetState extends State<CityMapWidget> {
               ),
             ],
           ),
-
-          // Tashkent Live Indicator Pill (Top Left)
           Positioned(
             top: 10,
             left: 10,
@@ -167,10 +170,9 @@ class _CityMapWidgetState extends State<CityMapWidget> {
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Text(
-                    'Tashkent, UZ · OpenStreetMap',
-                    style: TextStyle(
-                      fontFamily: 'SpaceMono',
+                  Text(
+                    'Tashkent, UZ · Live Map',
+                    style: GoogleFonts.spaceMono(
                       fontSize: 9.5,
                       fontWeight: FontWeight.bold,
                       color: AppColors.ink,
@@ -180,8 +182,6 @@ class _CityMapWidgetState extends State<CityMapWidget> {
               ),
             ),
           ),
-
-          // Zoom & Recenter Controls (Bottom Right)
           Positioned(
             bottom: 10,
             right: 10,

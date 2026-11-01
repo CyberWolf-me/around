@@ -14,7 +14,7 @@ export const AppHeader: React.FC = () => {
           Around<em style={{ color: 'var(--orange)', fontStyle: 'normal' }}>.</em>
         </div>
         <span className="mono-sm" style={{ color: 'var(--ink-3)', fontSize: 9.5, letterSpacing: '0.04em' }}>
-          Barlow Hill
+          Tashkent
         </span>
       </div>
 

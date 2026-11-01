@@ -1,129 +1,241 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/services/app_logger.dart';
 import '../models/post_model.dart';
 import '../models/place_model.dart';
+import '../models/profile_model.dart';
+import '../models/saved_place_model.dart';
 
 class StorageService {
   static const _savedPlacesKey = 'around_saved_places_v1';
+  static const _savedStatusesKey = 'around_saved_statuses_v1';
   static const _customDropsKey = 'around_custom_drops_v1';
   static const _customPlacesKey = 'around_custom_places_v1';
-  static const _supabaseUrlKey = 'around_supabase_url_v1';
-  static const _supabaseAnonKey = 'around_supabase_anon_key_v1';
+  static const _profileKey = 'around_user_profile_v1';
+  static const _followedFriendsKey = 'around_followed_friends_v1';
+  static const _friendshipStatusesKey = 'around_friendship_statuses_v1';
+  static const _blockedUsersKey = 'around_blocked_users_v1';
+  static const _reportsKey = 'around_reports_v1';
+  static const _plansKey = 'around_friend_plans_v1';
+  static const _onboardedKey = 'around_onboarded_v1';
+  static const _authUserEmailKey = 'around_auth_user_email_v1';
 
   static SharedPreferences? _prefs;
+  static final Map<String, Object> _memoryFallback = {};
 
   static Future<void> init() async {
     try {
       _prefs = await SharedPreferences.getInstance();
     } catch (e) {
-      debugPrint('[StorageService] Init error (using memory fallback): $e');
+      AppLogger.warn('StorageService', 'SharedPreferences init fallback to in-memory store', e);
     }
   }
 
-  // Saved places
+  // Onboarding state
+  static bool isOnboarded() {
+    return _prefs?.getBool(_onboardedKey) ?? (_memoryFallback[_onboardedKey] as bool? ?? true);
+  }
+
+  static Future<void> setOnboarded(bool value) async {
+    _memoryFallback[_onboardedKey] = value;
+    await _prefs?.setBool(_onboardedKey, value);
+  }
+
+  // Authenticated session email
+  static String? getAuthUserEmail() {
+    return _prefs?.getString(_authUserEmailKey) ?? (_memoryFallback[_authUserEmailKey] as String?);
+  }
+
+  static Future<void> setAuthUserEmail(String? email) async {
+    if (email == null) {
+      _memoryFallback.remove(_authUserEmailKey);
+      await _prefs?.remove(_authUserEmailKey);
+    } else {
+      _memoryFallback[_authUserEmailKey] = email;
+      await _prefs?.setString(_authUserEmailKey, email);
+    }
+  }
+
+  // Saved places IDs
   static List<String>? getSavedPlaceIds() {
-    return _prefs?.getStringList(_savedPlacesKey);
+    return _prefs?.getStringList(_savedPlacesKey) ?? (_memoryFallback[_savedPlacesKey] as List<String>?);
   }
 
   static Future<void> savePlaceIds(List<String> ids) async {
+    _memoryFallback[_savedPlacesKey] = List<String>.from(ids);
     await _prefs?.setStringList(_savedPlacesKey, ids);
+  }
+
+  // Saved places status map ('want_to_go' | 'been')
+  static Map<String, String> getSavedPlaceStatuses() {
+    final raw = _prefs?.getString(_savedStatusesKey) ?? (_memoryFallback[_savedStatusesKey] as String?);
+    if (raw == null || raw.isEmpty) return {};
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      return decoded.map((k, v) => MapEntry(k, v.toString()));
+    } catch (e) {
+      AppLogger.warn('StorageService', 'Failed decoding saved place statuses', e);
+      return {};
+    }
+  }
+
+  static Future<void> savePlaceStatuses(Map<String, String> statuses) async {
+    final encoded = jsonEncode(statuses);
+    _memoryFallback[_savedStatusesKey] = encoded;
+    await _prefs?.setString(_savedStatusesKey, encoded);
   }
 
   // Custom drops
   static List<PostModel> getStoredDrops() {
-    final raw = _prefs?.getString(_customDropsKey);
+    final raw = _prefs?.getString(_customDropsKey) ?? (_memoryFallback[_customDropsKey] as String?);
     if (raw == null || raw.isEmpty) return [];
     try {
       final List list = jsonDecode(raw);
       return list.map((item) => PostModel.fromJson(Map<String, dynamic>.from(item))).toList();
     } catch (e) {
-      debugPrint('[StorageService] Error loading stored drops: $e');
+      AppLogger.error('StorageService', 'Error loading stored drops', e);
       return [];
     }
   }
 
   static Future<void> persistDrops(List<PostModel> drops) async {
     try {
-      final encoded = jsonEncode(drops.map((p) => {
-        'id': p.id,
-        'author_id': p.authorId,
-        'author_name': p.authorName,
-        'author_username': p.authorUsername,
-        'author_avatar': p.authorAvatar,
-        'place_id': p.placeId,
-        'place_name': p.placeName,
-        'place_category': p.placeCategory,
-        'place_address': p.placeAddress,
-        'note': p.note,
-        'rating': p.rating,
-        'audience': p.audience.name,
-        'size': p.size.name,
-        'tags': p.tags,
-        'media_url': p.mediaUrl,
-        'saves_count': p.savesCount,
-        'created_at': p.createdAt.toIso8601String(),
-        'is_saved': p.isSaved,
-      }).toList());
+      final encoded = jsonEncode(drops.map((p) => p.toJson()).toList());
+      _memoryFallback[_customDropsKey] = encoded;
       await _prefs?.setString(_customDropsKey, encoded);
     } catch (e) {
-      debugPrint('[StorageService] Error persisting drops: $e');
+      AppLogger.error('StorageService', 'Error persisting drops', e);
     }
   }
 
   // Custom places created by user
   static List<PlaceModel> getCustomPlaces() {
-    final raw = _prefs?.getString(_customPlacesKey);
+    final raw = _prefs?.getString(_customPlacesKey) ?? (_memoryFallback[_customPlacesKey] as String?);
     if (raw == null || raw.isEmpty) return [];
     try {
       final List list = jsonDecode(raw);
       return list.map((item) => PlaceModel.fromJson(Map<String, dynamic>.from(item))).toList();
     } catch (e) {
-      debugPrint('[StorageService] Error loading custom places: $e');
+      AppLogger.error('StorageService', 'Error loading custom places', e);
       return [];
     }
   }
 
   static Future<void> persistCustomPlaces(List<PlaceModel> places) async {
     try {
-      final encoded = jsonEncode(places.map((p) => {
-        'id': p.id,
-        'slug': p.slug,
-        'name': p.name,
-        'category': p.category,
-        'street_address': p.streetAddress,
-        'district': p.district,
-        'city': p.city,
-        'latitude': p.latitude,
-        'longitude': p.longitude,
-        'distance_meters': p.distanceMeters,
-        'walk_time_minutes': p.walkTimeMinutes,
-        'price_tier': p.priceTier,
-        'hours': p.hours,
-        'status_line': p.statusLine,
-        'description': p.description,
-        'hero_image_url': p.heroImageUrl,
-        'rating_avg': p.ratingAvg,
-        'rating_count': p.ratingCount,
-        'tags': p.tags,
-        'photos': p.photos,
-      }).toList());
+      final encoded = jsonEncode(places.map((p) => p.toJson()).toList());
+      _memoryFallback[_customPlacesKey] = encoded;
       await _prefs?.setString(_customPlacesKey, encoded);
     } catch (e) {
-      debugPrint('[StorageService] Error persisting custom places: $e');
+      AppLogger.error('StorageService', 'Error persisting custom places', e);
     }
   }
 
-  // Supabase settings
-  static String? getSupabaseUrl() => _prefs?.getString(_supabaseUrlKey);
-  static String? getSupabaseAnonKey() => _prefs?.getString(_supabaseAnonKey);
+  // Profile & Privacy Settings
+  static ProfileModel? getStoredProfile() {
+    final raw = _prefs?.getString(_profileKey) ?? (_memoryFallback[_profileKey] as String?);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      return ProfileModel.fromJson(Map<String, dynamic>.from(jsonDecode(raw)));
+    } catch (e) {
+      AppLogger.warn('StorageService', 'Failed decoding stored profile', e);
+      return null;
+    }
+  }
 
-  static Future<void> saveSupabaseCredentials(String url, String anonKey) async {
-    await _prefs?.setString(_supabaseUrlKey, url);
-    await _prefs?.setString(_supabaseAnonKey, anonKey);
+  static Future<void> persistProfile(ProfileModel profile) async {
+    final encoded = jsonEncode(profile.toJson());
+    _memoryFallback[_profileKey] = encoded;
+    await _prefs?.setString(_profileKey, encoded);
+  }
+
+  // Mutual & Pending Friendship Statuses ('accepted' | 'pending_outgoing' | 'pending_incoming')
+  static Map<String, String>? getFriendshipStatuses() {
+    final raw = _prefs?.getString(_friendshipStatusesKey) ?? (_memoryFallback[_friendshipStatusesKey] as String?);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      return decoded.map((k, v) => MapEntry(k, v.toString()));
+    } catch (e) {
+      AppLogger.warn('StorageService', 'Failed decoding friendship statuses', e);
+      return null;
+    }
+  }
+
+  static Future<void> persistFriendshipStatuses(Map<String, String> statuses) async {
+    final encoded = jsonEncode(statuses);
+    _memoryFallback[_friendshipStatusesKey] = encoded;
+    await _prefs?.setString(_friendshipStatusesKey, encoded);
+  }
+
+  // Accepted friends set
+  static Set<String>? getFollowedFriends() {
+    final list = _prefs?.getStringList(_followedFriendsKey) ?? (_memoryFallback[_followedFriendsKey] as List<String>?);
+    return list?.toSet();
+  }
+
+  static Future<void> persistFollowedFriends(Set<String> ids) async {
+    final list = ids.toList();
+    _memoryFallback[_followedFriendsKey] = list;
+    await _prefs?.setStringList(_followedFriendsKey, list);
+  }
+
+  // Blocked users
+  static Set<String> getBlockedUsers() {
+    final list = _prefs?.getStringList(_blockedUsersKey) ?? (_memoryFallback[_blockedUsersKey] as List<String>?);
+    return list?.toSet() ?? <String>{};
+  }
+
+  static Future<void> persistBlockedUsers(Set<String> ids) async {
+    final list = ids.toList();
+    _memoryFallback[_blockedUsersKey] = list;
+    await _prefs?.setStringList(_blockedUsersKey, list);
+  }
+
+  // Moderation reports
+  static List<Map<String, dynamic>> getReports() {
+    final raw = _prefs?.getString(_reportsKey) ?? (_memoryFallback[_reportsKey] as String?);
+    if (raw == null || raw.isEmpty) return [];
+    try {
+      final List list = jsonDecode(raw);
+      return list.map((e) => Map<String, dynamic>.from(e)).toList();
+    } catch (e) {
+      AppLogger.warn('StorageService', 'Failed decoding reports', e);
+      return [];
+    }
+  }
+
+  static Future<int> addReport(Map<String, dynamic> report) async {
+    final current = getReports();
+    final updated = [report, ...current];
+    final encoded = jsonEncode(updated);
+    _memoryFallback[_reportsKey] = encoded;
+    await _prefs?.setString(_reportsKey, encoded);
+    final targetId = report['target_id']?.toString() ?? '';
+    return updated.where((r) => r['target_id'] == targetId).length;
+  }
+
+  // Friend plans
+  static List<FriendPlanModel>? getStoredPlans() {
+    final raw = _prefs?.getString(_plansKey) ?? (_memoryFallback[_plansKey] as String?);
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final List list = jsonDecode(raw);
+      return list.map((e) => FriendPlanModel.fromJson(Map<String, dynamic>.from(e))).toList();
+    } catch (e) {
+      AppLogger.warn('StorageService', 'Failed decoding stored plans', e);
+      return null;
+    }
+  }
+
+  static Future<void> persistPlans(List<FriendPlanModel> plans) async {
+    final encoded = jsonEncode(plans.map((p) => p.toJson()).toList());
+    _memoryFallback[_plansKey] = encoded;
+    await _prefs?.setString(_plansKey, encoded);
   }
 
   static Future<void> clearAll() async {
+    _memoryFallback.clear();
     await _prefs?.clear();
   }
 }

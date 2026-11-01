@@ -39,6 +39,7 @@ class FriendPlanModel {
   final String placeName;
   final List<String> attendeeInitials;
   final String scheduleTime;
+  final String note;
 
   const FriendPlanModel({
     required this.id,
@@ -46,5 +47,28 @@ class FriendPlanModel {
     required this.placeName,
     required this.attendeeInitials,
     required this.scheduleTime,
+    this.note = '',
   });
+
+  factory FriendPlanModel.fromJson(Map<String, dynamic> json) {
+    return FriendPlanModel(
+      id: json['id'] as String,
+      placeId: json['place_id'] as String,
+      placeName: json['place_name'] as String? ?? 'Venue',
+      attendeeInitials: (json['attendee_initials'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? ['YO'],
+      scheduleTime: json['schedule_time'] as String? ?? 'Sat 10:30 AM',
+      note: json['note'] as String? ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'place_id': placeId,
+      'place_name': placeName,
+      'attendee_initials': attendeeInitials,
+      'schedule_time': scheduleTime,
+      'note': note,
+    };
+  }
 }

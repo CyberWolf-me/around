@@ -9,15 +9,21 @@ void main() {
       repository = PlacesRepository();
     });
 
-    test('getPlaceById finds existing venues by ID', () {
-      final kettle = repository.getPlaceById('kettle');
-      expect(kettle, isNotNull);
-      expect(kettle!.name, equals('Kettle & Loaf'));
-      expect(kettle.district, equals('Barlow Hill'));
+    test('getPlaceById finds canonical Tashkent venues and resolves legacy aliases', () {
+      final breadly = repository.getPlaceById('breadly');
+      expect(breadly, isNotNull);
+      expect(breadly!.name, equals('Breadly Bakery & Café'));
+      expect(breadly.district, equals('Mirabad'));
+      expect(breadly.canonicalUuid, equals('11111111-1111-4111-8111-111111111101'));
 
-      final fern = repository.getPlaceById('fern');
-      expect(fern, isNotNull);
-      expect(fern!.name, equals('The Fern Room'));
+      final bnb = repository.getPlaceById('bnb');
+      expect(bnb, isNotNull);
+      expect(bnb!.name, equals('B&B Coffee House'));
+
+      // Legacy alias resolution without duplicating venues in getAllPlaces()
+      final legacyKettle = repository.getPlaceById('kettle');
+      expect(legacyKettle, isNotNull);
+      expect(legacyKettle!.id, equals('breadly'));
     });
 
     test('getPlaceById returns null for non-existent venue ID', () {
@@ -25,9 +31,11 @@ void main() {
       expect(nonExistent, isNull);
     });
 
-    test('getNearbyPlaces returns all seed venues when category is All and search is empty', () async {
+    test('getNearbyPlaces returns all 9 canonical Tashkent venues without duplicate aliases', () async {
       final places = await repository.getNearbyPlaces();
-      expect(places.length, greaterThanOrEqualTo(5));
+      expect(places.length, equals(9));
+      final uniqueIds = places.map((p) => p.id).toSet();
+      expect(uniqueIds.length, equals(places.length));
     });
 
     test('getNearbyPlaces filters by category accurately', () async {
@@ -41,15 +49,30 @@ void main() {
       }
     });
 
-    test('getNearbyPlaces filters by search query matching venue name', () async {
-      final results = await repository.getNearbyPlaces(searchQuery: 'Kettle');
+    test('getNearbyPlaces filters by search query matching venue name or district', () async {
+      final results = await repository.getNearbyPlaces(searchQuery: 'Breadly');
       expect(results.length, equals(1));
-      expect(results.first.id, equals('kettle'));
+      expect(results.first.id, equals('breadly'));
     });
 
     test('getNearbyPlaces returns empty list when search yields no matches', () async {
       final results = await repository.getNearbyPlaces(searchQuery: 'UnknownNonExistentVenue999');
       expect(results.isEmpty, isTrue);
+    });
+
+    test('getRecommendedPlaces ranks friend-recommended venues highest and excludes been places (Phase 6)', () {
+      final recs = repository.getRecommendedPlaces(
+        acceptedFriendPlaceIds: {'breadly', 'tims'},
+        savedPlaceIds: {'breadly', 'bnb'},
+        savedStatuses: {'bnb': 'been', 'breadly': 'want_to_go'},
+      );
+
+      expect(recs.isNotEmpty, isTrue);
+      // 'bnb' is marked as 'been' and must be excluded from new discovery recommendations
+      expect(recs.any((r) => r.place.id == 'bnb'), isFalse);
+      // Top recommendations must be the friend-recommended spots with explainable reasons
+      expect({'breadly', 'tims'}.contains(recs.first.place.id), isTrue);
+      expect(recs.first.explanation, contains('Recommended by your accepted friends'));
     });
   });
 }

@@ -31,7 +31,7 @@ export const DesktopRail: React.FC = () => {
     },
     {
       id: 'explore-map',
-      label: 'Explore · map',
+      label: 'Explore · Tashkent map',
       action: () => {
         setBooted(true);
         switchTab('explore');
@@ -41,7 +41,7 @@ export const DesktopRail: React.FC = () => {
     },
     {
       id: 'explore-list',
-      label: 'Explore · list',
+      label: 'Explore · venue list',
       action: () => {
         setBooted(true);
         switchTab('explore');
@@ -51,10 +51,10 @@ export const DesktopRail: React.FC = () => {
     },
     {
       id: 'place',
-      label: 'Place page (Kettle & Loaf)',
+      label: 'Place page (Breadly Café)',
       action: () => {
         setBooted(true);
-        pushScreen({ kind: 'place', id: 'kettle' });
+        pushScreen({ kind: 'place', id: 'breadly' });
       },
       isActive: booted && topScreen?.kind === 'place',
     },
@@ -119,7 +119,7 @@ export const DesktopRail: React.FC = () => {
         Around<span style={{ color: 'var(--orange)' }}>.</span>
       </div>
       <div className="sub" style={{ fontFamily: 'var(--mono)', fontSize: 9.5, lineHeight: 1.6, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-2)', marginBottom: 20 }}>
-        Places from people<br />you actually trust.
+        Tashkent places from<br />people you actually trust.
       </div>
 
       <div className="rail-h" style={{ fontFamily: 'var(--mono)', fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink-3)', paddingBottom: 8, borderBottom: '1.5px solid var(--ink)', marginBottom: 10 }}>
@@ -192,7 +192,7 @@ export const DesktopRail: React.FC = () => {
       </button>
 
       <div className="rail-note" style={{ marginTop: 20, fontFamily: 'var(--mono)', fontSize: 9, color: 'var(--ink-3)', lineHeight: 1.5 }}>
-        All data is persisted to localStorage. Tap any card, map pin, or bookmark to explore.
+        All Tashkent venue & drop data is persisted to localStorage. Tap any card, map pin, or bookmark to explore.
       </div>
     </aside>
   );

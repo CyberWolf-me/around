@@ -12,21 +12,21 @@ export const OnboardingScreen: React.FC = () => {
 
   const steps = [
     {
-      kicker: 'Around · Barlow Hill',
+      kicker: 'Around · Tashkent',
       title: 'Where should\nwe go?',
-      body: 'A map built from places your friends actually went — not from ratings written by strangers.',
+      body: 'A map built from places in Tashkent your friends actually went — not from ratings written by strangers.',
       art: 'collage',
     },
     {
       kicker: 'Step 1 of 2',
-      title: 'Follow five\npeople.',
-      body: 'Your feed is only as good as the people on it. Start with the ones you’d text for a recommendation.',
+      title: 'Follow five\nfriends.',
+      body: 'Your feed is only as good as the people on it. Start with the friends in Tashkent you’d text for a recommendation.',
       art: 'people',
     },
     {
       kicker: 'Step 2 of 2',
-      title: 'Pick a\nneighbourhood.',
-      body: 'We’ll start with one area so everything you see is walkable. You can widen this any time.',
+      title: 'Pick your\ndistrict.',
+      body: 'We’ll start around Mirabad, Yakkasaray, and Yunusabad so everything you see is walkable. You can widen this any time.',
       art: 'map',
     },
   ];
@@ -52,7 +52,7 @@ export const OnboardingScreen: React.FC = () => {
               transform: 'rotate(-3deg)',
             }}
           >
-            <img src="/assets/kettle-hero.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src="/assets/bakery-counter.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
 
           {/* Top right photo */}
@@ -70,7 +70,7 @@ export const OnboardingScreen: React.FC = () => {
               transform: 'rotate(4deg)',
             }}
           >
-            <img src="/assets/wine-tall.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src="/assets/patisserie.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
 
           {/* Bottom right photo */}
@@ -108,9 +108,9 @@ export const OnboardingScreen: React.FC = () => {
               gap: 6,
             }}
           >
-            <Avatar id="noor" size={19} />
+            <Avatar id="kamila" size={19} />
             <span className="mono" style={{ color: 'var(--ink)', fontSize: 10, fontWeight: 700 }}>
-              Noor says go
+              Kamila says go
             </span>
           </div>
         </div>
@@ -120,8 +120,9 @@ export const OnboardingScreen: React.FC = () => {
     if (current.art === 'people') {
       return (
         <div style={{ marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 8, flex: 1, justifyContent: 'center' }}>
-          {['noor', 'teo', 'mina', 'ari'].map((id) => {
+          {['kamila', 'bekzod', 'aziza', 'diyor', 'madina'].map((id) => {
             const p = INITIAL_PEOPLE[id];
+            if (!p) return null;
             const isFollowing = followedUserIds.has(id);
             return (
               <div
@@ -141,7 +142,7 @@ export const OnboardingScreen: React.FC = () => {
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 13, fontWeight: 700 }}>{p.name}</div>
                   <div className="mono-sm" style={{ color: 'var(--ink-3)', fontSize: 9.5 }}>
-                    @{p.handle} · {p.dropsCount} drops
+                    @{p.handle} · {p.neighborhood} · {p.dropsCount} drops
                   </div>
                 </div>
                 <button
@@ -166,7 +167,7 @@ export const OnboardingScreen: React.FC = () => {
 
     return (
       <div style={{ marginBottom: 20, flex: 1, display: 'flex', alignItems: 'center' }}>
-        <CityMap places={places} activePlaceId="kettle" onSelectPlace={() => {}} />
+        <CityMap places={places} activePlaceId="breadly" onSelectPlace={() => {}} />
       </div>
     );
   };
@@ -247,7 +248,7 @@ export const OnboardingScreen: React.FC = () => {
           style={{ flex: 1, height: 44, borderRadius: 12, boxShadow: 'var(--sh)' }}
           onClick={handleNext}
         >
-          {step === 2 ? 'Launch Barlow Hill' : 'Next'}
+          {step === 2 ? 'Launch Tashkent' : 'Next'}
           <Icon name="chevR" size={15} sw={2.5} />
         </button>
       </div>

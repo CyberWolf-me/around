@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 import '../../data/services/haptic_service.dart';
 import '../../features/feed/screens/feed_screen.dart';
@@ -7,10 +8,12 @@ import '../../features/feed/screens/notifications_screen.dart';
 import '../../features/explore/screens/explore_screen.dart';
 import '../../features/saved_places/screens/saved_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
+import '../../features/profile/screens/user_profile_screen.dart';
 import '../../features/places/screens/place_detail_screen.dart';
 import '../../features/create_post/screens/create_drop_sheet.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/auth/screens/onboarding_screen.dart';
+import '../../features/auth/screens/auth_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final GlobalKey<NavigatorState> _feedNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'feed');
@@ -74,13 +77,21 @@ final GoRouter appRouter = GoRouter(
         ),
       ],
     ),
-    // Top-level modal/detail routes pushed on top of root navigator
     GoRoute(
       path: '/places/:id',
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) {
         final placeId = state.pathParameters['id'] ?? '';
         return PlaceDetailScreen(placeId: placeId);
+      },
+    ),
+    GoRoute(
+      path: '/users/:id',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) {
+        final userId = state.pathParameters['id'] ?? '';
+        if (userId == 'you') return const ProfileScreen();
+        return UserProfileScreen(userId: userId);
       },
     ),
     GoRoute(
@@ -97,6 +108,11 @@ final GoRouter appRouter = GoRouter(
       path: '/onboarding',
       parentNavigatorKey: _rootNavigatorKey,
       builder: (context, state) => const OnboardingScreen(),
+    ),
+    GoRoute(
+      path: '/auth',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) => const AuthScreen(),
     ),
     GoRoute(
       path: '/create',
@@ -126,7 +142,6 @@ class ScaffoldWithNavBar extends StatelessWidget {
   void _onTap(BuildContext context, int index) {
     HapticService.selection();
     if (index == 2) {
-      // Middle "Drop" button triggers modal bottom sheet
       HapticService.medium();
       showModalBottomSheet(
         context: context,
@@ -137,12 +152,6 @@ class ScaffoldWithNavBar extends StatelessWidget {
       return;
     }
 
-    // Map 5 navigation items to 4 branches:
-    // Item 0 -> Branch 0 (Feed)
-    // Item 1 -> Branch 1 (Explore)
-    // Item 2 -> Drop (handled above)
-    // Item 3 -> Branch 2 (Saved)
-    // Item 4 -> Branch 3 (Profile)
     final branchIndex = index > 2 ? index - 1 : index;
     navigationShell.goBranch(
       branchIndex,
@@ -153,7 +162,6 @@ class ScaffoldWithNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentBranch = navigationShell.currentIndex;
-    // Map branch index back to nav item index
     final selectedNavIndex = currentBranch >= 2 ? currentBranch + 1 : currentBranch;
 
     return Scaffold(
@@ -225,17 +233,16 @@ class ScaffoldWithNavBar extends StatelessWidget {
           border: Border.all(color: AppColors.ink, width: 2),
           boxShadow: const [AppColors.shadowSm],
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.add, color: Colors.white, size: 18),
-            SizedBox(width: 4),
+            const Icon(Icons.add, color: Colors.white, size: 18),
+            const SizedBox(width: 4),
             Text(
               'DROP',
-              style: TextStyle(
-                fontFamily: 'SpaceMono',
+              style: GoogleFonts.spaceMono(
                 fontSize: 11,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
                 color: Colors.white,
                 letterSpacing: 0.5,
               ),
@@ -270,10 +277,9 @@ class ScaffoldWithNavBar extends StatelessWidget {
             const SizedBox(height: 3),
             Text(
               label,
-              style: TextStyle(
-                fontFamily: 'SpaceMono',
+              style: GoogleFonts.spaceMono(
                 fontSize: 9.5,
-                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
                 color: isSelected ? AppColors.orange : AppColors.ink2,
                 letterSpacing: 0.3,
               ),

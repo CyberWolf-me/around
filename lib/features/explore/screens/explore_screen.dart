@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../data/models/place_model.dart';
@@ -23,6 +24,20 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   String _selectedCategory = 'All';
   String _searchQuery = '';
   String _selectedPlaceId = 'breadly';
+  late Future<List<PlaceModel>> _placesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshPlaces();
+  }
+
+  void _refreshPlaces() {
+    _placesFuture = ref.read(placesRepositoryProvider).getNearbyPlaces(
+          category: _selectedCategory,
+          searchQuery: _searchQuery,
+        );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,19 +55,17 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               'Public Discovery',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9),
             ),
-            const Text(
+            Text(
               'Tashkent Community',
-              style: TextStyle(
+              style: GoogleFonts.bricolageGrotesque(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
-                fontFamily: 'BricolageGrotesque',
                 color: AppColors.ink,
               ),
             ),
           ],
         ),
         actions: [
-          // Segmented mode toggle (Map vs List)
           Container(
             margin: const EdgeInsets.only(right: 14),
             padding: const EdgeInsets.all(2),
@@ -87,17 +100,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
         ],
       ),
       body: FutureBuilder<List<PlaceModel>>(
-        future: placesRepo.getNearbyPlaces(
-          category: _selectedCategory,
-          searchQuery: _searchQuery,
-        ),
+        future: _placesFuture,
         builder: (context, snapshot) {
           final places = snapshot.data ?? [];
           final selectedPlace = placesRepo.getPlaceById(_selectedPlaceId) ?? (places.isNotEmpty ? places.first : null);
 
           return Column(
             children: [
-              // Search input
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                 child: Container(
@@ -115,9 +124,14 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
-                          onChanged: (val) => setState(() => _searchQuery = val),
+                          onChanged: (val) {
+                            setState(() {
+                              _searchQuery = val;
+                              _refreshPlaces();
+                            });
+                          },
                           decoration: const InputDecoration(
-                            hintText: 'Search cafés, ramen, study spots...',
+                            hintText: 'Search cafés, plov, study spots...',
                             hintStyle: TextStyle(fontSize: 12, color: AppColors.ink3),
                             border: InputBorder.none,
                             isDense: true,
@@ -127,24 +141,30 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       ),
                       if (_searchQuery.isNotEmpty)
                         GestureDetector(
-                          onTap: () => setState(() => _searchQuery = ''),
+                          onTap: () {
+                            setState(() {
+                              _searchQuery = '';
+                              _refreshPlaces();
+                            });
+                          },
                           child: const Icon(Icons.close, size: 16, color: AppColors.ink3),
                         ),
                     ],
                   ),
                 ),
               ),
-
-              // Category chips
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 6),
                 child: CategoryChips(
                   selectedCategory: _selectedCategory,
-                  onSelected: (cat) => setState(() => _selectedCategory = cat),
+                  onSelected: (cat) {
+                    setState(() {
+                      _selectedCategory = cat;
+                      _refreshPlaces();
+                    });
+                  },
                 ),
               ),
-
-              // Content based on View Mode
               Expanded(
                 child: _isMapView
                     ? Padding(
@@ -159,7 +179,6 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            // Active Place Preview Card
                             if (selectedPlace != null)
                               GestureDetector(
                                 onTap: () => context.push('/places/${selectedPlace.id}'),
@@ -271,7 +290,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         },
                       ),
               ),
-              const SizedBox(height: 60), // tab bar clearance
+              const SizedBox(height: 60),
             ],
           );
         },
@@ -313,11 +332,10 @@ class _ViewToggleButton extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               label,
-              style: TextStyle(
+              style: GoogleFonts.spaceMono(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 color: isSelected ? AppColors.paper : AppColors.ink,
-                fontFamily: 'SpaceMono',
               ),
             ),
           ],

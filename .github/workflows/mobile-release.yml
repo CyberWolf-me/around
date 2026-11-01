@@ -17,8 +17,45 @@ on:
           - production-staged-10pct
 
 jobs:
-  build-and-package:
-    name: Build & Package Mobile Artifacts
+  build-flutter-android:
+    name: Build Flutter Android Release (AAB & APK)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      - name: Run Flutter verification suite
+        run: |
+          flutter analyze
+          flutter test
+
+      - name: Build Android Release APK
+        run: flutter build apk --release
+
+      - name: Upload Android Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: around-android-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 14
+
+  build-web-companion:
+    name: Build & Package Web Companion Artifact
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -39,9 +76,9 @@ jobs:
       - name: Build production bundle
         run: npm run build
 
-      - name: Upload release artifact
+      - name: Upload web companion artifact
         uses: actions/upload-artifact@v4
         with:
-          name: around-mobile-build
+          name: around-web-companion-build
           path: dist/
           retention-days: 14

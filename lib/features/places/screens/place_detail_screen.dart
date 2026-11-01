@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
+import '../../../data/models/place_model.dart';
+import '../../../data/models/post_model.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
+import '../../../data/services/storage_service.dart';
 import '../../create_post/screens/create_drop_sheet.dart';
 
 class PlaceDetailScreen extends ConsumerStatefulWidget {
@@ -22,11 +27,179 @@ class PlaceDetailScreen extends ConsumerStatefulWidget {
 class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
   int _tabIndex = 0; // 0 = Friends' Drops, 1 = Public Reviews
 
+  Future<void> _copyShareLink(PlaceModel place) async {
+    HapticService.light();
+    final link = 'https://around.app/places/${place.slug}';
+    await Clipboard.setData(ClipboardData(text: link));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Copied link: $link'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _showDirectionsDialog(PlaceModel place) {
+    HapticService.light();
+    final coordsText = '${place.latitude.toStringAsFixed(4)}, ${place.longitude.toStringAsFixed(4)}';
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: AppColors.paper,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border(
+            top: BorderSide(color: AppColors.ink, width: 2.5),
+            left: BorderSide(color: AppColors.ink, width: 2),
+            right: BorderSide(color: AppColors.ink, width: 2),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Walk to ${place.name}',
+              style: GoogleFonts.bricolageGrotesque(fontSize: 20, fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '${place.streetAddress}, ${place.district}, ${place.city}',
+              style: const TextStyle(fontSize: 13, color: AppColors.ink2),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Estimated: ${place.walkDistanceLabel} (${place.distanceMeters.round()}m) · GPS: $coordsText',
+              style: GoogleFonts.spaceMono(fontSize: 10.5, color: AppColors.ink3),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: '${place.name}, ${place.streetAddress}, Tashkent ($coordsText)'));
+                  if (ctx.mounted) Navigator.pop(ctx);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Venue address & GPS coordinates copied for Yandex / Google Maps')),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.copy, size: 16, color: Colors.white),
+                label: const Text('Copy Address & Coordinates', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.orange,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: AppColors.ink, width: 2),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showReportOrBlockSheet({required String targetType, required String targetId, String? authorId, String? authorName}) {
+    HapticService.medium();
+    final reasons = [
+      'Inappropriate photo or text',
+      'Spam or promotional shilling',
+      'Wrong venue / inaccurate location',
+      'Harassment or privacy violation',
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(18),
+        decoration: const BoxDecoration(
+          color: AppColors.paper,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border(top: BorderSide(color: AppColors.ink, width: 2.5)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Safety & Moderation',
+              style: GoogleFonts.bricolageGrotesque(fontSize: 18, fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 8),
+            ...reasons.map((r) => ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.flag_outlined, color: AppColors.orange, size: 18),
+                  title: Text(r, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                  onTap: () async {
+                    var quarantined = false;
+                    if (targetType == 'post') {
+                      quarantined = await ref.read(postsRepositoryProvider.notifier).reportPost(targetId, r);
+                    } else {
+                      await StorageService.addReport({
+                        'target_type': targetType,
+                        'target_id': targetId,
+                        'reason': r,
+                        'created_at': DateTime.now().toIso8601String(),
+                      });
+                    }
+                    if (ctx.mounted) Navigator.pop(ctx);
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            quarantined
+                                ? 'Drop automatically quarantined after reaching 3 community reports.'
+                                : 'Report submitted: "$r"',
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                )),
+            if (authorId != null && authorId != 'you') ...[
+              const Divider(),
+              ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.block, color: AppColors.danger, size: 18),
+                title: Text(
+                  'Block @${authorName ?? authorId}',
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.danger),
+                ),
+                onTap: () async {
+                  await ref.read(blockedUsersProvider.notifier).blockUser(authorId);
+                  if (ctx.mounted) Navigator.pop(ctx);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Blocked ${authorName ?? authorId}. Their drops are now hidden.')),
+                    );
+                  }
+                },
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final placesRepo = ref.watch(placesRepositoryProvider);
     final postsNotifier = ref.watch(postsRepositoryProvider.notifier);
+    ref.watch(postsRepositoryProvider);
     final followedFriends = ref.watch(followedFriendsProvider);
+    final blockedUsers = ref.watch(blockedUsersProvider);
     final savedPlaces = ref.watch(savedPlacesProvider);
 
     final place = placesRepo.getPlaceById(widget.placeId);
@@ -38,14 +211,22 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     }
 
     final isSaved = savedPlaces.contains(place.id);
-    final friendDrops = postsNotifier.getDropsForPlace(place.id, friendsOnly: true, followedIds: followedFriends);
-    final publicDrops = postsNotifier.getDropsForPlace(place.id, friendsOnly: false);
+    final friendDrops = postsNotifier.getDropsForPlace(
+      place.id,
+      friendsOnly: true,
+      followedIds: followedFriends,
+      blockedIds: blockedUsers,
+    );
+    final publicDrops = postsNotifier.getDropsForPlace(
+      place.id,
+      friendsOnly: false,
+      blockedIds: blockedUsers,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.paper,
       body: CustomScrollView(
         slivers: [
-          // Custom App Bar with actions
           SliverAppBar(
             pinned: true,
             leading: IconButton(
@@ -75,20 +256,15 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.share, color: AppColors.ink),
-                onPressed: () {
-                  HapticService.light();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Place link copied to clipboard'),
-                      duration: Duration(seconds: 2),
-                    ),
-                  );
-                },
+                onPressed: () => _copyShareLink(place),
+              ),
+              IconButton(
+                icon: const Icon(Icons.flag_outlined, color: AppColors.ink3, size: 20),
+                tooltip: 'Report Venue',
+                onPressed: () => _showReportOrBlockSheet(targetType: 'place', targetId: place.id),
               ),
             ],
           ),
-
-          // Hero Image Card
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -107,7 +283,6 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                       path: place.heroImageUrl,
                       fit: BoxFit.cover,
                     ),
-                    // Gradient overlay
                     Container(
                       decoration: const BoxDecoration(
                         gradient: LinearGradient(
@@ -121,7 +296,6 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                         ),
                       ),
                     ),
-                    // Info overlay
                     Positioned(
                       bottom: 14,
                       left: 14,
@@ -151,7 +325,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.95),
+                                  color: Colors.white.withValues(alpha: 0.95),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                                 child: Text(
@@ -168,11 +342,10 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                           const SizedBox(height: 6),
                           Text(
                             place.name,
-                            style: const TextStyle(
+                            style: GoogleFonts.bricolageGrotesque(
                               color: Colors.white,
                               fontSize: 26,
                               fontWeight: FontWeight.w800,
-                              fontFamily: 'BricolageGrotesque',
                               letterSpacing: -0.6,
                             ),
                           ),
@@ -181,9 +354,12 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                             children: [
                               const Icon(Icons.location_on, size: 12, color: Colors.white),
                               const SizedBox(width: 4),
-                              Text(
-                                '${place.streetAddress} · ${place.walkDistanceLabel}',
-                                style: const TextStyle(color: Colors.white, fontSize: 11),
+                              Expanded(
+                                child: Text(
+                                  '${place.streetAddress} · ${place.walkDistanceLabel}',
+                                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
                             ],
                           ),
@@ -195,8 +371,6 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               ),
             ),
           ),
-
-          // Stat Split (Public vs Friends)
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -218,10 +392,9 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                             children: [
                               Text(
                                 '${place.ratingAvg}',
-                                style: const TextStyle(
+                                style: GoogleFonts.bricolageGrotesque(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w800,
-                                  fontFamily: 'BricolageGrotesque',
                                 ),
                               ),
                               const SizedBox(width: 3),
@@ -249,16 +422,15 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            '4 friends',
-                            style: TextStyle(
+                          Text(
+                            '${friendDrops.length} ${friendDrops.length == 1 ? 'friend' : 'friends'}',
+                            style: GoogleFonts.bricolageGrotesque(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
-                              fontFamily: 'BricolageGrotesque',
                             ),
                           ),
                           Text(
-                            'recommend this spot',
+                            'dropped this spot',
                             style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9),
                           ),
                         ],
@@ -269,8 +441,6 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               ),
             ),
           ),
-
-          // Quote line
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
@@ -288,8 +458,6 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               ),
             ),
           ),
-
-          // Tags list
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -302,7 +470,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                     decoration: BoxDecoration(
                       color: AppColors.paper2,
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: AppColors.ink.withOpacity(0.2)),
+                      border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
                     ),
                     child: Text('#$t', style: const TextStyle(fontSize: 10.5, color: AppColors.ink2)),
                   ),
@@ -310,8 +478,6 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               ),
             ),
           ),
-
-          // Tab Switcher (Friends' Drops vs Public Reviews)
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -377,14 +543,12 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               ),
             ),
           ),
-
-          // Drops List
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  final list = _tabIndex == 0 ? friendDrops : publicDrops;
+                  final List<PostModel> list = _tabIndex == 0 ? friendDrops : publicDrops;
                   if (list.isEmpty) {
                     return Container(
                       padding: const EdgeInsets.all(24),
@@ -410,21 +574,40 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                       children: [
                         Row(
                           children: [
-                            CircleAvatar(
-                              radius: 12,
-                              backgroundColor: AppColors.ink,
-                              child: Text(
-                                post.authorAvatar ?? post.authorName[0],
-                                style: const TextStyle(color: Colors.white, fontSize: 9),
+                            GestureDetector(
+                              onTap: () => context.push('/users/${post.authorId}'),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: AppColors.ink,
+                                    child: Text(
+                                      post.authorAvatar ?? post.authorName[0],
+                                      style: const TextStyle(color: Colors.white, fontSize: 9),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    post.authorName,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              post.authorName,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                             ),
                             const Spacer(),
                             Text(post.timeAgo, style: Theme.of(context).textTheme.labelSmall),
+                            IconButton(
+                              icon: const Icon(Icons.more_horiz, size: 16, color: AppColors.ink3),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onPressed: () => _showReportOrBlockSheet(
+                                targetType: 'post',
+                                targetId: post.id,
+                                authorId: post.authorId,
+                                authorName: post.authorUsername,
+                              ),
+                            ),
                           ],
                         ),
                         if (post.mediaUrl != null) ...[
@@ -453,27 +636,20 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               ),
             ),
           ),
-
-          // Clearance for bottom sticky button
           const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),
       bottomSheet: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.paper,
-          border: const Border(top: BorderSide(color: AppColors.ink, width: 1.5)),
+          border: Border(top: BorderSide(color: AppColors.ink, width: 1.5)),
         ),
         child: Row(
           children: [
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () {
-                  HapticService.light();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Opening walk directions in Yandex / Google Maps')),
-                  );
-                },
+                onPressed: () => _showDirectionsDialog(place),
                 icon: const Icon(Icons.navigation, size: 16, color: AppColors.ink),
                 label: const Text('Directions', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)),
                 style: OutlinedButton.styleFrom(

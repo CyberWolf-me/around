@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../data/models/post_model.dart';
@@ -39,28 +41,38 @@ class BentoCard extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Author header
               Row(
                 children: [
-                  CircleAvatar(
-                    radius: 12,
-                    backgroundColor: AppColors.ink,
-                    child: Text(
-                      post.authorAvatar ?? post.authorName[0],
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    post.authorName.split(' ').first,
-                    style: const TextStyle(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.ink,
+                  GestureDetector(
+                    onTap: () {
+                      HapticService.light();
+                      context.push('/users/${post.authorId}');
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundColor: AppColors.ink,
+                          child: Text(
+                            post.authorAvatar ?? post.authorName[0],
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          post.authorName.split(' ').first,
+                          style: const TextStyle(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.ink,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -73,7 +85,6 @@ class BentoCard extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              // Quote note
               Text(
                 '“${post.note}”',
                 style: const TextStyle(
@@ -84,7 +95,6 @@ class BentoCard extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              // Venue pill tag
               Wrap(
                 spacing: 6,
                 runSpacing: 4,
@@ -115,9 +125,9 @@ class BentoCard extends ConsumerWidget {
                     (tag) => Container(
                       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.6),
+                        color: Colors.white.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: AppColors.ink.withOpacity(0.2)),
+                        border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
                       ),
                       child: Text(
                         '#$tag',
@@ -154,7 +164,6 @@ class BentoCard extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Photo with audience pill and bookmark button
             Stack(
               children: [
                 SizedBox(
@@ -165,13 +174,11 @@ class BentoCard extends ConsumerWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
-                // Audience badge
                 Positioned(
                   top: 8,
                   left: 8,
                   child: _AudiencePill(isFriends: post.isFriendsOnly),
                 ),
-                // Bookmark action
                 Positioned(
                   top: 8,
                   right: 8,
@@ -184,7 +191,7 @@ class BentoCard extends ConsumerWidget {
                       width: 28,
                       height: 28,
                       decoration: BoxDecoration(
-                        color: isSaved ? AppColors.orange : AppColors.paper.withOpacity(0.92),
+                        color: isSaved ? AppColors.orange : AppColors.paper.withValues(alpha: 0.92),
                         border: Border.all(color: AppColors.ink, width: 1.5),
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: const [AppColors.shadowSm],
@@ -199,7 +206,6 @@ class BentoCard extends ConsumerWidget {
                 ),
               ],
             ),
-            // Card Content Body
             Padding(
               padding: const EdgeInsets.all(10),
               child: Column(
@@ -207,18 +213,29 @@ class BentoCard extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 9,
-                        backgroundColor: AppColors.ink,
-                        child: Text(
-                          post.authorAvatar ?? post.authorName[0],
-                          style: const TextStyle(color: Colors.white, fontSize: 8),
+                      GestureDetector(
+                        onTap: () {
+                          HapticService.light();
+                          context.push('/users/${post.authorId}');
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircleAvatar(
+                              radius: 9,
+                              backgroundColor: AppColors.ink,
+                              child: Text(
+                                post.authorAvatar ?? post.authorName[0],
+                                style: const TextStyle(color: Colors.white, fontSize: 8),
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              post.authorName.split(' ').first,
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 5),
-                      Text(
-                        post.authorName.split(' ').first,
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                       ),
                       const Spacer(),
                       Text(
@@ -284,10 +301,9 @@ class _AudiencePill extends StatelessWidget {
           const SizedBox(width: 3),
           Text(
             isFriends ? 'Friends' : 'Public',
-            style: TextStyle(
+            style: GoogleFonts.spaceMono(
               fontSize: 9,
               fontWeight: FontWeight.w700,
-              fontFamily: 'SpaceMono',
               color: isFriends ? AppColors.ink : AppColors.paper,
             ),
           ),

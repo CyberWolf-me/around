@@ -1,24 +1,140 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/post_model.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/errors/app_failure.dart';
+import '../../core/services/app_logger.dart';
 import '../services/storage_service.dart';
 import '../services/supabase_service.dart';
+import 'places_repository.dart';
+import 'profiles_repository.dart';
 
 final postsRepositoryProvider = NotifierProvider<PostsNotifier, List<PostModel>>(PostsNotifier.new);
 
 class PostsNotifier extends Notifier<List<PostModel>> {
+  final List<DateTime> _recentPublishTimestamps = [];
+
   @override
   List<PostModel> build() {
-    // Merge stored drops with initial seed drops
     final storedDrops = StorageService.getStoredDrops();
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      Future.microtask(syncRemoteFeed);
+    }
     if (storedDrops.isNotEmpty) {
-      // Remove any stored drops that duplicate seed IDs, and prepend stored drops
       final storedIds = storedDrops.map((d) => d.id).toSet();
       final filteredSeeds = _initialSeedPosts.where((s) => !storedIds.contains(s.id)).toList();
       return [...storedDrops, ...filteredSeeds];
     }
     return _initialSeedPosts;
+  }
+
+  bool _isCurrentUserAuthor(String authorId) {
+    if (authorId == 'you') return true;
+    final currentProfileId = ref.read(currentProfileProvider).id;
+    if (authorId == currentProfileId) return true;
+    final authUid = SupabaseService.currentUser?.id;
+    return authUid != null && authorId == authUid;
+  }
+
+  /// Calls the hardened SECURITY INVOKER `get_friends_feed` PostGIS RPC (`00003` & `00005`)
+  /// when authenticated with Supabase and merges remote drops into state (MIG-02 aligned).
+  Future<void> syncRemoteFeed() async {
+    if (!SupabaseService.isInitialized || !SupabaseService.isAuthenticated) return;
+    try {
+      final response = await SupabaseService.client.rpc(
+        'get_friends_feed',
+        params: {'page_limit': 30, 'page_offset': 0},
+      );
+      if (response is List && response.isNotEmpty) {
+        final remotePosts = response
+            .whereType<Map<String, dynamic>>()
+            .map((row) => PostModel.fromJson({
+                  'id': row['post_id']?.toString() ?? '',
+                  'author_id': row['author_id']?.toString() ?? '',
+                  'author_name': (row['author_name'] ?? row['author_full_name'])?.toString() ?? 'Friend',
+                  'author_username': row['author_username']?.toString() ?? 'friend',
+                  'author_avatar': (row['author_avatar'] ?? row['author_avatar_url'])?.toString() ?? 'FR',
+                  'place_id': (row['place_slug'] ?? row['place_id'])?.toString() ?? 'breadly',
+                  'place_name': row['place_name']?.toString() ?? 'Tashkent Spot',
+                  'place_category': row['place_category']?.toString() ?? 'Café',
+                  'place_address': (row['place_address'] ?? row['place_street_address'])?.toString() ?? 'Tashkent',
+                  'note': row['note']?.toString() ?? '',
+                  'rating': row['rating'],
+                  'audience': row['audience']?.toString() ?? 'friends',
+                  'size': row['size']?.toString() ?? 'hero',
+                  'tags': row['tags'] ?? const <String>[],
+                  'media_url': (row['media_url'] ?? row['primary_media_url'])?.toString(),
+                  'saves_count': row['saves_count'] ?? 0,
+                  'created_at': row['created_at']?.toString(),
+                }))
+            .toList();
+        final existingIds = state.map((p) => p.id).toSet();
+        final newRemotes = remotePosts.where((r) => !existingIds.contains(r.id)).toList();
+        if (newRemotes.isNotEmpty) {
+          state = [...newRemotes, ...state];
+          await StorageService.persistDrops(state);
+        }
+      }
+    } catch (e) {
+      AppLogger.warn('PostsRepository', 'Remote get_friends_feed sync skipped', e);
+    }
+  }
+
+  /// Fetches authorized Friends & Public drops for a specific venue from Supabase (`INT-02` Journey D).
+  Future<void> syncRemotePlaceDrops(String placeId) async {
+    if (!SupabaseService.isInitialized || !SupabaseService.isAuthenticated) return;
+    try {
+      final canonical = PlacesRepository.resolveCanonicalId(placeId);
+      final dbUuid = ref.read(placesRepositoryProvider).getPlaceById(canonical)?.canonicalUuid;
+      if (dbUuid == null) return;
+
+      final rows = await SupabaseService.client
+          .from('posts')
+          .select('*, profiles(username, full_name, avatar_url), post_media(media_url, is_primary)')
+          .eq('place_id', dbUuid)
+          .eq('is_quarantined', false)
+          .order('created_at', ascending: false)
+          .limit(30);
+
+      if (rows.isNotEmpty) {
+        final placeModel = ref.read(placesRepositoryProvider).getPlaceById(canonical);
+        final fetched = <PostModel>[];
+        for (final raw in rows.whereType<Map<String, dynamic>>()) {
+          final prof = raw['profiles'] is Map ? Map<String, dynamic>.from(raw['profiles'] as Map) : <String, dynamic>{};
+          final mediaList = raw['post_media'] is List ? (raw['post_media'] as List) : const [];
+          String? mediaUrl;
+          if (mediaList.isNotEmpty && mediaList.first is Map) {
+            mediaUrl = (mediaList.first as Map)['media_url']?.toString();
+          }
+          fetched.add(PostModel.fromJson({
+            'id': raw['id']?.toString() ?? '',
+            'author_id': raw['author_id']?.toString() ?? '',
+            'author_name': prof['full_name']?.toString() ?? 'Explorer',
+            'author_username': prof['username']?.toString() ?? 'explorer',
+            'author_avatar': prof['avatar_url']?.toString() ?? 'EX',
+            'place_id': canonical,
+            'place_name': placeModel?.name ?? 'Tashkent Spot',
+            'place_category': placeModel?.category ?? 'Café',
+            'place_address': placeModel?.streetAddress ?? 'Tashkent',
+            'note': raw['note']?.toString() ?? '',
+            'rating': raw['rating'],
+            'audience': raw['audience']?.toString() ?? 'public',
+            'size': raw['size']?.toString() ?? 'half',
+            'tags': raw['tags'] ?? const <String>[],
+            'media_url': mediaUrl,
+            'saves_count': raw['saves_count'] ?? 0,
+            'created_at': raw['created_at']?.toString(),
+          }));
+        }
+        final existingIds = state.map((p) => p.id).toSet();
+        final newItems = fetched.where((f) => !existingIds.contains(f.id)).toList();
+        if (newItems.isNotEmpty) {
+          state = [...newItems, ...state];
+          await StorageService.persistDrops(state);
+        }
+      }
+    } catch (e) {
+      AppLogger.warn('PostsRepository', 'Remote place drops sync skipped', e);
+    }
   }
 
   static final List<PostModel> _initialSeedPosts = [
@@ -32,7 +148,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       placeName: 'Breadly Bakery & Café',
       placeCategory: 'Bakery · Specialty Café',
       placeAddress: '24 Taras Shevchenko Street, Mirabad',
-      note: 'The lavender matcha and warm sourdough here are unrivaled. Courtyard gets morning sun until 11am.',
+      note: 'The lavender matcha and warm sourdough here are a morning ritual. Courtyard gets sun until 11am.',
       rating: 5,
       audience: PostAudience.friends,
       size: PostSize.hero,
@@ -50,7 +166,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       placeId: 'bnb',
       placeName: 'B&B Coffee House',
       placeCategory: 'Study Café · Roastery',
-      placeAddress: '24 Shota Rustaveli Street, Yakkasaray',
+      placeAddress: '18 Shota Rustaveli Street, Yakkasaray',
       note: 'Completed my full architectural render in one sitting. High-speed Wi-Fi, plugs at every booth, quiet corner.',
       rating: 5,
       audience: PostAudience.friends,
@@ -178,7 +294,8 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     ),
   ];
 
-  Future<void> publishDrop({
+  /// Enforces rate limiting (max 10 drops / 5 minutes) and input validation (SEC-08).
+  Future<AppFailure?> publishDrop({
     required String placeId,
     required String placeName,
     required String placeCategory,
@@ -189,48 +306,238 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     List<String> tags = const [],
     String? mediaPath,
   }) async {
+    final now = DateTime.now();
+    _recentPublishTimestamps.removeWhere((t) => now.difference(t).inMinutes >= 5);
+    if (_recentPublishTimestamps.length >= 10) {
+      return const AppFailure('Rate limit exceeded: Maximum 10 drops per 5 minutes.', code: 'RATE_LIMITED');
+    }
+
+    final validationError = AppLogger.validateDropInput(note: note, tags: tags);
+    if (validationError != null) return validationError;
+
+    if (mediaPath != null) {
+      final imgError = AppLogger.validateImagePath(mediaPath);
+      if (imgError != null) return imgError;
+    }
+
+    _recentPublishTimestamps.add(now);
+    final profile = ref.read(currentProfileProvider);
+    final canonicalPlaceId = PlacesRepository.resolveCanonicalId(placeId);
+
     final newPost = PostModel(
-      id: 'drop_${DateTime.now().millisecondsSinceEpoch}',
-      authorId: 'you',
-      authorName: 'You (Explorer)',
-      authorUsername: 'you',
-      authorAvatar: 'YO',
-      placeId: placeId,
+      id: 'drop_${now.millisecondsSinceEpoch}',
+      authorId: profile.id,
+      authorName: profile.fullName,
+      authorUsername: profile.username,
+      authorAvatar: profile.initials,
+      placeId: canonicalPlaceId,
       placeName: placeName,
       placeCategory: placeCategory,
       placeAddress: placeAddress,
-      note: note,
+      note: note.trim(),
       rating: rating,
       audience: audience,
       size: mediaPath != null ? PostSize.hero : PostSize.note,
       tags: tags,
       mediaUrl: mediaPath,
       savesCount: 0,
-      createdAt: DateTime.now(),
+      createdAt: now,
     );
 
-    // Update state
     final updatedList = [newPost, ...state];
     state = updatedList;
-
-    // Persist to local storage
     await StorageService.persistDrops(updatedList);
 
-    // Push to Supabase if connected
-    if (SupabaseService.isInitialized) {
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      UploadedMediaResult? uploadedMedia;
       try {
-        await SupabaseService.client.from('posts').insert({
-          'place_id': placeId,
-          'note': note,
-          'rating': rating,
-          'audience': audience.name,
-          'tags': tags,
-          'media_url': mediaPath,
-        });
+        final placeModel = ref.read(placesRepositoryProvider).getPlaceById(canonicalPlaceId);
+        final dbPlaceUuid = placeModel?.canonicalUuid;
+        if (dbPlaceUuid != null) {
+          final insertedPost = await SupabaseService.client
+              .from('posts')
+              .insert({
+                'author_id': SupabaseService.currentUser!.id,
+                'place_id': dbPlaceUuid,
+                'note': note.trim(),
+                'rating': rating,
+                'audience': audience.name,
+                'size': newPost.size.name,
+                'tags': tags,
+              })
+              .select('id')
+              .single();
+
+          if (mediaPath != null && insertedPost['id'] != null) {
+            uploadedMedia = await SupabaseService.uploadDropMediaResult(mediaPath);
+            await SupabaseService.client.from('post_media').insert({
+              'post_id': insertedPost['id'],
+              'storage_path': uploadedMedia?.storagePath ?? mediaPath,
+              'media_url': uploadedMedia?.mediaUrl ?? mediaPath,
+              'is_primary': true,
+            });
+          }
+        }
       } catch (e) {
-        debugPrint('[PostsRepository] Supabase push note: $e');
+        if (uploadedMedia != null) {
+          await SupabaseService.removeOrphanedMedia(uploadedMedia.storagePath);
+        }
+        AppLogger.error('PostsRepository', 'Supabase drop sync failed', e);
       }
     }
+    return null;
+  }
+
+  /// Edits an existing Drop owned by the current user (Phase 3.3 — Experiences Domain).
+  Future<AppFailure?> editDrop({
+    required String postId,
+    required String note,
+    int? rating,
+    PostAudience? audience,
+    List<String>? tags,
+  }) async {
+    final target = state.where((p) => p.id == postId).firstOrNull;
+    if (target == null) {
+      return const AppFailure('Drop not found.', code: 'NOT_FOUND');
+    }
+    if (!_isCurrentUserAuthor(target.authorId)) {
+      return const AppFailure('You can only edit your own drops.', code: 'FORBIDDEN');
+    }
+
+    final validationError = AppLogger.validateDropInput(
+      note: note,
+      tags: tags ?? target.tags,
+    );
+    if (validationError != null) return validationError;
+
+    state = state.map<PostModel>((p) {
+      if (p.id != postId) return p;
+      return p.copyWith(
+        note: note.trim(),
+        rating: rating ?? p.rating,
+        audience: audience ?? p.audience,
+        tags: tags ?? p.tags,
+      );
+    }).toList();
+    await StorageService.persistDrops(state);
+
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      try {
+        await SupabaseService.client
+            .from('posts')
+            .update({
+              'note': note.trim(),
+              if (rating != null) 'rating': rating,
+              if (audience != null) 'audience': audience.name,
+              if (tags != null) 'tags': tags,
+            })
+            .eq('id', postId)
+            .eq('author_id', SupabaseService.currentUser!.id);
+      } catch (e) {
+        AppLogger.warn('PostsRepository', 'Supabase editDrop sync skipped', e);
+      }
+    }
+    return null;
+  }
+
+  /// Deletes a Drop owned by the current user (Phase 3.3 — Experiences Domain).
+  Future<bool> deleteDrop(String postId) async {
+    final target = state.where((p) => p.id == postId).firstOrNull;
+    if (target == null) return false;
+    if (!_isCurrentUserAuthor(target.authorId)) {
+      return false;
+    }
+
+    state = state.where((p) => p.id != postId).toList();
+    await StorageService.persistDrops(state);
+
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      try {
+        await SupabaseService.client
+            .from('posts')
+            .delete()
+            .eq('id', postId)
+            .eq('author_id', SupabaseService.currentUser!.id);
+      } catch (e) {
+        AppLogger.warn('PostsRepository', 'Supabase deleteDrop sync skipped', e);
+      }
+    }
+    return true;
+  }
+
+  /// Adds a reaction (`heart`, `fire`, `bookmark_nod`, `coffee`) to an authorized Drop (Phase 4.3).
+  Future<void> reactToPost(String postId, {String reaction = 'heart'}) async {
+    state = state.map((p) {
+      if (p.id != postId) return p;
+      return p.copyWith(savesCount: p.savesCount + 1);
+    }).toList();
+    await StorageService.persistDrops(state);
+
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      try {
+        await SupabaseService.client.from('post_reactions').upsert({
+          'post_id': postId,
+          'user_id': SupabaseService.currentUser!.id,
+          'reaction': reaction,
+        });
+      } catch (e) {
+        AppLogger.warn('PostsRepository', 'Supabase post_reactions sync skipped', e);
+      }
+    }
+  }
+
+  /// Adds a comment (1–300 chars) to an authorized Drop (Phase 4.3).
+  Future<AppFailure?> addCommentToPost(String postId, String body) async {
+    final trimmed = body.trim();
+    if (trimmed.isEmpty || trimmed.length > 300) {
+      return const AppFailure('Comment must be between 1 and 300 characters.', code: 'INVALID_COMMENT');
+    }
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      try {
+        await SupabaseService.client.from('post_comments').insert({
+          'post_id': postId,
+          'author_id': SupabaseService.currentUser!.id,
+          'body': trimmed,
+        });
+      } catch (e) {
+        AppLogger.warn('PostsRepository', 'Supabase post_comments sync skipped', e);
+      }
+    }
+    return null;
+  }
+
+  /// Increments report count on a post and automatically quarantines it at 3+ reports.
+  Future<bool> reportPost(String postId, String reason) async {
+    final totalReports = await StorageService.addReport({
+      'target_type': 'post',
+      'target_id': postId,
+      'reason': reason,
+      'created_at': DateTime.now().toIso8601String(),
+    });
+
+    if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
+      try {
+        await SupabaseService.client.from('reports').insert({
+          'reporter_id': SupabaseService.currentUser!.id,
+          'target_type': 'post',
+          'target_id': postId,
+          'reason': reason,
+        });
+      } catch (e) {
+        AppLogger.warn('PostsRepository', 'Supabase report sync skipped', e);
+      }
+    }
+
+    var quarantinedNow = false;
+    state = state.map((p) {
+      if (p.id != postId) return p;
+      final newCount = totalReports > p.reportsCount ? totalReports : p.reportsCount + 1;
+      final shouldQuarantine = newCount >= 3;
+      if (shouldQuarantine) quarantinedNow = true;
+      return p.copyWith(reportsCount: newCount, isQuarantined: shouldQuarantine);
+    }).toList();
+    await StorageService.persistDrops(state);
+    return quarantinedNow;
   }
 
   void addDrop(PostModel post) {
@@ -238,19 +545,38 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     StorageService.persistDrops(state);
   }
 
-  List<PostModel> getFriendsDrops(Set<String> followedIds) {
-    return state.where((p) => p.authorId == 'you' || followedIds.contains(p.authorId)).toList();
-  }
-
-  List<PostModel> getPublicDrops() {
-    return state.where((p) => p.audience == PostAudience.public).toList();
-  }
-
-  List<PostModel> getDropsForPlace(String placeId, {bool friendsOnly = false, Set<String>? followedIds}) {
+  List<PostModel> getFriendsDrops(Set<String> acceptedFriendIds, {Set<String>? blockedIds}) {
+    final blocked = blockedIds ?? ref.read(blockedUsersProvider);
     return state.where((p) {
-      if (p.placeId != placeId) return false;
+      if (p.isQuarantined) return false;
+      if (blocked?.contains(p.authorId) ?? false) return false;
+      return _isCurrentUserAuthor(p.authorId) || acceptedFriendIds.contains(p.authorId);
+    }).toList();
+  }
+
+  List<PostModel> getPublicDrops({Set<String>? blockedIds}) {
+    final blocked = blockedIds ?? ref.read(blockedUsersProvider);
+    return state.where((p) {
+      if (p.isQuarantined) return false;
+      if (blocked?.contains(p.authorId) ?? false) return false;
+      return p.audience == PostAudience.public;
+    }).toList();
+  }
+
+  List<PostModel> getDropsForPlace(
+    String placeId, {
+    bool friendsOnly = false,
+    Set<String>? followedIds,
+    Set<String>? blockedIds,
+  }) {
+    final canonicalTarget = PlacesRepository.resolveCanonicalId(placeId);
+    final blocked = blockedIds ?? ref.read(blockedUsersProvider);
+    return state.where((p) {
+      if (p.isQuarantined) return false;
+      if (PlacesRepository.resolveCanonicalId(p.placeId) != canonicalTarget) return false;
+      if (blocked?.contains(p.authorId) ?? false) return false;
       if (friendsOnly) {
-        return p.authorId == 'you' || (followedIds?.contains(p.authorId) ?? false);
+        return _isCurrentUserAuthor(p.authorId) || (followedIds?.contains(p.authorId) ?? false);
       }
       return p.audience == PostAudience.public;
     }).toList();

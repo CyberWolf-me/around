@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/services/haptic_service.dart';
 
@@ -47,18 +48,17 @@ class CategoryChips extends StatelessWidget {
                 color: isSelected ? AppColors.ink : AppColors.paper2,
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(
-                  color: isSelected ? AppColors.ink : AppColors.ink.withOpacity(0.2),
+                  color: isSelected ? AppColors.ink : AppColors.ink.withValues(alpha: 0.2),
                   width: 1.4,
                 ),
               ),
               alignment: Alignment.center,
               child: Text(
                 cat,
-                style: TextStyle(
+                style: GoogleFonts.spaceMono(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   color: isSelected ? AppColors.paper : AppColors.ink2,
-                  fontFamily: 'SpaceMono',
                 ),
               ),
             ),

@@ -9,10 +9,19 @@ class StoryRail extends ConsumerWidget {
 
   const StoryRail({super.key, required this.onSelectPlace});
 
+  static const List<String> storyPlaceIds = [
+    'breadly',
+    'bnb',
+    'ecorn',
+    'tims',
+    'chorsu',
+    'steam',
+    'kitobxon',
+  ];
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final placesRepo = ref.watch(placesRepositoryProvider);
-    final storyPlaceIds = ['kettle', 'castellan', 'sable', 'volta', 'marigold'];
 
     return SizedBox(
       height: 86,

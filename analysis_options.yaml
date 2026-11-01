@@ -2,11 +2,7 @@
 # check for errors, warnings, and lints.
 include: package:flutter_lints/flutter.yaml
 
-analyzer:
-  errors:
-    deprecated_member_use: ignore
-    unnecessary_underscores: ignore
-
 linter:
   rules:
-    # avoid_print: false
+    prefer_const_constructors: true
+    prefer_final_fields: true

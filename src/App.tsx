@@ -29,7 +29,7 @@ export const AppContent: React.FC = () => {
         return <PlaceDetailScreen placeId={topScreen.id} />;
       }
       if (topScreen.kind === 'profile') {
-        return <ProfileScreen />;
+        return <ProfileScreen userId={topScreen.userId} />;
       }
       if (topScreen.kind === 'notifs') {
         return <ActivityScreen />;
@@ -57,21 +57,16 @@ export const AppContent: React.FC = () => {
 
   return (
     <div className="stage">
-      {/* Desktop presentation side navigation rail */}
       <DesktopRail />
 
-      {/* Mobile Device Container */}
       <MobileFrame>
         {renderActiveScreen()}
 
-        {/* Tab Bar - Shown when booted and not inside place detail */}
         {booted && !isPlaceActive && <TabBar />}
 
-        {/* Create Drop 4-step wizard modal sheet */}
         <CreateDropModal />
       </MobileFrame>
 
-      {/* Shared element photo flight animation */}
       <FlightPhoto flight={flight} />
     </div>
   );

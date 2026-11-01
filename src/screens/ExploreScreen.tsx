@@ -18,7 +18,7 @@ export const ExploreScreen: React.FC = () => {
 
   const [activeCategory, setActiveCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string>('kettle');
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string>('breadly');
 
   const filteredPlaces = useMemo(() => {
     return places.filter((p: Place) => {
@@ -46,10 +46,10 @@ export const ExploreScreen: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
         <div>
           <div className="mono" style={{ color: 'var(--ink-3)', fontSize: 9.5, marginBottom: 2 }}>
-            Public Discovery
+            Public Discovery · 41.31° N, 69.28° E
           </div>
           <div className="display d-lg" style={{ fontSize: 22, fontWeight: 800 }}>
-            Barlow Hill
+            Tashkent
           </div>
         </div>
 
@@ -89,7 +89,7 @@ export const ExploreScreen: React.FC = () => {
         <Icon name="search" size={15} sw={2.4} style={{ color: 'var(--ink-3)' }} />
         <input
           type="text"
-          placeholder="Search by venue name, tag, or street..."
+          placeholder="Search Tashkent venues, districts, or tags..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{

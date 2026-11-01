@@ -2,6 +2,10 @@ export type Audience = 'friends' | 'public';
 
 export type DropSize = 'hero' | 'half' | 'wide' | 'note';
 
+export type SaveStatus = 'want_to_go' | 'been';
+
+export type FriendshipStatus = 'accepted' | 'pending_outgoing' | 'pending_incoming' | 'none';
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -14,6 +18,8 @@ export interface UserProfile {
   savedCount: number;
   bio?: string;
   isFollowing?: boolean;
+  hideVisitsHistory?: boolean;
+  allowFriendRequests?: boolean;
 }
 
 export interface Place {
@@ -49,6 +55,8 @@ export interface PlaceDrop {
   tags?: string[];
   tint?: string;
   fresh?: boolean;
+  reportsCount?: number;
+  quarantined?: boolean;
 }
 
 export interface PublicReview {
@@ -86,9 +94,17 @@ export interface PrivacySettings {
   blockedUsers: string[];
 }
 
+export interface ContentReport {
+  id: string;
+  targetType: 'drop' | 'place' | 'profile';
+  targetId: string;
+  reason: string;
+  createdAt: string;
+}
+
 export type ScreenTab = 'feed' | 'explore' | 'saved' | 'profile';
 
-export type StackScreen = 
+export type StackScreen =
   | { kind: 'place'; id: string }
   | { kind: 'profile'; userId?: string }
   | { kind: 'notifs' }

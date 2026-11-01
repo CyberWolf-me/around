@@ -12,21 +12,25 @@ export const CreateDropModal: React.FC = () => {
     closeCreateDrop,
     publishDrop,
     places,
+    addCustomPlace,
     privacySettings,
     getPlaceById,
   } = useApp();
 
   const [step, setStep] = useState<number>(0);
-  const [photo, setPhoto] = useState<string | null>('/assets/kettle-hero.jpg');
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string>('kettle');
+  const [photo, setPhoto] = useState<string | null>('/assets/bakery-counter.jpg');
+  const [selectedPlaceId, setSelectedPlaceId] = useState<string>('breadly');
   const [note, setNote] = useState<string>('');
   const [rating, setRating] = useState<number>(5);
-  const [tags, setTags] = useState<string[]>(['quiet mornings']);
+  const [tags, setTags] = useState<string[]>(['specialty coffee']);
   const [aud, setAud] = useState<Audience>(privacySettings.defaultAudience || 'friends');
   const [venueSearch, setVenueSearch] = useState<string>('');
+  const [addingVenue, setAddingVenue] = useState<boolean>(false);
+  const [newVenueName, setNewVenueName] = useState<string>('');
+  const [newVenueStreet, setNewVenueStreet] = useState<string>('');
+  const [newVenueCat, setNewVenueCat] = useState<string>('Café · Bakery');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Drag-to-dismiss sheet gesture tracking
   const [dragY, setDragY] = useState<number>(0);
   const isDragging = useRef<boolean>(false);
   const startY = useRef<number>(0);
@@ -47,28 +51,79 @@ export const CreateDropModal: React.FC = () => {
   const currentPlace = getPlaceById(selectedPlaceId) || places[0];
 
   const curatedPhotos = [
-    '/assets/kettle-hero.jpg',
     '/assets/bakery-counter.jpg',
-    '/assets/pastries.jpg',
     '/assets/study-desk.jpg',
-    '/assets/wine-tall.jpg',
-    '/assets/records-crates.jpg',
-    '/assets/ramen-bowl.jpg',
+    '/assets/patisserie.jpg',
+    '/assets/cafe-light.jpg',
+    '/assets/street.jpg',
+    '/assets/window-girl.jpg',
+    '/assets/wine-wide.jpg',
     '/assets/bookshop-tall.jpg',
   ];
 
+  // Compress uploaded photo on an offscreen canvas to avoid exhausting 5MB localStorage quota
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setPhoto(event.target.result as string);
-          buzz(10);
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (!dataUrl) return;
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 800;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
         }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          setPhoto(canvas.toDataURL('image/jpeg', 0.75));
+        } else {
+          setPhoto(dataUrl);
+        }
+        buzz(10);
       };
-      reader.readAsDataURL(file);
-    }
+      img.src = dataUrl;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCreateCustomVenue = () => {
+    if (!newVenueName.trim()) return;
+    const newId = `custom_${Date.now()}`;
+    const customPlace: Place = {
+      id: newId,
+      name: newVenueName.trim(),
+      cat: newVenueCat.trim() || 'Café',
+      street: newVenueStreet.trim() || '15 Taras Shevchenko Street, Tashkent',
+      dist: '5 min walk',
+      price: '$$',
+      img: photo || '/assets/bakery-counter.jpg',
+      hours: '08:00 – 22:00',
+      closed: 'Open today',
+      rating: 4.8,
+      reviews: 1,
+      tags: ['specialty coffee'],
+      line: 'Newly discovered Tashkent neighborhood spot.',
+      imgs: [photo || '/assets/bakery-counter.jpg'],
+      coords: { x: 50, y: 50 },
+    };
+    addCustomPlace(customPlace);
+    setSelectedPlaceId(newId);
+    setAddingVenue(false);
+    setNewVenueName('');
+    setNewVenueStreet('');
   };
 
   const toggleTag = (t: string) => {
@@ -81,9 +136,8 @@ export const CreateDropModal: React.FC = () => {
       setStep((s: number) => s + 1);
       buzz(8);
     } else {
-      // Publish
       publishDrop({
-        placeId: selectedPlaceId,
+        placeId: currentPlace.id,
         note,
         rating,
         tags,
@@ -108,7 +162,6 @@ export const CreateDropModal: React.FC = () => {
       p.cat.toLowerCase().includes(venueSearch.toLowerCase())
   );
 
-  // Gesture handling
   const onPointerDown = (e: React.PointerEvent) => {
     isDragging.current = true;
     startY.current = e.clientY;
@@ -135,7 +188,6 @@ export const CreateDropModal: React.FC = () => {
 
   return (
     <>
-      {/* Scrim backdrop */}
       <div
         className="sheet-scrim"
         onClick={closeCreateDrop}
@@ -148,7 +200,6 @@ export const CreateDropModal: React.FC = () => {
         }}
       />
 
-      {/* Slide-up bottom sheet */}
       <div
         className="sheet"
         style={{
@@ -173,7 +224,6 @@ export const CreateDropModal: React.FC = () => {
           margin: '0 auto',
         }}
       >
-        {/* Grab bar */}
         <div
           className="sheet-grab"
           onPointerDown={onPointerDown}
@@ -199,7 +249,6 @@ export const CreateDropModal: React.FC = () => {
           />
         </div>
 
-        {/* Modal Top Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 18px 10px', borderBottom: '1px solid rgba(21,19,15,.12)' }}>
           <button
             onClick={handleBack}
@@ -227,12 +276,9 @@ export const CreateDropModal: React.FC = () => {
           </button>
         </div>
 
-        {/* Body content based on step */}
         <div style={{ padding: '16px 18px 24px', overflowY: 'auto', flex: 1, minHeight: 320 }}>
-          {/* STEP 0: Photo Selection */}
           {step === 0 && (
             <div>
-              {/* Photo preview */}
               <div
                 style={{
                   height: 200,
@@ -258,7 +304,6 @@ export const CreateDropModal: React.FC = () => {
                 )}
               </div>
 
-              {/* Upload trigger */}
               <input
                 type="file"
                 ref={fileInputRef}
@@ -276,7 +321,7 @@ export const CreateDropModal: React.FC = () => {
               </button>
 
               <div className="mono-sm" style={{ color: 'var(--ink-3)', fontSize: 10, marginBottom: 8, textTransform: 'uppercase' }}>
-                Or select local venue snapshot:
+                Or select curated Tashkent venue snapshot:
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
@@ -308,34 +353,73 @@ export const CreateDropModal: React.FC = () => {
             </div>
           )}
 
-          {/* STEP 1: Venue Selection */}
           {step === 1 && (
             <div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  background: 'var(--paper-2)',
-                  border: '1.5px solid var(--ink)',
-                  borderRadius: 10,
-                  padding: '7px 10px',
-                  marginBottom: 12,
-                }}
-              >
-                <Icon name="search" size={14} sw={2.2} style={{ color: 'var(--ink-3)' }} />
-                <input
-                  type="text"
-                  placeholder="Search Barlow Hill venues..."
-                  value={venueSearch}
-                  onChange={(e) => setVenueSearch(e.target.value)}
-                  style={{ border: 0, background: 'none', outline: 'none', width: '100%', fontSize: 12 }}
-                />
+              <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+                <div
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    background: 'var(--paper-2)',
+                    border: '1.5px solid var(--ink)',
+                    borderRadius: 10,
+                    padding: '7px 10px',
+                  }}
+                >
+                  <Icon name="search" size={14} sw={2.2} style={{ color: 'var(--ink-3)' }} />
+                  <input
+                    type="text"
+                    placeholder="Search Tashkent venues..."
+                    value={venueSearch}
+                    onChange={(e) => setVenueSearch(e.target.value)}
+                    style={{ border: 0, background: 'none', outline: 'none', width: '100%', fontSize: 12 }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-ghost"
+                  onClick={() => setAddingVenue(v => !v)}
+                  title="Add custom venue"
+                >
+                  <Icon name="plus" size={14} sw={2.5} />
+                </button>
               </div>
+
+              {addingVenue && (
+                <div style={{ padding: 12, background: 'var(--paper-2)', border: '1.5px solid var(--ink)', borderRadius: 12, marginBottom: 12 }}>
+                  <div className="display d-sm" style={{ fontSize: 13, marginBottom: 6 }}>Add New Tashkent Venue</div>
+                  <input
+                    type="text"
+                    placeholder="Venue name *"
+                    value={newVenueName}
+                    onChange={(e) => setNewVenueName(e.target.value)}
+                    style={{ width: '100%', padding: 6, borderRadius: 6, border: '1px solid var(--ink)', marginBottom: 6 }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Street address"
+                    value={newVenueStreet}
+                    onChange={(e) => setNewVenueStreet(e.target.value)}
+                    style={{ width: '100%', padding: 6, borderRadius: 6, border: '1px solid var(--ink)', marginBottom: 6 }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Category"
+                    value={newVenueCat}
+                    onChange={(e) => setNewVenueCat(e.target.value)}
+                    style={{ width: '100%', padding: 6, borderRadius: 6, border: '1px solid var(--ink)', marginBottom: 8 }}
+                  />
+                  <button type="button" className="btn btn-primary btn-sm btn-block" onClick={handleCreateCustomVenue}>
+                    Add & Select Venue
+                  </button>
+                </div>
+              )}
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 260, overflowY: 'auto' }}>
                 {filteredPlaces.map((p: Place) => {
-                  const isSelected = selectedPlaceId === p.id;
+                  const isSelected = currentPlace.id === p.id;
                   return (
                     <button
                       key={p.id}
@@ -373,7 +457,6 @@ export const CreateDropModal: React.FC = () => {
             </div>
           )}
 
-          {/* STEP 2: Note & Rating */}
           {step === 2 && (
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, padding: '8px 10px', background: 'var(--paper-2)', borderRadius: 10 }}>
@@ -391,7 +474,7 @@ export const CreateDropModal: React.FC = () => {
                 <textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  placeholder="e.g. Back room is quiet until eleven, cortado is the best here..."
+                  placeholder="e.g. Lavender matcha and warm sourdough on the Taras Shevchenko courtyard..."
                   rows={3}
                   maxLength={180}
                   style={{
@@ -451,7 +534,6 @@ export const CreateDropModal: React.FC = () => {
             </div>
           )}
 
-          {/* STEP 3: Audience Selector */}
           {step === 3 && (
             <div>
               <div className="mono-sm" style={{ color: 'var(--ink-3)', marginBottom: 10, fontSize: 10.5 }}>
@@ -459,7 +541,6 @@ export const CreateDropModal: React.FC = () => {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {/* Friends Only Option */}
                 <button
                   type="button"
                   onClick={() => {
@@ -509,7 +590,6 @@ export const CreateDropModal: React.FC = () => {
                   </div>
                 </button>
 
-                {/* Public Option */}
                 <button
                   type="button"
                   onClick={() => {
@@ -549,7 +629,7 @@ export const CreateDropModal: React.FC = () => {
                       Public Discovery
                     </div>
                     <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.4, color: 'var(--ink-2)' }}>
-                      Discoverable by the wider Barlow Hill community in Explore and search. Your live location history remains strictly private.
+                      Discoverable by the wider Tashkent community in Explore and search. Your live location history remains strictly private.
                     </p>
                   </div>
                 </button>
@@ -558,7 +638,6 @@ export const CreateDropModal: React.FC = () => {
           )}
         </div>
 
-        {/* Modal Bottom CTA Bar */}
         <div style={{ padding: '12px 18px 24px', borderTop: '1px solid rgba(21,19,15,.12)', display: 'flex', gap: 10 }}>
           {step > 0 && (
             <button

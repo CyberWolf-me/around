@@ -35,3 +35,9 @@ node_modules/
 dist/
 dist-ssr/
 *.local
+
+# Environment & local archives
+.env
+around-fixes/
+around-fixed.zip
+supabase/.temp/

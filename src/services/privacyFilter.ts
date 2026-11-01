@@ -1,10 +1,11 @@
 import { PlaceDrop, PrivacySettings } from '../types';
 
 /**
- * Enforces the dual-layer privacy invariant for social feed:
- * - Only includes drops from followed users (or current user)
+ * Enforces the dual-layer privacy & moderation invariant for social feed:
+ * - Excludes quarantined drops (3+ unique community reports)
  * - Excludes blocked users
- * - Ensures friends-only drops from non-followed accounts are never leaked
+ * - Only includes drops from accepted mutual friends (or current user)
+ * - Ensures friends-only drops from non-connected accounts are never leaked
  */
 export function filterFeedDrops(
   drops: PlaceDrop[],
@@ -13,25 +14,26 @@ export function filterFeedDrops(
   blockedUserIds: Set<string>
 ): PlaceDrop[] {
   return drops.filter(drop => {
+    if (drop.quarantined) return false;
     if (blockedUserIds.has(drop.who)) return false;
-    // Current user can always see their own drops
     if (drop.who === currentUserId) return true;
-    // Must be following author to see their drops in the friends feed
     if (!followedUserIds.has(drop.who)) return false;
     return true;
   });
 }
 
 /**
- * Enforces privacy boundary for public global explore feed:
- * - Strictly ONLY drops with audience === 'public'
+ * Enforces privacy & moderation boundary for public global explore feed:
+ * - Excludes quarantined drops
  * - Excludes blocked users
+ * - Strictly ONLY drops with audience === 'public'
  */
 export function filterExploreDrops(
   drops: PlaceDrop[],
   blockedUserIds: Set<string>
 ): PlaceDrop[] {
   return drops.filter(drop => {
+    if (drop.quarantined) return false;
     if (blockedUserIds.has(drop.who)) return false;
     return drop.aud === 'public';
   });
@@ -40,8 +42,8 @@ export function filterExploreDrops(
 /**
  * Filters drops specifically for a canonical place page:
  * Separates recommendations into:
- * - Friends' layer (friends-only drops from people you follow)
- * - Public layer (public drops from everyone)
+ * - Friends' layer (drops from accepted mutual friends)
+ * - Public layer (public drops from everyone, excluding quarantined/blocked)
  */
 export function filterPlaceDrops(
   drops: PlaceDrop[],
@@ -52,6 +54,7 @@ export function filterPlaceDrops(
   blockedUserIds: Set<string>
 ): PlaceDrop[] {
   return drops.filter(drop => {
+    if (drop.quarantined) return false;
     if (drop.place !== placeId) return false;
     if (blockedUserIds.has(drop.who)) return false;
 
@@ -66,7 +69,7 @@ export function filterPlaceDrops(
 }
 
 /**
- * Determines whether a user's visit history may be displayed
+ * Determines whether a user's chronological visit history may be displayed
  */
 export function canViewVisitHistory(
   targetUserId: string,
@@ -77,4 +80,16 @@ export function canViewVisitHistory(
   if (targetUserId === viewerUserId) return true;
   if (targetSettings.hideVisitsHistory) return false;
   return isMutualFollower;
+}
+
+/**
+ * Applies automated moderation quarantine when a drop reaches 3+ reports
+ */
+export function applyReportToDrop(drop: PlaceDrop): PlaceDrop {
+  const nextCount = (drop.reportsCount || 0) + 1;
+  return {
+    ...drop,
+    reportsCount: nextCount,
+    quarantined: nextCount >= 3,
+  };
 }

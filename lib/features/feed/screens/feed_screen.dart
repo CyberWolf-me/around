@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
@@ -14,11 +15,15 @@ class FeedScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final postsNotifier = ref.watch(postsRepositoryProvider.notifier);
-    ref.watch(postsRepositoryProvider); // trigger rebuild on post changes
+    ref.watch(postsRepositoryProvider);
     final followedFriends = ref.watch(followedFriendsProvider);
+    final blockedUsers = ref.watch(blockedUsersProvider);
     final userProfile = ref.watch(currentProfileProvider);
 
-    final visibleDrops = postsNotifier.getFriendsDrops(followedFriends);
+    final visibleDrops = postsNotifier.getFriendsDrops(
+      followedFriends,
+      blockedIds: blockedUsers,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.paper,
@@ -27,15 +32,14 @@ class FeedScreen extends ConsumerWidget {
         title: Row(
           children: [
             RichText(
-              text: const TextSpan(
-                style: TextStyle(
-                  fontFamily: 'BricolageGrotesque',
+              text: TextSpan(
+                style: GoogleFonts.bricolageGrotesque(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
                   color: AppColors.ink,
                   letterSpacing: -0.8,
                 ),
-                children: [
+                children: const [
                   TextSpan(text: 'Around'),
                   TextSpan(text: '.', style: TextStyle(color: AppColors.orange)),
                 ],
@@ -47,10 +51,10 @@ class FeedScreen extends ConsumerWidget {
               decoration: BoxDecoration(
                 color: AppColors.paper2,
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: AppColors.ink.withOpacity(0.2)),
+                border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
               ),
               child: Text(
-                'Tashkent',
+                'Tashkent · ${userProfile.neighborhood}',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 8.5),
               ),
             ),
@@ -113,7 +117,7 @@ class FeedScreen extends ConsumerWidget {
             ),
           ),
           const SliverToBoxAdapter(
-            child: SizedBox(height: 70), // tab bar clearance
+            child: SizedBox(height: 70),
           ),
         ],
       ),

@@ -7,40 +7,77 @@ import { FriendPlan, Place } from '../types';
 
 export const SavedScreen: React.FC = () => {
   const {
+    places,
     savedPlaceIds,
+    savedPlaceStatuses,
     toggleSavePlace,
+    setSavedPlaceStatus,
     openPlace,
     getPlaceById,
     plans,
+    addPlan,
     switchTab,
   } = useApp();
 
   const [activeFilter, setActiveFilter] = useState<'All' | 'Want to go' | 'Been'>('All');
+  const [planModalOpen, setPlanModalOpen] = useState<boolean>(false);
+  const [planPlaceId, setPlanPlaceId] = useState<string>(places[0]?.id || 'breadly');
+  const [planWhen, setPlanWhen] = useState<string>('Sun 11:00');
+  const [planNote, setPlanNote] = useState<string>('');
 
   const filters = ['All', 'Want to go', 'Been'] as const;
 
-  const validSavedPlaces = savedPlaceIds
+  const allSavedPlaces = savedPlaceIds
     .map((id: string) => getPlaceById(id))
     .filter((p): p is Place => Boolean(p));
+
+  const validSavedPlaces = allSavedPlaces.filter((p: Place) => {
+    if (activeFilter === 'All') return true;
+    const status = savedPlaceStatuses[p.id] || 'want_to_go';
+    if (activeFilter === 'Want to go') return status === 'want_to_go';
+    if (activeFilter === 'Been') return status === 'been';
+    return true;
+  });
+
+  const handleCreatePlan = (e: React.FormEvent) => {
+    e.preventDefault();
+    addPlan({
+      placeId: planPlaceId,
+      who: ['kamila', 'bekzod'],
+      when: planWhen.trim() || 'Sat 11:00',
+      note: planNote.trim() || 'Coffee catch-up in Tashkent',
+    });
+    setPlanModalOpen(false);
+    setPlanNote('');
+  };
 
   return (
     <div className="screen saved-screen" style={{ padding: '8px 14px 24px' }}>
       {/* Header */}
       <div style={{ paddingBottom: 10 }}>
         <div className="mono-sm" style={{ color: 'var(--ink-3)', marginBottom: 2 }}>
-          Your shortlist
+          Your Tashkent shortlist
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div className="display d-xl" style={{ fontSize: 26, fontWeight: 800 }}>
             Saved
           </div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-            <span className="display d-md" style={{ color: 'var(--orange)', fontSize: 18, fontWeight: 800 }}>
-              {validSavedPlaces.length}
-            </span>
-            <span className="mono-sm" style={{ color: 'var(--ink-3)' }}>
-              places
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+              <span className="display d-md" style={{ color: 'var(--orange)', fontSize: 18, fontWeight: 800 }}>
+                {validSavedPlaces.length}
+              </span>
+              <span className="mono-sm" style={{ color: 'var(--ink-3)' }}>
+                places
+              </span>
+            </div>
+            <button
+              className="btn btn-ghost btn-sm"
+              style={{ height: 28, padding: '0 10px', fontSize: 11 }}
+              onClick={() => setPlanModalOpen(true)}
+            >
+              <Icon name="plus" size={12} sw={2.5} /> Plan
+            </button>
           </div>
         </div>
       </div>
@@ -57,6 +94,8 @@ export const SavedScreen: React.FC = () => {
               padding: '6px 0',
               border: 0,
               borderRadius: 8,
+              background: activeFilter === f ? 'var(--ink)' : 'transparent',
+              color: activeFilter === f ? 'var(--paper)' : 'var(--ink)',
               fontFamily: 'var(--body)',
               fontWeight: 700,
               fontSize: 11,
@@ -95,7 +134,7 @@ export const SavedScreen: React.FC = () => {
               return (
                 <button
                   key={pl.id}
-                  onClick={(e) => openPlace(pl.placeId, e.currentTarget)}
+                  onClick={(e) => openPlace(p.id, e.currentTarget)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -153,79 +192,95 @@ export const SavedScreen: React.FC = () => {
             }}
           >
             <div className="display d-sm" style={{ fontSize: 16, marginBottom: 4 }}>
-              Your shortlist is empty
+              No places in "{activeFilter}"
             </div>
             <p className="mono-sm" style={{ fontSize: 11, color: 'var(--ink-3)', marginBottom: 14 }}>
-              Bookmark places you want to visit so you never forget friend recommendations.
+              Bookmark places or switch status between "Want to go" and "Been".
             </p>
             <button className="btn btn-primary btn-sm" onClick={() => switchTab('explore')}>
-              Explore Barlow Hill
+              Explore Venues
             </button>
           </div>
         ) : (
-          validSavedPlaces.map((p: Place) => (
-            <div key={p.id} style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
-              <button
-                className="venrow"
-                style={{
-                  flex: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  padding: 9,
-                  background: 'var(--paper)',
-                  border: '1.8px solid var(--ink)',
-                  borderRadius: 14,
-                  boxShadow: '2.5px 2.5px 0 var(--ink)',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                }}
-                onClick={(e) => openPlace(p.id, e.currentTarget)}
-              >
-                <div
+          validSavedPlaces.map((p: Place) => {
+            const status = savedPlaceStatuses[p.id] || 'want_to_go';
+            const isBeen = status === 'been';
+
+            return (
+              <div key={p.id} style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
+                <button
+                  className="venrow"
                   style={{
-                    width: 54,
-                    height: 54,
-                    borderRadius: 10,
-                    overflow: 'hidden',
-                    flexShrink: 0,
-                    border: '1.5px solid var(--ink)',
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: 9,
+                    background: 'var(--paper)',
+                    border: '1.8px solid var(--ink)',
+                    borderRadius: 14,
+                    boxShadow: '2.5px 2.5px 0 var(--ink)',
+                    textAlign: 'left',
+                    cursor: 'pointer',
                   }}
+                  onClick={(e) => openPlace(p.id, e.currentTarget)}
                 >
-                  <img src={p.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
+                  <div
+                    style={{
+                      width: 54,
+                      height: 54,
+                      borderRadius: 10,
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      border: '1.5px solid var(--ink)',
+                    }}
+                  >
+                    <img src={p.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
 
-                <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <div className="display d-sm" style={{ fontSize: 14.5, fontWeight: 700 }}>
-                    {p.name}
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <div className="display d-sm" style={{ fontSize: 14.5, fontWeight: 700 }}>
+                      {p.name}
+                    </div>
+                    <div className="mono-sm" style={{ color: 'var(--ink-3)', fontSize: 10 }}>
+                      {p.cat} · {p.dist}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                      <StarRating rating={p.rating} size={8.5} />
+                      <span style={{ fontSize: 10, fontWeight: 700 }}>{p.rating}</span>
+                      <span
+                        className={`pill ${isBeen ? 'fill-ink' : 'fill-bu'}`}
+                        style={{ height: 18, fontSize: 8.5, padding: '0 6px' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSavedPlaceStatus(p.id, isBeen ? 'want_to_go' : 'been');
+                        }}
+                        title="Tap to toggle between Want to go and Been"
+                      >
+                        {isBeen ? '✓ Been' : 'Want to go'}
+                      </span>
+                    </div>
                   </div>
-                  <div className="mono-sm" style={{ color: 'var(--ink-3)', fontSize: 10 }}>
-                    {p.cat} · {p.dist}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <StarRating rating={p.rating} size={8.5} />
-                    <span style={{ fontSize: 10, fontWeight: 700 }}>{p.rating}</span>
-                  </div>
-                </div>
-              </button>
+                </button>
 
-              <button
-                className="iconbtn"
-                onClick={() => toggleSavePlace(p.id)}
-                style={{
-                  alignSelf: 'center',
-                  background: 'var(--orange)',
-                  color: '#FFFFFF',
-                  borderColor: 'var(--ink)',
-                  boxShadow: '2px 2px 0 var(--ink)',
-                }}
-                aria-label="Remove from saved"
-                title="Remove from saved"
-              >
-                <Icon name="bookmark" size={14} sw={2.2} fill="currentColor" />
-              </button>
-            </div>
-          ))
+                <button
+                  className="iconbtn"
+                  onClick={() => toggleSavePlace(p.id)}
+                  style={{
+                    alignSelf: 'center',
+                    background: 'var(--orange)',
+                    color: '#FFFFFF',
+                    borderColor: 'var(--ink)',
+                    boxShadow: '2px 2px 0 var(--ink)',
+                  }}
+                  aria-label="Remove from saved"
+                  title="Remove from saved"
+                >
+                  <Icon name="bookmark" size={14} sw={2.2} fill="currentColor" />
+                </button>
+              </div>
+            );
+          })
         )}
       </div>
 
@@ -234,8 +289,76 @@ export const SavedScreen: React.FC = () => {
         style={{ marginTop: 16, height: 38 }}
         onClick={() => switchTab('explore')}
       >
-        <Icon name="compass" size={14} sw={2.2} /> Find More Places in Barlow Hill
+        <Icon name="compass" size={14} sw={2.2} /> Find More Places in Tashkent
       </button>
+
+      {planModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(21,19,15,.6)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 18,
+          }}
+          onClick={() => setPlanModalOpen(false)}
+        >
+          <form
+            onSubmit={handleCreatePlan}
+            style={{
+              background: 'var(--paper)',
+              border: '2.5px solid var(--ink)',
+              borderRadius: 18,
+              padding: 18,
+              width: '100%',
+              maxWidth: 330,
+              boxShadow: 'var(--sh-lg)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="display d-sm" style={{ fontSize: 17, marginBottom: 12 }}>
+              New Plan with Friends
+            </div>
+            <label className="mono-sm" style={{ display: 'block', marginBottom: 4 }}>Venue</label>
+            <select
+              value={planPlaceId}
+              onChange={(e) => setPlanPlaceId(e.target.value)}
+              style={{ width: '100%', padding: 8, borderRadius: 8, border: '1.5px solid var(--ink)', marginBottom: 10, background: 'var(--paper)' }}
+            >
+              {places.map(pl => (
+                <option key={pl.id} value={pl.id}>{pl.name}</option>
+              ))}
+            </select>
+            <label className="mono-sm" style={{ display: 'block', marginBottom: 4 }}>When</label>
+            <input
+              type="text"
+              value={planWhen}
+              onChange={(e) => setPlanWhen(e.target.value)}
+              placeholder="e.g. Sat 10:30"
+              style={{ width: '100%', padding: 8, borderRadius: 8, border: '1.5px solid var(--ink)', marginBottom: 10 }}
+            />
+            <label className="mono-sm" style={{ display: 'block', marginBottom: 4 }}>Note</label>
+            <input
+              type="text"
+              value={planNote}
+              onChange={(e) => setPlanNote(e.target.value)}
+              placeholder="e.g. Sourdough & lavender matcha"
+              style={{ width: '100%', padding: 8, borderRadius: 8, border: '1.5px solid var(--ink)', marginBottom: 14 }}
+            />
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button type="button" className="btn btn-ghost btn-sm" style={{ flex: 1 }} onClick={() => setPlanModalOpen(false)}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary btn-sm" style={{ flex: 1 }}>
+                Create
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
