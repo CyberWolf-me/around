@@ -126,8 +126,9 @@ void main() {
       expect(find.text('Shaykhontohur'), findsOneWidget);
       expect(find.text('Mirabad'), findsOneWidget);
 
-      // Verify Action Button
-      expect(find.text('Share Taste Passport'), findsOneWidget);
+      // Verify Action Buttons
+      expect(find.text('Copy Link'), findsOneWidget);
+      expect(find.text('Telegram'), findsOneWidget);
     });
 
     testWidgets('TastePassportCard handles empty venue list gracefully', (tester) async {

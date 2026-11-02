@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/services/telegram_share_service.dart';
 import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/models/profile_model.dart';
@@ -254,7 +255,7 @@ class TastePassportCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
-                            color: AppColors.orange,
+                            color: AppColors.butter,
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: AppColors.ink, width: 1.5),
                             boxShadow: const [AppColors.shadowTactile],
@@ -263,14 +264,62 @@ class TastePassportCard extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.share, size: 14, color: AppColors.ink),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Share Taste Passport',
-                                style: GoogleFonts.instrumentSans(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                  color: AppColors.ink,
+                              const Icon(Icons.copy, size: 14, color: AppColors.ink),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  'Copy Link',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.instrumentSans(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                    color: AppColors.ink,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: BouncingWidget(
+                        onTap: () async {
+                          HapticService.medium();
+                          await TelegramShareService.sharePassportToTelegram(
+                            fullName: profile.fullName,
+                            username: profile.username,
+                            neighborhood: profile.neighborhood,
+                            placeCount: topPlaces.length,
+                          );
+                          if (onShare != null) onShare!();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF229ED9),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.ink, width: 1.5),
+                            boxShadow: const [AppColors.shadowTactile],
+                          ),
+                          alignment: Alignment.center,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.send_rounded, size: 14, color: Colors.white),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  'Telegram',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: GoogleFonts.instrumentSans(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ],

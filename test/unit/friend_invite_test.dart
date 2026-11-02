@@ -157,7 +157,8 @@ void main() {
 
       await tester.pumpAndSettle();
       expect(find.text('Your Personal Invite Link'), findsOneWidget);
-      expect(find.text('Copy Your Link'), findsOneWidget);
+      expect(find.text('Copy Link'), findsOneWidget);
+      expect(find.text('Telegram'), findsOneWidget);
     });
 
     testWidgets('FriendInviteScreen enforces block precedence (Security Invariant Rule C)', (tester) async {

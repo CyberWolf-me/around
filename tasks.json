@@ -1042,13 +1042,15 @@
       "description": "Implement native Telegram share engine with rich invite text, deep link payloads, and Taste Passport card integration.",
       "ownerRole": "Mobile Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P12-03"
       ],
       "affectedPaths": [
         "lib/core/services/telegram_share_service.dart",
         "lib/features/profile/screens/friend_invite_screen.dart",
+        "lib/features/profile/screens/profile_screen.dart",
+        "lib/features/profile/widgets/taste_passport_card.dart",
         "test/unit/telegram_share_service_test.dart"
       ],
       "acceptanceCriteria": [
@@ -1070,7 +1072,7 @@
       "description": "Build reusable EmptyStateWidget and wire into FeedScreen and SavedScreen with clear social and discovery CTAs.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P12-04"
       ],

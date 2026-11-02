@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/friend_invite_service.dart';
+import '../../../core/services/telegram_share_service.dart';
 import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/services/haptic_service.dart';
@@ -144,28 +145,87 @@ class _FriendInviteScreenState extends ConsumerState<FriendInviteScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            BouncingWidget(
-              onTap: () {
-                HapticService.selection();
-                FriendInviteService.copyInviteLink(
-                  inviterId: currentProfile.id,
-                  username: currentProfile.username,
-                  fullName: currentProfile.fullName,
-                  neighborhood: currentProfile.neighborhood,
-                );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('✓ Invite link copied to clipboard')),
-                );
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.orange,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: const [AppColors.shadowTactile],
+            Row(
+              children: [
+                Expanded(
+                  child: BouncingWidget(
+                    onTap: () {
+                      HapticService.selection();
+                      FriendInviteService.copyInviteLink(
+                        inviterId: currentProfile.id,
+                        username: currentProfile.username,
+                        fullName: currentProfile.fullName,
+                        neighborhood: currentProfile.neighborhood,
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('✓ Invite link copied to clipboard')),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.paper2,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.borderSubtle, width: 1.2),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.copy, size: 14, color: AppColors.ink),
+                          SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              'Copy Link',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.ink, fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                child: const Text('Copy Your Link', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-              ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: BouncingWidget(
+                    onTap: () async {
+                      HapticService.medium();
+                      await TelegramShareService.shareInviteToTelegram(
+                        inviterId: currentProfile.id,
+                        username: currentProfile.username,
+                        fullName: currentProfile.fullName,
+                        neighborhood: currentProfile.neighborhood,
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF229ED9),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: const [AppColors.shadowTactile],
+                      ),
+                      alignment: Alignment.center,
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.send_rounded, size: 14, color: Colors.white),
+                          SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              'Telegram',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 12),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

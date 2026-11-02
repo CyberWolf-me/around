@@ -12,6 +12,7 @@ import '../../../data/services/haptic_service.dart';
 import '../../../data/services/supabase_service.dart';
 import '../../../core/services/deep_link_service.dart';
 import '../../../core/services/friend_invite_service.dart';
+import '../../../core/services/telegram_share_service.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../widgets/taste_passport_card.dart';
@@ -696,12 +697,46 @@ class ProfileScreen extends ConsumerWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Text(
-                                'Copy Link',
+                                'Copy',
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
                                 ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          BouncingWidget(
+                            onTap: () async {
+                              HapticService.medium();
+                              await TelegramShareService.shareInviteToTelegram(
+                                inviterId: currentProfile.id,
+                                username: currentProfile.username,
+                                fullName: currentProfile.fullName,
+                                neighborhood: currentProfile.neighborhood,
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF229ED9),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.send_rounded, size: 12, color: Colors.white),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Telegram',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
