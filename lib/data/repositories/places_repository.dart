@@ -9,6 +9,11 @@ final placesRepositoryProvider = Provider<PlacesRepository>((ref) {
   return PlacesRepository();
 });
 
+final districtDensityProvider = FutureProvider<List<DistrictDensityModel>>((ref) async {
+  final repo = ref.watch(placesRepositoryProvider);
+  return repo.getDistrictActivityDensity();
+});
+
 class RecommendedPlaceResult {
   final PlaceModel place;
   final double relevanceScore;

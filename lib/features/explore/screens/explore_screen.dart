@@ -18,6 +18,8 @@ import '../../../core/services/atmosphere_service.dart';
 import '../widgets/category_chips.dart';
 import '../widgets/city_map_widget.dart';
 import '../widgets/venue_row_widget.dart';
+import '../../places/widgets/district_density_overlay.dart';
+import 'package:latlong2/latlong.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
@@ -32,6 +34,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   String _selectedCategory = 'All';
   String _searchQuery = '';
   String _selectedPlaceId = 'breadly';
+  String? _selectedDistrict;
+  LatLng? _mapTargetLocation;
   bool _atmosphereActive = false;
   late AtmosphereInfo _currentAtmosphere;
   late Future<List<PlaceModel>> _placesFuture;
@@ -75,6 +79,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       savedPlaceIds: savedPlaces.toSet(),
       savedStatuses: savedStatuses,
     );
+
+    final densityAsync = ref.watch(districtDensityProvider);
+    final densities = densityAsync.asData?.value ?? const <DistrictDensityModel>[];
 
     return Scaffold(
       backgroundColor: AppColors.paper,
@@ -296,10 +303,25 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               child: Column(
                                 children: [
+                                  if (densities.isNotEmpty) ...[
+                                    DistrictDensityOverlay(
+                                      districts: densities,
+                                      selectedDistrict: _selectedDistrict,
+                                      onDistrictTap: (district) {
+                                        setState(() {
+                                          _selectedDistrict = district.district;
+                                          _mapTargetLocation = LatLng(district.centroidLat, district.centroidLng);
+                                        });
+                                      },
+                                    ),
+                                    const SizedBox(height: 6),
+                                  ],
                                   Expanded(
                                     child: CityMapWidget(
                                       places: places,
                                       selectedPlaceId: _selectedPlaceId,
+                                      districtDensities: densities,
+                                      targetLocation: _mapTargetLocation,
                                       onSelectPlace: (id) => setState(() => _selectedPlaceId = id),
                                     ),
                                   ),
