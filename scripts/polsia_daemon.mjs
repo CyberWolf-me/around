@@ -20,12 +20,14 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { generateBriefingFile } from './web_intelligence.mjs';
 
 const ROOT = process.cwd();
 const IS_WIN = process.platform === 'win32';
 const TASKS_FILE = path.join(ROOT, 'tasks.json');
 const PULSE_FILE = path.join(ROOT, 'COMPANY_PULSE.md');
 const CRITIQUE_FILE = path.join(ROOT, 'CRITIQUE_REPORT.md');
+const WEB_INTEL_FILE = path.join(ROOT, 'WEB_INTELLIGENCE.md');
 const CEO_SCHEMA_FILE = path.join(ROOT, '.agents', 'schemas', 'ceo_tasks.schema.json');
 const LOG_DIR = path.join(ROOT, 'logs', 'polsia');
 
@@ -216,17 +218,32 @@ function appendCompanyPulse(entry) {
  * Department 1 & 2: Product/UX/Growth Auditor + Autonomous CEO Sprint Generator
  * Never declares the product "100% DONE" — discovers gaps, critiques UX/growth/engineering, and queues Phase N+1.
  */
-function runAutonomousDiscoveryAndReplenishment(tasksData) {
+async function runAutonomousDiscoveryAndReplenishment(tasksData) {
   const nextPhase = computeNextPhaseNumber(tasksData);
+  log('INTEL', 'Gathering live web & market intelligence on Tashkent culture & discovery trends...');
+  try {
+    await generateBriefingFile();
+    log('INTEL', 'Generated latest WEB_INTELLIGENCE.md briefing.');
+  } catch (err) {
+    log('INTEL', `Web intelligence fetch warning: ${err.message}`);
+  }
+
+  const webIntelText = fs.existsSync(WEB_INTEL_FILE)
+    ? fs.readFileSync(WEB_INTEL_FILE, 'utf8').slice(0, 4000)
+    : 'No live web intelligence available.';
+
   log('AUDITOR', `All current tasks are DONE. Running Department 1 (Product/UX/Growth Audit) for Phase P${nextPhase}...`);
 
   const auditPrompt = `
 You are the Adversarial Product Critic, UX Lead, and Growth Hacker for Around (the places-first social discovery app in Tashkent).
 Inspect the actual code in lib/features/, lib/data/, src/, and supabase/migrations/.
 
+CURRENT LIVE TASHKENT & MARKET INTELLIGENCE:
+${webIntelText}
+
 Write a concise, ruthless audit to CRITIQUE_REPORT.md identifying the top 4 concrete gaps across:
-1. Product Depth & User Delight (what screens, interactions, or flows still feel basic, static, or incomplete?)
-2. Growth & Viral Loops (invite links, shareable venue/drop cards, onboarding taste quiz, friend discovery, city leaderboards/streaks)
+1. Product Depth & User Delight (grounded in Tashkent third-wave coffee culture, real neighborhoods, atmosphere, sensory tags)
+2. Growth & Viral Loops (invite links, shareable taste passports, friend discovery, viral mechanics)
 3. Backend & Spatial Intelligence (PostGIS query capabilities, search ranking, caching, real-time sync, edge cases)
 4. QA & Edge-Case Resilience (untested error states, offline edge cases, accessibility/localization for Tashkent EN/RU/UZ)
 
@@ -246,6 +263,9 @@ Write your findings directly to CRITIQUE_REPORT.md.
 You are the Autonomous CEO & Chief Product Architect for Around.
 In a Polsia-style autonomous company, the product is NEVER "100% finished" — every completed release unlocks the next iteration of product depth, user growth, and technical excellence.
 
+CURRENT LIVE TASHKENT & MARKET INTELLIGENCE:
+${webIntelText}
+
 Here is the latest adversarial audit from CRITIQUE_REPORT.md:
 ${critiqueText}
 
@@ -254,6 +274,7 @@ ${existingIds}
 
 Generate 3 to 4 concrete, high-impact vertical-slice tasks for Phase P${nextPhase} using IDs "P${nextPhase}-01", "P${nextPhase}-02", "P${nextPhase}-03" (and optionally "P${nextPhase}-04").
 - Set "P${nextPhase}-01" to status "READY" and subsequent tasks to "BACKLOG" with sequential dependencies.
+- Ground features in real-world Tashkent culture, trending venues, and verified viral mechanics from the intelligence briefing.
 - Every task must specify exact Dart/SQL/TS files in "affectedPaths", measurable "acceptanceCriteria", and "verificationCommands" ("flutter analyze --fatal-infos --fatal-warnings", "flutter test").
 - Return strictly valid JSON matching the schema.
 `.trim();
@@ -282,7 +303,7 @@ Generate 3 to 4 concrete, high-impact vertical-slice tasks for Phase P${nextPhas
     appendCompanyPulse(
       `### [${timestamp()}] Autonomous CEO Sprint Generated — Phase P${nextPhase}\n- **Strategic Thesis**: ${parsed.strategicSummary}\n- **New Tasks Queued**: ${parsed.newTasks.map((t) => `\`${t.id}\` (${t.title})`).join(', ')}\n`
     );
-    runShell('git add tasks.json COMPANY_PULSE.md CRITIQUE_REPORT.md && git commit -m "chore(ceo): autonomously replenish Phase P' + nextPhase + ' backlog"');
+    runShell('git add tasks.json COMPANY_PULSE.md CRITIQUE_REPORT.md WEB_INTELLIGENCE.md && git commit -m "chore(ceo): autonomously replenish Phase P' + nextPhase + ' backlog"');
     if (AUTO_PUSH) runShell('git push');
     log('CEO-AGENT', `Appended ${added} new Phase P${nextPhase} tasks to tasks.json.`);
     return added > 0;
@@ -352,7 +373,7 @@ function shipCompletedSlice(task) {
       runShell('npx supabase db push');
     }
     runShell('git push');
-    log('SHIPPER', 'Pushed verified commit to origin/main.');
+    log('SHIPPER', 'Pushed verified commit.');
   }
 }
 
@@ -368,7 +389,7 @@ async function main() {
     let task = findNextUnblockedTask(tasksData);
 
     if (!task) {
-      const replenished = runAutonomousDiscoveryAndReplenishment(tasksData);
+      const replenished = await runAutonomousDiscoveryAndReplenishment(tasksData);
       if (!replenished) {
         log('DAEMON', `Waiting ${SLEEP_SECONDS}s before retrying CEO discovery...`);
         await new Promise((r) => setTimeout(r, SLEEP_SECONDS * 1000));
@@ -410,7 +431,8 @@ ${
 
 MANDATORY RULES:
 1. Implement the complete vertical slice (production code + unit/widget tests).
-2. Do NOT mark the task DONE yourself in tasks.json and do NOT run git commit—the external Polsia daemon will run the verification suite, update tasks.json, and commit ONLY if your code passes all checks.
+2. Live web search is available: run \`node scripts/web_intelligence.mjs --query "<topic>"\` if you need live Tashkent venue context, API documentation, or package syntax.
+3. Do NOT mark the task DONE yourself in tasks.json and do NOT run git commit—the external Polsia daemon will run the verification suite, update tasks.json, and commit ONLY if your code passes all checks.
 `.trim();
 
       runHeadlessAgy(builderPrompt, { timeoutSec: 900 });
