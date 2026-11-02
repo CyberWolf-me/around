@@ -547,3 +547,32 @@ Currently, users have to assemble these stops manually. In Strava, athletes foll
    - `CuratedRouteNavigator.tsx` in `src/components/` rendering interactive multi-stop route timelines with audio-tactile haptic feedback.
 4. **Supabase SQL Schema & Shared Route Completion RPC Migration (`P25-04`)**:
    - `00016_curated_routes_and_crawl_completions.sql` adding `curated_routes` and `route_completions` tables, with idempotent RPC `complete_curated_route` rewarding 150 curator XP upon verifying all stops.
+
+
+---
+
+## Autonomous Product Audit & Replenishment — Phase 26 (November 3, 2026)
+
+### Strategic Evaluation: Milestone 2.5 Complete & Group Crawl Live Beacons
+With Phase 25 delivered and tagged as `v2.5.0-staging.1` (335 Flutter tests, 86 Web tests, zero static analysis warnings), Around has established the curated walking routes and multi-stop crawl engine.
+
+### The Adversarial Growth Audit for Phase 26:
+In Tashkent, people almost never do coffee crawls or culinary food walks alone—they go with 2–4 close friends or colleagues.
+Currently, routes can only be tracked individually. There is no collective group experience:
+- Friends have no way to synchronize their progress along a crawl route.
+- If Kamila arrives at Breadly 10 minutes earlier than Bekzod, there is no in-app signal showing where the rest of the group is without exchanging clumsy Telegram chat messages ("Where are you guys?").
+- If a group completes a crawl together, they should receive a collective **"Squad Finisher" XP Multiplier** (+200 XP).
+
+Crucially, this must respect our non-negotiable **Rule C & Dual-Layer Privacy Invariant**:
+- We NEVER stream or broadcast continuous raw GPS coordinates.
+- Presence is signaled solely via explicit venue check-in tokens (`current_place_id`) associated with the active crawl stop.
+
+### Phase 26 Work Breakdown:
+1. **Group Crawl Session & Collective Route Progress Engine (`P26-01`)**:
+   - `GroupCrawlSessionEngine` in `lib/core/services/group_crawl_session_engine.dart` managing session codes (`CRAWL-XXXX`), participant states, collective stop progress, and squad completion qualification.
+2. **Interactive Group Crawl Radar & Live Presence HUD Widget (`P26-02`)**:
+   - `GroupCrawlRadarHUD` in `lib/features/explore/widgets/group_crawl_radar_hud.dart` displaying friend avatars placed along the route stops, collective completion percentage, and join modal.
+3. **Web Companion Group Crawl Live Beacon & Room Viewer (`P26-03`)**:
+   - `GroupCrawlRoomViewer.tsx` in `src/components/` rendering real-time group crawl participants, stop badges, and Web Audio tactile feedback.
+4. **Supabase SQL Schema & Group Crawl Session RPC Migration (`P26-04`)**:
+   - `00017_group_crawl_sessions_and_live_beacons.sql` creating session tables, RLS participant isolation, and idempotent `join_or_update_group_crawl` RPC.

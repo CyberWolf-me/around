@@ -2633,6 +2633,113 @@
         "flutter test test/unit/curated_routes_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P26-01",
+      "title": "Group Crawl Session & Collective Route Progress Engine",
+      "domain": "Social Graph & Discovery",
+      "description": "GroupCrawlSessionEngine in lib/core/services/group_crawl_session_engine.dart managing session codes, participant states, collective stop progress, and squad completion qualification.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P25-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/group_crawl_session_engine.dart",
+        "test/unit/group_crawl_session_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Generates clean 6-character room codes (e.g. CRAWL-MIRABAD-88) and manages participant presence.",
+        "Tracks participant stop positions without streaming raw GPS coordinates.",
+        "Calculates collective group progress and squad completion XP bonus (+200 XP).",
+        "Unit test validates session creation, participant joins, check-ins, and completion status."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/group_crawl_session_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart state machine and group synchronization service."
+    },
+    {
+      "id": "P26-02",
+      "title": "Interactive Group Crawl Radar & Live Presence HUD Widget",
+      "domain": "Social Graph & Discovery",
+      "description": "GroupCrawlRadarHUD in lib/features/explore/widgets/group_crawl_radar_hud.dart displaying friend avatars placed along the route stops, collective completion percentage, and join modal.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P26-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/group_crawl_radar_hud.dart",
+        "test/widget/group_crawl_radar_hud_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders floating group HUD with participant avatar bubbles along route stops.",
+        "Displays collective progress bar and nearest unvisited group stop.",
+        "Provides room code sharing and quick join dialog.",
+        "Widget test verifies HUD rendering, avatar positioning, and interaction callbacks."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/group_crawl_radar_hud_test.dart"
+      ],
+      "riskAssessment": "Low: UI presentation widget."
+    },
+    {
+      "id": "P26-03",
+      "title": "Web Companion Group Crawl Live Beacon & Room Viewer",
+      "domain": "Social Graph & Discovery",
+      "description": "GroupCrawlRoomViewer.tsx in src/components/ rendering real-time group crawl participants, stop badges, and Web Audio tactile feedback.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P26-02"
+      ],
+      "affectedPaths": [
+        "src/components/GroupCrawlRoomViewer.tsx",
+        "src/__tests__/groupCrawlRoomViewer.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders active group crawl room with participant avatars and stop positions.",
+        "Provides audio-tactile haptic feedback on participant check-ins and squad completion.",
+        "Vitest test suite verifies session calculations, participant tracking, and localization."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P26-04",
+      "title": "Supabase SQL Schema & Group Crawl Session RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00017_group_crawl_sessions_and_live_beacons.sql adding group_crawl_sessions and group_crawl_participants tables with join_or_update_group_crawl RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P26-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00017_group_crawl_sessions_and_live_beacons.sql",
+        "test/unit/group_crawl_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates group_crawl_sessions and group_crawl_participants tables with RLS policies.",
+        "Creates idempotent join_or_update_group_crawl RPC with auth.uid() caller invariants.",
+        "Enforces privacy: no raw GPS coordinates stored, only discrete place IDs.",
+        "Unit test validates SQL syntax and RPC signature."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/group_crawl_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
