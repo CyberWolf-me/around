@@ -1893,7 +1893,7 @@
       "description": "TrophyCabinetWidget on TastePassportScreen displaying filterable grid of District Crowns, Streak Badges, and Quest Medals with locked progress indicators and haptic interactions.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P0",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P18-04"
       ],
@@ -1921,7 +1921,7 @@
       "description": "VenueRhythmSparkline widget on PlaceDetailScreen displaying 24h activity curve, friend drop density, and peak hours based on real drop timestamps.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P19-01"
       ],

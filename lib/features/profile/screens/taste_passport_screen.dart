@@ -12,6 +12,7 @@ import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../widgets/taste_passport_card.dart';
 import '../widgets/taste_radar_widget.dart';
+import '../widgets/trophy_cabinet_widget.dart';
 
 /// Screen displaying a user's shareable Tashkent Taste Passport.
 /// Can be opened directly or via deep link: around://passport/:username
@@ -50,6 +51,17 @@ class _TastePassportScreenState extends ConsumerState<TastePassportScreen> {
           .whereType<PlaceModel>()
           .take(4)
           .toList();
+
+      final dropDistricts = myDrops
+          .map((d) => allPlaces.where((p) => p.id == d.placeId).firstOrNull?.district ?? '')
+          .where((d) => d.isNotEmpty)
+          .toList();
+      final visitedIds = myDrops.map((d) => d.placeId).toSet()..addAll(savedIds);
+      final trophies = TrophyCabinetWidget.createDefaultTrophies(
+        visitedPlaceIds: visitedIds,
+        streakWeeks: myDrops.isNotEmpty ? 4 : 0,
+        userDropDistricts: dropDistricts,
+      );
 
       return Scaffold(
         backgroundColor: AppColors.paper,
@@ -96,6 +108,11 @@ class _TastePassportScreenState extends ConsumerState<TastePassportScreen> {
               TasteRadarWidget(
                 places: topPlaces,
                 languageCode: currentLang,
+              ),
+              const SizedBox(height: 14),
+              TrophyCabinetWidget(
+                trophies: trophies,
+                curatorName: currentProfile.fullName,
               ),
               const SizedBox(height: 14),
               Container(
@@ -188,6 +205,20 @@ class _TastePassportScreenState extends ConsumerState<TastePassportScreen> {
           );
         }
 
+        final memberDistricts = memberPosts
+            .map((d) => allPlaces.where((p) => p.id == d.placeId).firstOrNull?.district ?? '')
+            .where((d) => d.isNotEmpty)
+            .toList();
+        if (memberDistricts.isEmpty && member.neighborhood.isNotEmpty) {
+          memberDistricts.add(member.neighborhood);
+        }
+        final memberVisitedIds = memberPosts.map((d) => d.placeId).toSet()..addAll(topPlaces.map((p) => p.id));
+        final trophies = TrophyCabinetWidget.createDefaultTrophies(
+          visitedPlaceIds: memberVisitedIds,
+          streakWeeks: member.dropsCount >= 5 ? 4 : 2,
+          userDropDistricts: memberDistricts,
+        );
+
         final memberProfile = ProfileModel(
           id: member.id,
           username: member.handle,
@@ -249,6 +280,11 @@ class _TastePassportScreenState extends ConsumerState<TastePassportScreen> {
                 TasteRadarWidget(
                   places: topPlaces,
                   languageCode: currentLang,
+                ),
+                const SizedBox(height: 14),
+                TrophyCabinetWidget(
+                  trophies: trophies,
+                  curatorName: member.name,
                 ),
               ],
             ),
