@@ -1,13 +1,23 @@
 # PRODUCT.md — Around Long-Term Product Vision & Specification
 
-## 1. Strategic Vision
+## 1. Strategic Vision: The Social Network for City Life ("Strava for Places")
 
-**Around** is a places-first social discovery platform launching in **Tashkent, Uzbekistan**. Its central experience is not simply browsing a static directory or reading anonymous reviews—it is discovering places through **people, experiences, and communities**.
+**Around** is a places-first social discovery platform launching in **Tashkent, Uzbekistan**. Its central experience is not browsing an exhaustive static directory or reading anonymous reviews from strangers—it is discovering places through **people, trusted tastes, and shared experiences**.
+
+### Strategic Positioning vs. Utilities (Yandex Maps / 2GIS)
+Yandex Maps and 2GIS answer: *"What is near me?"* and *"How do I navigate there?"* They are infrastructure utilities with field-verified teams and turn-by-turn routing.
+
+**Around answers:** *"Where did my friends go that they actually loved?"* and *"Who wants to meet for coffee at Breadly tomorrow morning?"*
+
+Just as **Strava** did not build maps or GPS chips, but built athletic identity and peer motivation on top of maps—and just as **Letterboxd** did not build a movie directory, but built taste identity on top of TMDb—**Around builds social trust, shared moments, and curated taste passports on top of city geography.**
 
 Around connects three fundamental dimensions into a single continuous product loop:
-1. **Places (The Foundation of Discovery):** Real-world cafés, bakeries, study spaces, parks, and cultural venues in Tashkent with accurate geospatial coordinates, hours, vibe tags, and neighborhood context.
-2. **People (The Foundation of Trust):** Mutual friends, trusted profiles, authentic relationships, and transparent social proof.
-3. **Experiences (The Foundation of Engagement):** Place Drops, photos, notes, ratings, saved collections, shared plans, 24-hour stories, and contextual recommendations.
+1. **Places (The Spatial Anchor):** Real-world cafés, bakeries, tea houses, study spaces, parks, and cultural venues in Tashkent with accurate coordinates, hours, vibe tags, and neighborhood context.
+2. **People (The Foundation of Trust):** Mutual friends, trusted profiles, authentic relationships, and transparent social proof without anonymous star manipulation.
+3. **Experiences (The Foundation of Engagement):** Place Drops, photos, notes, ratings, saved collections, shared plans with RSVP, 24-hour stories, and contextual recommendations.
+
+### The Long-Term Monetization Runway (Venue Intelligence SaaS)
+While the consumer platform focuses purely on social connection, mutual friend circles, and taste discovery, consumer engagement generates valuable spatial affinity intelligence (saves, visits, peak atmosphere times, neighborhood reach). In later phases, this aggregated, privacy-preserving data forms a self-service B2B analytics portal for Tashkent venue owners seeking to understand their real community footprint.
 
 ### The Core Product Loop
 > **Visit a Place → Create a Drop → Choose an Audience (`Friends` or `Public`) → Friends Discover It → Save to a Collection or Create a Plan → Visit & Share Back.**

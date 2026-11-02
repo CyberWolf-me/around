@@ -942,6 +942,180 @@
         "npm test"
       ],
       "riskAssessment": "Low: Client-side locale management; zero external dependencies."
+    },
+    {
+      "id": "P12-01",
+      "title": "Environment Configuration Architecture (AppConfig)",
+      "domain": "Platform",
+      "description": "Implement 3-tier environment configuration (dev, staging, production) resolving Supabase URL, anon key, deep link domain, and timeouts via --dart-define.",
+      "ownerRole": "Mobile Engineer",
+      "priority": "P0",
+      "status": "DONE",
+      "completedAt": "2026-11-02T22:10:00+05:00",
+      "dependencies": [
+        "P11-04"
+      ],
+      "affectedPaths": [
+        "lib/core/config/app_config.dart",
+        "lib/data/services/supabase_service.dart",
+        ".env.example",
+        ".env.staging",
+        ".env.production",
+        "test/unit/app_config_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "AppConfig resolves dev, staging, or production mode cleanly from String.fromEnvironment('ENV').",
+        "Provides environment-specific Supabase credentials, deep link domain, and timeouts.",
+        "SupabaseService strictly validates credentials and rejects service_role keys in all environments.",
+        "Unit tests verify configuration resolution, fallback behavior, and key rejection security."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm test"
+      ],
+      "riskAssessment": "Medium: Fundamental connection plumbing; requires robust fallbacks to avoid breaking local dev."
+    },
+    {
+      "id": "P12-02",
+      "title": "Production Analytics & Venue Telemetry Service",
+      "domain": "Platform",
+      "description": "Implement structured AnalyticsService instrumenting 12 core user journey events and venue engagement metrics to seed future B2B venue analytics.",
+      "ownerRole": "Mobile Engineer",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P12-01"
+      ],
+      "affectedPaths": [
+        "lib/core/services/analytics_service.dart",
+        "lib/core/services/app_logger.dart",
+        "test/unit/analytics_service_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "AnalyticsService instruments 12 core funnel & engagement events.",
+        "Records venue affinity telemetry (saves, drops, story views, atmosphere peaks) for future B2B portal.",
+        "Dispatches events safely without blocking UI and logs structured payloads.",
+        "Unit tests verify event payloads, sanitization, and offline handling."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm test"
+      ],
+      "riskAssessment": "Low: Pure service abstraction; zero breaking UI changes."
+    },
+    {
+      "id": "P12-03",
+      "title": "First-Run Onboarding Redesign (Social & Privacy Focused)",
+      "domain": "Identity",
+      "description": "Redesign onboarding into a 3-screen interactive flow explaining friend discovery, dual-layer privacy, and neighborhood selection.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P12-02"
+      ],
+      "affectedPaths": [
+        "lib/features/auth/screens/onboarding_screen.dart",
+        "lib/core/routing/app_router.dart",
+        "test/widget/onboarding_screen_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "3-screen interactive onboarding: Discover Through Friends -> Drop & Choose Audience -> District & Friend Invite.",
+        "Persists onboarding completion in StorageService.",
+        "Emits onboarding_complete analytics event upon finish.",
+        "Widget tests verify navigation, state persistence, and responsive UI."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm test"
+      ],
+      "riskAssessment": "Low: Screen-level update; existing router handles completed state."
+    },
+    {
+      "id": "P12-04",
+      "title": "Telegram Social Graph & Invite Loop Integration",
+      "domain": "Social Graph",
+      "description": "Implement native Telegram share engine with rich invite text, deep link payloads, and Taste Passport card integration.",
+      "ownerRole": "Mobile Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P12-03"
+      ],
+      "affectedPaths": [
+        "lib/core/services/telegram_share_service.dart",
+        "lib/features/profile/screens/friend_invite_screen.dart",
+        "test/unit/telegram_share_service_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "TelegramShareService constructs valid tg:// and https://t.me/share/url links with custom text and deep links.",
+        "FriendInviteScreen includes one-tap 'Share to Telegram' action alongside QR code.",
+        "Unit tests verify URI formatting, character escaping, and link parameters."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm test"
+      ],
+      "riskAssessment": "Low: Uses platform URL launcher; zero breaking changes."
+    },
+    {
+      "id": "P12-05",
+      "title": "Actionable Empty States & Error Resilience UX",
+      "domain": "Discovery",
+      "description": "Build reusable EmptyStateWidget and wire into FeedScreen and SavedScreen with clear social and discovery CTAs.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P12-04"
+      ],
+      "affectedPaths": [
+        "lib/core/widgets/empty_state_widget.dart",
+        "lib/features/feed/screens/feed_screen.dart",
+        "lib/features/saved_places/screens/saved_screen.dart",
+        "test/widget/empty_state_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "EmptyStateWidget supports title, subtitle, icon, and primary/secondary CTAs.",
+        "FeedScreen shows social invite CTA when user has no friend drops.",
+        "SavedScreen shows explore CTA when user has no saved places.",
+        "Widget tests verify rendering and button callbacks."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm test"
+      ],
+      "riskAssessment": "Low: Visual polish and UX resilience."
+    },
+    {
+      "id": "P12-06",
+      "title": "Production Database Scale Indexes & Optimization",
+      "domain": "Platform",
+      "description": "Add composite indexes for high-throughput query patterns across posts, saved_places, friendships, and stories.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P12-01"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00011_production_indexes.sql"
+      ],
+      "acceptanceCriteria": [
+        "Migration adds composite indexes with IF NOT EXISTS.",
+        "Covers posts(place_id, audience, is_quarantined, created_at DESC) and saved_places(user_id, status).",
+        "rls_authorization_test.sql passes without regression."
+      ],
+      "verificationCommands": [
+        "npm test",
+        "flutter test"
+      ],
+      "riskAssessment": "Low: Non-blocking index creation."
     }
   ],
   "loopConfig": {

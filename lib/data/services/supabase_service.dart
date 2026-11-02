@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/config/app_config.dart';
 import '../../core/services/app_logger.dart';
 import '../../core/services/exif_sanitizer.dart';
 
@@ -16,10 +17,10 @@ class UploadedMediaResult {
 }
 
 class SupabaseService {
-  // Credentials injected strictly via build-time --dart-define environment variables (TASK-05 / SEC-06)
-  static const String appEnv = String.fromEnvironment('APP_ENV', defaultValue: 'development');
-  static const String envUrl = String.fromEnvironment('SUPABASE_URL', defaultValue: '');
-  static const String envAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY', defaultValue: '');
+  // Credentials resolved through centralized AppConfig (P12-01 / SEC-06)
+  static String get appEnv => AppConfig.current.environment.label;
+  static String get envUrl => AppConfig.current.supabaseUrl;
+  static String get envAnonKey => AppConfig.current.supabaseAnonKey;
 
   static bool _isInitialized = false;
 
@@ -32,20 +33,26 @@ class SupabaseService {
   static bool get isAuthenticated => currentUser != null;
 
   static Future<void> initialize() async {
+    final validationError = AppConfig.validateCredentials(
+      url: envUrl,
+      anonKey: envAnonKey,
+      environment: AppConfig.current.environment,
+    );
+
     if (envUrl.isEmpty || envAnonKey.isEmpty) {
       AppLogger.info(
         'SupabaseService',
-        'Missing compile-time SUPABASE_URL or SUPABASE_ANON_KEY (APP_ENV=$appEnv). '
+        'Missing compile-time SUPABASE_URL or SUPABASE_ANON_KEY (ENV=$appEnv). '
         'Pass --dart-define-from-file=.env for cloud mode; running in local persistence mode.',
       );
       _isInitialized = false;
       return;
     }
 
-    if (envAnonKey.contains('service_role')) {
+    if (validationError != null && validationError.contains('CRITICAL SECURITY VIOLATION')) {
       AppLogger.error(
         'SupabaseService',
-        'SECURITY VIOLATION: Never pass a service_role key to the mobile application.',
+        validationError,
       );
       _isInitialized = false;
       return;
