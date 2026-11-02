@@ -24,6 +24,7 @@ class StorageService {
   static const _notificationsKey = 'around_notifications_v1';
   static const _biometricLockKey = 'around_biometric_lock_v1';
   static const _appLanguageKey = 'around_app_language_v1';
+  static const _userNeighborhoodKey = 'around_user_neighborhood_v1';
 
   static SharedPreferences? _prefs;
   static final Map<String, Object> _memoryFallback = {};
@@ -55,6 +56,17 @@ class StorageService {
   static Future<void> setGuestMode(bool value) async {
     _memoryFallback[_guestModeKey] = value;
     await _prefs?.setBool(_guestModeKey, value);
+  }
+
+  // User neighborhood selection
+  static String getUserNeighborhood() {
+    return _prefs?.getString(_userNeighborhoodKey) ??
+        (_memoryFallback[_userNeighborhoodKey] as String? ?? 'Mirabad');
+  }
+
+  static Future<void> setUserNeighborhood(String neighborhood) async {
+    _memoryFallback[_userNeighborhoodKey] = neighborhood;
+    await _prefs?.setString(_userNeighborhoodKey, neighborhood);
   }
 
   // Authenticated session email
