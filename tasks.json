@@ -983,7 +983,8 @@
       "description": "Implement structured AnalyticsService instrumenting 12 core user journey events and venue engagement metrics to seed future B2B venue analytics.",
       "ownerRole": "Mobile Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
+      "completedAt": "2026-11-02T22:14:00+05:00",
       "dependencies": [
         "P12-01"
       ],
@@ -1012,7 +1013,7 @@
       "description": "Redesign onboarding into a 3-screen interactive flow explaining friend discovery, dual-layer privacy, and neighborhood selection.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P12-02"
       ],
