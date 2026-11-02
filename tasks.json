@@ -2454,7 +2454,7 @@
       "description": "DistrictCoverageCard in lib/features/explore/widgets/district_coverage_card.dart rendering district coverage progress bars and discovery recommendations.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P24-01"
       ],
