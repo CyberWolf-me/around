@@ -67,6 +67,29 @@ void main() {
       expect(results.isEmpty, isTrue);
     });
 
+    test('getNearbyPlaces supports deterministic keyset cursor pagination without duplicate venues (P8-01)', () async {
+      // Fetch Page 1 with limit 5
+      final page1 = await repository.getNearbyPlaces(limit: 5);
+      expect(page1.length, equals(5));
+
+      final lastVenue = page1.last;
+      final lastDist = lastVenue.distanceMeters;
+
+      // Fetch Page 2 using cursor from last item of Page 1
+      final page2 = await repository.getNearbyPlaces(
+        limit: 5,
+        cursorDistance: lastDist,
+        cursorId: lastVenue.id,
+      );
+
+      expect(page2.isNotEmpty, isTrue);
+      // Ensure zero overlap between Page 1 and Page 2
+      final page1Ids = page1.map((p) => p.id).toSet();
+      for (final p in page2) {
+        expect(page1Ids.contains(p.id), isFalse, reason: 'Venue ${p.id} duplicated across cursor boundaries');
+      }
+    });
+
     test('getRecommendedPlaces ranks friend-recommended venues highest and excludes been places (Phase 6)', () {
       final recs = repository.getRecommendedPlaces(
         acceptedFriendPlaceIds: {'breadly', 'tims'},

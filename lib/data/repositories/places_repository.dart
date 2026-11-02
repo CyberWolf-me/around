@@ -413,23 +413,37 @@ class PlacesRepository {
     }
   }
 
+  /// Fetches nearby places with support for keyset cursor pagination (`P8-01`).
+  /// Deterministic tie-breaking on `id` prevents duplicate venues across pages.
   Future<List<PlaceModel>> getNearbyPlaces({
     double lat = 41.3111,
     double lng = 69.2797,
     String category = 'All',
     String searchQuery = '',
+    int limit = 20,
+    double? cursorDistance,
+    String? cursorId,
   }) async {
     if (SupabaseService.isInitialized) {
       try {
+        final Map<String, dynamic> params = {
+          'user_lat': lat,
+          'user_lng': lng,
+          'radius_meters': 5000,
+          'filter_category': category,
+          'search_query': searchQuery,
+          'limit_count': limit,
+        };
+        if (cursorDistance != null) {
+          params['p_cursor_distance'] = cursorDistance;
+          if (cursorId != null && cursorId.contains('-')) {
+            params['p_cursor_id'] = cursorId;
+          }
+        }
+
         final res = await SupabaseService.client.rpc(
           'get_nearby_places',
-          params: {
-            'user_lat': lat,
-            'user_lng': lng,
-            'radius_meters': 5000,
-            'filter_category': category,
-            'search_query': searchQuery,
-          },
+          params: params,
         );
         if (res is List) {
           return res.map((e) => PlaceModel.fromJson(Map<String, dynamic>.from(e))).toList();
@@ -452,7 +466,25 @@ class PlacesRepository {
       return matchesCat && matchesSearch;
     }).toList();
 
-    return filtered;
+    // Deterministic distance + ID tie-breaking for local pagination
+    filtered.sort((a, b) {
+      final comp = a.distanceMeters.compareTo(b.distanceMeters);
+      if (comp != 0) return comp;
+      return a.id.compareTo(b.id);
+    });
+
+    Iterable<PlaceModel> paged = filtered;
+    if (cursorDistance != null) {
+      paged = paged.where((p) {
+        if (p.distanceMeters > cursorDistance) return true;
+        if (p.distanceMeters == cursorDistance && cursorId != null) {
+          return p.id.compareTo(cursorId) > 0;
+        }
+        return false;
+      });
+    }
+
+    return paged.take(limit).toList();
   }
 
   /// Explainable, privacy-preserving recommendation engine (Phase 6 — Discovery Domain).

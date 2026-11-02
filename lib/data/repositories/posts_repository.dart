@@ -82,6 +82,88 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     }
   }
 
+  bool _hasMoreRemoteDrops = true;
+  bool get hasMoreRemoteDrops => _hasMoreRemoteDrops;
+
+  /// Loads the next page of friends drops via keyset cursor pagination (`P8-01`).
+  /// Uses (createdAt, id) of the oldest loaded drop as deterministic cursor.
+  Future<int> loadMoreFriendsFeed({int pageSize = 20}) async {
+    if (!SupabaseService.isInitialized || !SupabaseService.isAuthenticated) return 0;
+    if (!_hasMoreRemoteDrops) return 0;
+
+    try {
+      // Find the oldest remote/feed drop in the current state to use as the keyset cursor
+      final sorted = List<PostModel>.from(state)
+        ..sort((a, b) {
+          final comp = b.createdAt.compareTo(a.createdAt);
+          if (comp != 0) return comp;
+          return b.id.compareTo(a.id);
+        });
+
+      final oldestDrop = sorted.isNotEmpty ? sorted.last : null;
+
+      final Map<String, dynamic> params = {
+        'page_limit': pageSize,
+        'page_offset': 0,
+      };
+
+      if (oldestDrop != null) {
+        params['p_cursor_created_at'] = oldestDrop.createdAt.toIso8601String();
+        if (oldestDrop.id.contains('-')) {
+          params['p_cursor_id'] = oldestDrop.id;
+        }
+      }
+
+      final response = await SupabaseService.client.rpc(
+        'get_friends_feed',
+        params: params,
+      );
+
+      if (response is List) {
+        if (response.isEmpty || response.length < pageSize) {
+          _hasMoreRemoteDrops = false;
+        }
+
+        final remotePosts = response
+            .whereType<Map<String, dynamic>>()
+            .map((row) => PostModel.fromJson({
+                  'id': row['post_id']?.toString() ?? '',
+                  'author_id': row['author_id']?.toString() ?? '',
+                  'author_name': (row['author_name'] ?? row['author_full_name'])?.toString() ?? 'Friend',
+                  'author_username': row['author_username']?.toString() ?? 'friend',
+                  'author_avatar': (row['author_avatar'] ?? row['author_avatar_url'])?.toString() ?? 'FR',
+                  'place_id': (row['place_slug'] ?? row['place_id'])?.toString() ?? 'breadly',
+                  'place_name': row['place_name']?.toString() ?? 'Tashkent Spot',
+                  'place_category': row['place_category']?.toString() ?? 'Café',
+                  'place_address': (row['place_address'] ?? row['place_street_address'])?.toString() ?? 'Tashkent',
+                  'note': row['note']?.toString() ?? '',
+                  'rating': row['rating'],
+                  'audience': row['audience']?.toString() ?? 'friends',
+                  'size': row['size']?.toString() ?? 'hero',
+                  'tags': row['tags'] ?? const <String>[],
+                  'media_url': (row['media_url'] ?? row['primary_media_url'])?.toString(),
+                  'saves_count': row['saves_count'] ?? 0,
+                  'created_at': row['created_at']?.toString(),
+                }))
+            .toList();
+
+        final existingIds = state.map((p) => p.id).toSet();
+        final newDrops = remotePosts.where((r) => !existingIds.contains(r.id)).toList();
+
+        if (newDrops.isNotEmpty) {
+          state = [...state, ...newDrops];
+          await StorageService.persistDrops(state);
+        }
+
+        return newDrops.length;
+      }
+      return 0;
+    } catch (e) {
+      AppLogger.warn('PostsRepository', 'loadMoreFriendsFeed keyset pagination skipped', e);
+      return 0;
+    }
+  }
+
   /// Fetches authorized Friends & Public drops for a specific venue from Supabase (`INT-02` Journey D).
   Future<void> syncRemotePlaceDrops(String placeId) async {
     if (!SupabaseService.isInitialized || !SupabaseService.isAuthenticated) return;

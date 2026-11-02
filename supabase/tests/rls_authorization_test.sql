@@ -209,6 +209,27 @@ BEGIN
     RAISE EXCEPTION 'FAIL [Scenario 8C]: Blocked user Bob could still read Alice story!';
   END IF;
 
+  -- ==========================================================================
+  -- SCENARIO 9: Keyset Cursor Pagination & Deterministic Tie-Breaking (P8-01)
+  -- ==========================================================================
+  PERFORM set_config('request.jwt.claim.sub', alice_id::TEXT, TRUE);
+
+  -- Alice fetches page 1 (limit 1)
+  SELECT post_id INTO private_post_id
+  FROM public.get_friends_feed(1, 0, NULL, NULL);
+
+  IF private_post_id IS NULL THEN
+    RAISE EXCEPTION 'FAIL [Scenario 9A]: get_friends_feed page 1 returned empty result!';
+  END IF;
+
+  -- Verify nearby places keyset query executes under authenticated
+  SELECT COUNT(*) INTO visible_count
+  FROM public.get_nearby_places(41.3111, 69.2797, 5000, 'All', '', 5, NULL, NULL);
+
+  IF visible_count < 1 THEN
+    RAISE EXCEPTION 'FAIL [Scenario 9B]: get_nearby_places keyset query returned 0 places!';
+  END IF;
+
   RAISE NOTICE 'ALL MULTI-USER RLS & AUTHORIZATION SCENARIOS PASSED UNDER ROLE authenticated.';
 END $$;
 

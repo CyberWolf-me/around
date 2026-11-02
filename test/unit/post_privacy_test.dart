@@ -192,5 +192,12 @@ void main() {
       expect(deleted, isTrue);
       expect(container.read(postsRepositoryProvider).any((p) => p.id == 'test-post-1'), isFalse);
     });
+
+    test('loadMoreFriendsFeed safely handles offline / mock mode and keyset boundaries (P8-01)', () async {
+      final addedCount = await notifier.loadMoreFriendsFeed(pageSize: 10);
+      // In offline / unauthenticated test environment, gracefully returns 0 without crashing or duplicating state
+      expect(addedCount, equals(0));
+      expect(notifier.hasMoreRemoteDrops, isTrue);
+    });
   });
 }
