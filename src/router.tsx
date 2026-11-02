@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AppProvider } from './context/AppContext';
 import { AppContent } from './App';
+import { initTelegramWebApp, parseTelegramStartParam } from './services/telegramWebApp';
 
 export type RouteType = 'home' | 'invite' | 'passport' | 'place';
 
@@ -75,10 +76,32 @@ export function buildTelegramShareUrl(url: string, text: string): string {
   return `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
 }
 
+export function resolveInitialRoute(
+  pathname: string,
+  startParam?: string | null
+): RouteMatch {
+  if (startParam && startParam.trim().length > 0) {
+    const parsed = parseTelegramStartParam(startParam);
+    if (parsed.type === 'invite') {
+      return { path: `/invite/${parsed.value}`, type: 'invite', params: { code: parsed.value } };
+    }
+    if (parsed.type === 'place') {
+      return { path: `/places/${parsed.value}`, type: 'place', params: { id: parsed.value } };
+    }
+    if (parsed.type === 'passport') {
+      return { path: `/u/${parsed.value}/passport`, type: 'passport', params: { username: parsed.value } };
+    }
+  }
+
+  return parseRoute(pathname);
+}
+
 export const WebCompanionRouter: React.FC = () => {
-  const [route, setRoute] = useState<RouteMatch>(() =>
-    parseRoute(typeof window !== 'undefined' ? window.location.pathname : '/')
-  );
+  const [route, setRoute] = useState<RouteMatch>(() => {
+    const twa = initTelegramWebApp();
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '/';
+    return resolveInitialRoute(currentPath, twa.startParam);
+  });
 
   useEffect(() => {
     const handlePopState = () => {

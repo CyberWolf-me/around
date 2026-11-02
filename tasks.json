@@ -1302,7 +1302,7 @@
       "description": "Add Telegram WebApp SDK bindings to web companion, automatically detecting start_param cohort invites and synchronizing Telegram theme params.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P13-02"
       ],
@@ -1329,7 +1329,7 @@
       "description": "Implement database-level purge_my_visit_history() RPC atomically zeroing out check-ins, sensitive visit history, and reaction logs with zero residual trace.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P13-03"
       ],
