@@ -18,6 +18,7 @@ import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/quests_repository.dart';
 import '../widgets/taste_passport_card.dart';
 import '../widgets/taste_quests_card.dart';
+import '../widgets/district_leaderboard_sheet.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -160,6 +161,8 @@ class ProfileScreen extends ConsumerWidget {
 
     final currentUserId = SupabaseService.currentUser?.id ?? profile.id;
     final myDrops = posts.where((p) => p.authorId == currentUserId || p.authorId == profile.id || p.authorId == 'you').toList();
+    final leaderboard = ref.watch(districtLegendLeaderboardProvider);
+    final userLegends = leaderboard.getLegendsForUser(currentUserId);
 
     return Scaffold(
       backgroundColor: AppColors.paper,
@@ -325,6 +328,18 @@ class ProfileScreen extends ConsumerWidget {
                               style: const TextStyle(fontSize: 12.5, color: AppColors.ink2, height: 1.35),
                             ),
                           ],
+                          if (userLegends.isNotEmpty)
+                            LocalLegendBadge(
+                              legends: userLegends,
+                              onTap: () {
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  backgroundColor: Colors.transparent,
+                                  isScrollControlled: true,
+                                  builder: (ctx) => const DistrictLeaderboardSheet(),
+                                );
+                              },
+                            ),
                         ],
                       ),
                     ),

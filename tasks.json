@@ -1571,7 +1571,7 @@
       "description": "DistrictLeaderboardSheet and LocalLegendBadge widgets displaying Tashkent neighborhood rankings, crown flair, and drop count progress.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P15-04"
       ],
@@ -1599,7 +1599,7 @@
       "description": "Wire Telegram.WebApp.BackButton lifecycle and deep-linked place sharing into src/services/telegramWebApp.ts and src/router.tsx with Vitest test assertions.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P16-01"
       ],
