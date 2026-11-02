@@ -74,38 +74,38 @@ class FriendPresenceRail extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 7,
-                      height: 7,
-                      decoration: BoxDecoration(
-                        color: onlineCount > 0 ? AppColors.mint : AppColors.orange,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          if (onlineCount > 0)
-                            BoxShadow(
-                              color: AppColors.mint.withValues(alpha: 0.6),
-                              blurRadius: 5,
-                              spreadRadius: 1,
-                            ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _getHeaderTitle(lang).toUpperCase(),
-                      style: GoogleFonts.spaceMono(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.ink2,
-                        letterSpacing: 0.8,
-                      ),
-                    ),
-                  ],
+                Container(
+                  width: 7,
+                  height: 7,
+                  decoration: BoxDecoration(
+                    color: onlineCount > 0 ? AppColors.mint : AppColors.orange,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      if (onlineCount > 0)
+                        BoxShadow(
+                          color: AppColors.mint.withValues(alpha: 0.6),
+                          blurRadius: 5,
+                          spreadRadius: 1,
+                        ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    _getHeaderTitle(lang).toUpperCase(),
+                    style: GoogleFonts.spaceMono(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.ink2,
+                      letterSpacing: 0.6,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(

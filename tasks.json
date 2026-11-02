@@ -1759,7 +1759,7 @@
       "description": "ExplorerStreakEngine in lib/core/services/explorer_streak_engine.dart computing weekly active streaks and badge awards with unit tests.",
       "ownerRole": "Core Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P17-03"
       ],
