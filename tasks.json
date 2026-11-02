@@ -1652,7 +1652,7 @@
       "description": "FriendPresenceEngine computing recency and neighborhood activity indicators for friend cards without raw GPS leakage.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P16-03"
       ],
