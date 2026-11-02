@@ -1410,7 +1410,7 @@
       "description": "Create high-aesthetic 9:16 story preview widget with clipboard export and deep link QR for Telegram and Instagram Stories.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P14-02"
       ],
@@ -1436,7 +1436,7 @@
       "description": "Implement WeeklyDigestEngine computing weekly district drop volumes, peak atmosphere hours, and inviting friends to weekend meetups.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P14-03"
       ],
