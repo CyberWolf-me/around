@@ -1383,7 +1383,7 @@
       "description": "Implement searchPlacesMultilingual in PlacesRepository supporting bidirectional Uzbek Cyrillic-to-Latin transliteration and Russian category synonyms.",
       "ownerRole": "Mobile Engineering & Core Engineering",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P14-01"
       ],
@@ -1410,7 +1410,7 @@
       "description": "Create high-aesthetic 9:16 story preview widget with clipboard export and deep link QR for Telegram and Instagram Stories.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P14-02"
       ],

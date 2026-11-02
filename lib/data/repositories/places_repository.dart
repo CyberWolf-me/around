@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/services/app_logger.dart';
+import '../../core/services/transliteration_service.dart';
 import '../models/place_model.dart';
 import '../services/storage_service.dart';
 import '../services/supabase_service.dart';
@@ -1326,17 +1327,37 @@ class PlacesRepository {
       }
     }
 
+    final searchTerms = searchQuery.trim().isNotEmpty
+        ? TransliterationService.expandSearchTerms(searchQuery)
+        : const <String>{};
+
     final all = getAllPlaces();
     final filtered = all.where((p) {
       final matchesCat = category == 'All' ||
           p.category.toLowerCase().contains(category.toLowerCase()) ||
           p.tags.any((t) => t.toLowerCase().contains(category.toLowerCase()));
-      final matchesSearch = searchQuery.isEmpty ||
-          p.name.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          p.streetAddress.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          p.district.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          p.tags.any((t) => t.toLowerCase().contains(searchQuery.toLowerCase()));
-      return matchesCat && matchesSearch;
+      if (!matchesCat) return false;
+      if (searchQuery.trim().isEmpty) return true;
+
+      final nameNorm = TransliterationService.normalizeQuery(p.name);
+      final catNorm = TransliterationService.normalizeQuery(p.category);
+      final distNorm = TransliterationService.normalizeQuery(p.district);
+      final addrNorm = TransliterationService.normalizeQuery(p.streetAddress);
+      final tagsNorm = p.tags.map((t) => TransliterationService.normalizeQuery(t)).toList();
+
+      return searchTerms.any((term) {
+        if (term.length < 2) return false;
+        return nameNorm.contains(term) ||
+            catNorm.contains(term) ||
+            distNorm.contains(term) ||
+            addrNorm.contains(term) ||
+            tagsNorm.any((t) => t.contains(term)) ||
+            p.name.toLowerCase().contains(term) ||
+            p.category.toLowerCase().contains(term) ||
+            p.district.toLowerCase().contains(term) ||
+            p.streetAddress.toLowerCase().contains(term) ||
+            p.tags.any((t) => t.toLowerCase().contains(term));
+      });
     }).toList();
 
     // Deterministic distance + ID tie-breaking for local pagination
@@ -1436,6 +1457,36 @@ class PlacesRepository {
       }
     }
     return null;
+  }
+
+  /// Searches places across Uzbek Cyrillic, Uzbek Latin, Russian, and English (`P14-02`).
+  List<PlaceModel> searchPlacesMultilingual(String query) {
+    if (query.trim().isEmpty) return getAllPlaces();
+
+    final searchTerms = TransliterationService.expandSearchTerms(query);
+    final all = getAllPlaces();
+
+    return all.where((p) {
+      final nameNorm = TransliterationService.normalizeQuery(p.name);
+      final catNorm = TransliterationService.normalizeQuery(p.category);
+      final distNorm = TransliterationService.normalizeQuery(p.district);
+      final addrNorm = TransliterationService.normalizeQuery(p.streetAddress);
+      final tagsNorm = p.tags.map((t) => TransliterationService.normalizeQuery(t)).toList();
+
+      return searchTerms.any((term) {
+        if (term.length < 2) return false;
+        return nameNorm.contains(term) ||
+            catNorm.contains(term) ||
+            distNorm.contains(term) ||
+            addrNorm.contains(term) ||
+            tagsNorm.any((t) => t.contains(term)) ||
+            p.name.toLowerCase().contains(term) ||
+            p.category.toLowerCase().contains(term) ||
+            p.district.toLowerCase().contains(term) ||
+            p.streetAddress.toLowerCase().contains(term) ||
+            p.tags.any((t) => t.toLowerCase().contains(term));
+      });
+    }).toList();
   }
 
   /// Fetches privacy-preserving district density metrics (`P13-02`).
