@@ -106,7 +106,10 @@ function runHeadlessAgy(prompt, { jsonSchema = null, timeoutSec = 900 } = {}) {
   });
 
   const output = (res.stdout || '').trim();
-  const errOutput = (res.stderr || '').trim();
+  const errOutput = (res.stderr || (res.error ? res.error.message : '')).trim();
+  if (res.error) {
+    log('AGY', `Spawn error: ${res.error.message}. Ensure "${AGY_BIN}" is installed in PATH or pass --agy-bin <path>.`);
+  }
   fs.writeFileSync(
     path.join(LOG_DIR, `last_agent_turn_${Date.now()}.log`),
     `PROMPT:\n${prompt}\n\nSTDOUT:\n${output}\n\nSTDERR:\n${errOutput}\n`,

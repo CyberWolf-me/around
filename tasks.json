@@ -657,6 +657,88 @@
         "flutter analyze --fatal-infos --fatal-warnings && flutter test && npm run lint && npm test"
       ],
       "riskAssessment": "Low: Final automated release gate before production cutover."
+    },
+    {
+      "id": "P9-01",
+      "title": "Real-Time Live Drops & Reactions Broadcast via Supabase Channels",
+      "domain": "Experiences",
+      "description": "Connect SupabaseClient.channel('public:posts') in PostsRepository to listen for INSERT, UPDATE, and DELETE events, streaming new friend drops and real-time reaction counters directly to FeedScreen without manual pull-to-refresh.",
+      "ownerRole": "Mobile Engineering & Backend Engineering",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P8-05"
+      ],
+      "affectedPaths": [
+        "lib/data/repositories/posts_repository.dart",
+        "lib/features/feed/screens/feed_screen.dart",
+        "test/unit/post_privacy_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "PostsRepository manages a real-time postgres changes subscription on public.posts and public.post_reactions.",
+        "New posts from followed friends are prepended smoothly without layout jumps.",
+        "Hermetic unit tests verify subscription lifecycle, stream parsing, and offline fallback."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/post_privacy_test.dart"
+      ],
+      "riskAssessment": "Low: Non-breaking additive real-time enhancement backed by existing Supabase publication."
+    },
+    {
+      "id": "P9-02",
+      "title": "24-Hour Ephemeral Venue Stories Capture & Fullscreen Player",
+      "domain": "Engagement",
+      "description": "Wire public.place_stories from Migration 00006 into StoriesRepository, StoryRail, and a fullscreen gesture-driven StoryViewerScreen with progress bars, countdown timer, and camera capture.",
+      "ownerRole": "Mobile Engineering & Product Design",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P9-01"
+      ],
+      "affectedPaths": [
+        "lib/data/repositories/stories_repository.dart",
+        "lib/features/feed/widgets/story_rail.dart",
+        "lib/features/feed/screens/story_viewer_screen.dart",
+        "test/widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Stories display with active 24-hour expiration countdown and only visible to authorized audience (friends/public).",
+        "Fullscreen story viewer supports tap-to-advance and pause-on-hold.",
+        "Automated tests verify story retrieval, filtering, and expiry."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test"
+      ],
+      "riskAssessment": "Low: Ephemeral stories schema and RLS policies are already deployed in 00006."
+    },
+    {
+      "id": "P9-03",
+      "title": "Biometric App Lock & In-Memory Sensitive Visit History Vault",
+      "domain": "Trust & Safety",
+      "description": "Implement an optional biometric/PIN app lock using local_auth when app transitions to background, and secure user visit history memory cache when hide_visits_history is enabled.",
+      "ownerRole": "Security Engineering & Mobile Engineering",
+      "priority": "P2",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P9-02"
+      ],
+      "affectedPaths": [
+        "lib/core/services/biometric_service.dart",
+        "lib/features/settings/screens/settings_screen.dart",
+        "test/unit/post_privacy_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Users can toggle 'Require Biometrics on Resume' in Settings.",
+        "App blurs preview and prompts for authentication if backgrounded for >60 seconds.",
+        "Unit tests verify privacy flag enforcement and settings persistence."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test"
+      ],
+      "riskAssessment": "Low: Local hardware capability with graceful fallback when biometric hardware is unconfigured."
     }
   ],
   "loopConfig": {
