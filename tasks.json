@@ -2243,7 +2243,7 @@
       "description": "GroupMeetupCoordinationSheet in lib/features/plans/widgets/group_meetup_coordination_sheet.dart enabling seamless group coffee/dining coordination with venue, time, and pre-formatted Telegram RSVP links.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P22-01"
       ],
@@ -2269,7 +2269,7 @@
       "description": "MetroStationFilter.tsx in src/components/ providing metro station filter chips (Oybek, Kosmonavtlar, Chorsu, etc.) with audio-tactile feedback and responsive web layout.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P22-02"
       ],
