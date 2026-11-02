@@ -2401,7 +2401,7 @@
       "description": "SubwaySyncDiagnosticsService in lib/core/services/subway_sync_diagnostics_service.dart tracking cache hit rates and offline duration metrics during metro commutes.",
       "ownerRole": "Core Engineering & Backend Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P23-03"
       ],
