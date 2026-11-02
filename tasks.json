@@ -2189,12 +2189,13 @@
       "description": "CuratorNotificationService in lib/core/services/curator_notification_service.dart issuing in-app notifications and tactile alerts on achievement unlocks and streak milestones.",
       "ownerRole": "Core Engineering & Mobile Engineering",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P21-03"
       ],
       "affectedPaths": [
         "lib/core/services/curator_notification_service.dart",
+        "lib/data/repositories/notifications_repository.dart",
         "test/unit/curator_notification_service_test.dart"
       ],
       "acceptanceCriteria": [
