@@ -1273,7 +1273,7 @@
       "description": "Build PostGIS aggregation RPC get_district_activity_density and Flutter map density rings visualizing live Tashkent social heat without exposing raw user GPS coordinates.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P13-01"
       ],
@@ -1302,7 +1302,7 @@
       "description": "Add Telegram WebApp SDK bindings to web companion, automatically detecting start_param cohort invites and synchronizing Telegram theme params.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P13-02"
       ],

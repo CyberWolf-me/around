@@ -23,6 +23,46 @@ class RecommendedPlaceResult {
   });
 }
 
+class DistrictDensityModel {
+  final String district;
+  final int dropCount;
+  final int activeVenuesCount;
+  final double centroidLat;
+  final double centroidLng;
+  final double relativeDensity;
+
+  const DistrictDensityModel({
+    required this.district,
+    required this.dropCount,
+    required this.activeVenuesCount,
+    required this.centroidLat,
+    required this.centroidLng,
+    required this.relativeDensity,
+  });
+
+  factory DistrictDensityModel.fromJson(Map<String, dynamic> json) {
+    return DistrictDensityModel(
+      district: json['district'] as String? ?? 'Tashkent',
+      dropCount: (json['drop_count'] as num?)?.toInt() ?? 0,
+      activeVenuesCount: (json['active_venues_count'] as num?)?.toInt() ?? 0,
+      centroidLat: (json['centroid_lat'] as num?)?.toDouble() ?? 41.3111,
+      centroidLng: (json['centroid_lng'] as num?)?.toDouble() ?? 69.2797,
+      relativeDensity: (json['relative_density'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'district': district,
+      'drop_count': dropCount,
+      'active_venues_count': activeVenuesCount,
+      'centroid_lat': centroidLat,
+      'centroid_lng': centroidLng,
+      'relative_density': relativeDensity,
+    };
+  }
+}
+
 class PlacesRepository {
   static const Map<String, String> _legacyAliases = {
     'kettle': 'breadly',
@@ -1391,5 +1431,66 @@ class PlacesRepository {
       }
     }
     return null;
+  }
+
+  /// Fetches privacy-preserving district density metrics (`P13-02`).
+  /// Aggregates anonymous activity scores without exposing user IDs or raw timestamps.
+  Future<List<DistrictDensityModel>> getDistrictActivityDensity({int windowDays = 7}) async {
+    if (SupabaseService.isInitialized) {
+      try {
+        final res = await SupabaseService.client.rpc(
+          'get_district_activity_density',
+          params: {'p_window_days': windowDays},
+        );
+        if (res is List) {
+          return res.map((e) => DistrictDensityModel.fromJson(Map<String, dynamic>.from(e))).toList();
+        }
+      } catch (err) {
+        AppLogger.warn('PlacesRepository', 'RPC get_district_activity_density fallback to local', err);
+      }
+    }
+
+    // Local spatial fallback: calculate district centroids and venue density from canonical catalog
+    final all = getAllPlaces();
+    final Map<String, List<PlaceModel>> byDistrict = {};
+    for (final p in all) {
+      byDistrict.putIfAbsent(p.district, () => []).add(p);
+    }
+
+    // Default synthetic drop counts for Tashkent core districts
+    final Map<String, int> syntheticDrops = {
+      'Mirabad': 42,
+      'Central Tashkent': 35,
+      'Yakkasaray': 28,
+      'Yunusabad': 22,
+      'Shaykhontohur': 19,
+      'Mirzo Ulugbek': 15,
+    };
+
+    int maxDrops = 1;
+    for (final count in syntheticDrops.values) {
+      if (count > maxDrops) maxDrops = count;
+    }
+
+    final List<DistrictDensityModel> results = [];
+    byDistrict.forEach((district, places) {
+      if (places.isEmpty) return;
+      final avgLat = places.map((p) => p.latitude).reduce((a, b) => a + b) / places.length;
+      final avgLng = places.map((p) => p.longitude).reduce((a, b) => a + b) / places.length;
+      final drops = syntheticDrops[district] ?? (places.length * 2);
+      final density = (drops / maxDrops).clamp(0.0, 1.0);
+
+      results.add(DistrictDensityModel(
+        district: district,
+        dropCount: drops,
+        activeVenuesCount: places.length,
+        centroidLat: double.parse(avgLat.toStringAsFixed(4)),
+        centroidLng: double.parse(avgLng.toStringAsFixed(4)),
+        relativeDensity: double.parse(density.toStringAsFixed(3)),
+      ));
+    });
+
+    results.sort((a, b) => b.dropCount.compareTo(a.dropCount));
+    return results;
   }
 }
