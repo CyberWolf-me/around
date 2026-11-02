@@ -457,3 +457,23 @@ However, to convert discovery into real-world social meetups and prevent streak 
    - Port the 24-hour urban rhythm sparkline into the Web Companion (`PlaceRhythmHeatmap.tsx`) with peak atmosphere badges, hour selection, and direct mobile app deep links.
 4. **Curator Milestone & Trophy In-App Notification Dispatcher (`P21-04`)**:
    - Reactive milestone notification dispatcher (`CuratorNotificationService`) issuing in-app notifications and haptic alerts when curators unlock achievements, level up streaks, or secure district crowns.
+
+
+---
+
+## Autonomous Product Audit & Replenishment — Phase 22 (November 3, 2026)
+
+### Strategic Evaluation: Milestone 2.1 Complete & Urban Metro Navigation
+With Phase 21 successfully delivered and released as `v2.1.0-staging.1` (267 Flutter tests, 59 Web tests, zero static analysis warnings), Around has solidified its core taste discovery, streak preservation, and in-app milestone triggers.
+
+However, to ground Around deeply into the physical geography of Tashkent and solve group coordination, Phase 22 introduces 4 high-value capabilities:
+
+1. **Tashkent Subway Station Proximity & Transit Landmark Beacon (`P22-01`)**:
+   - In Tashkent, residents and curators locate spots by their nearest metro station ("Kosmonavtlar", "Oybek", "Mustaqillik Maydoni", "Amir Timur Xiyoboni", "Chorsu", etc.).
+   - `SubwayProximityEngine` calculates geodesic distance to all key Tashkent metro stations across the Chilonzor, O'zbekiston, and Yunusobod lines, providing walking estimates and line badge indicators.
+2. **Curator Group Meetup Coordination Sheet & Multi-Friend Telegram RSVPs (`P22-02`)**:
+   - Extends 1-on-1 coffee pings to small groups (3-6 curators) for weekend brunches and coffee study sessions, generating pre-formatted group coordination links with RSVP tracking.
+3. **Web Companion Metro Landmark Filter & Station Quick-Jump (`P22-03`)**:
+   - Introduces `MetroStationFilter.tsx` to the web companion, allowing quick venue discovery along major subway transit hubs with audio-tactile click feedback.
+4. **Cryptographic Drop Anti-Tamper & Verified Visit Seal Engine (`P22-04`)**:
+   - Solidifies the "Strava for Places" guarantee by signing drops on-device with cryptographic hashes and displaying a "Verified Visit" seal on authentic local drops.

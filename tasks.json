@@ -2208,6 +2208,112 @@
         "flutter test test/unit/curator_notification_service_test.dart"
       ],
       "riskAssessment": "Low: In-app notification dispatcher."
+    },
+    {
+      "id": "P22-01",
+      "title": "Tashkent Subway Station Proximity & Transit Landmark Beacon",
+      "domain": "Spatial Data & Discovery",
+      "description": "SubwayProximityEngine in lib/core/services/subway_proximity_engine.dart calculating distance and walking time to Tashkent metro stations (Chilonzor, O'zbekiston, Yunusobod lines) with metro badge indicators.",
+      "ownerRole": "Spatial Engineer & Mobile Engineering",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P21-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/subway_proximity_engine.dart",
+        "test/unit/subway_proximity_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Contains coordinates and line associations for key Tashkent metro stations.",
+        "Calculates closest station, walking distance in meters, and estimated walking minutes.",
+        "Provides trilingual station labels (Uzbek, Russian, English) and line color codes.",
+        "Unit tests verify distance precision, station lookup, and formatting."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/subway_proximity_test.dart"
+      ],
+      "riskAssessment": "Low: Mathematical spatial distance calculation."
+    },
+    {
+      "id": "P22-02",
+      "title": "Curator Group Meetup Coordination Sheet & Multi-Friend Telegram RSVPs",
+      "domain": "Social Graph & Coordination",
+      "description": "GroupMeetupCoordinationSheet in lib/features/plans/widgets/group_meetup_coordination_sheet.dart enabling seamless group coffee/dining coordination with venue, time, and pre-formatted Telegram RSVP links.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P22-01"
+      ],
+      "affectedPaths": [
+        "lib/features/plans/widgets/group_meetup_coordination_sheet.dart",
+        "test/widget/group_meetup_coordination_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders group meetup planner with date/time pickers and venue selector.",
+        "Generates pre-formatted Telegram invite message with deep link to Around place and plan.",
+        "Widget tests verify form inputs, message generator, and modal interactions."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/group_meetup_coordination_test.dart"
+      ],
+      "riskAssessment": "Low: Widget UI and deep-link generation."
+    },
+    {
+      "id": "P22-03",
+      "title": "Web Companion Metro Landmark Filter & Station Quick-Jump",
+      "domain": "Spatial Data & Discovery",
+      "description": "MetroStationFilter.tsx in src/components/ providing metro station filter chips (Oybek, Kosmonavtlar, Chorsu, etc.) with audio-tactile feedback and responsive web layout.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P22-02"
+      ],
+      "affectedPaths": [
+        "src/components/MetroStationFilter.tsx",
+        "src/__tests__/metroStationFilter.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders horizontal filter chips for major Tashkent metro stations with line badges.",
+        "Filters places by proximity to selected station.",
+        "Triggers sound and haptic effects on filter selection.",
+        "Vitest test suite verifies filtering logic, line colors, and empty states."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P22-04",
+      "title": "Cryptographic Drop Anti-Tamper & Verified Visit Seal Engine",
+      "domain": "Security & Data Integrity",
+      "description": "DropVerificationService in lib/core/services/drop_verification_service.dart computing cryptographic verification hashes and rendering Verified Visit seal on genuine on-device drops.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P22-03"
+      ],
+      "affectedPaths": [
+        "lib/core/services/drop_verification_service.dart",
+        "test/unit/drop_verification_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Computes SHA-256 HMAC hash over authorId, placeId, and timestamp with client-side secret.",
+        "Verifies tamper-evident integrity of drops.",
+        "Unit tests verify hash generation, validity checks, and tampering rejection."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/drop_verification_test.dart"
+      ],
+      "riskAssessment": "Low: Cryptographic hashing and verification logic."
     }
   ],
   "loopConfig": {
