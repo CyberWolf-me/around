@@ -13,13 +13,18 @@ import { ActivityScreen } from './screens/ActivityScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { CreateDropModal } from './screens/CreateDropModal';
+import type { RouteMatch } from './router';
 
-export const AppContent: React.FC = () => {
+export const AppContent: React.FC<{ currentRoute?: RouteMatch }> = ({ currentRoute }) => {
   const { booted, activeTab, stack, flight } = useApp();
 
   const topScreen = stack[stack.length - 1];
 
   const renderActiveScreen = () => {
+    if (currentRoute?.type === 'place' && currentRoute.params.id) {
+      return <PlaceDetailScreen placeId={currentRoute.params.id} />;
+    }
+
     if (!booted) {
       return <OnboardingScreen />;
     }

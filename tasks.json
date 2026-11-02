@@ -1186,7 +1186,7 @@
       "description": "Add OpenGraph social meta tags to index.html for rich Telegram chat previews and universal deep link bridge.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P12-08"
       ],
@@ -1213,7 +1213,7 @@
       "description": "Execute full automated verification gate, tag v1.2.0-staging.1, and verify production release bundle readiness.",
       "ownerRole": "QA & Release Lead",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P12-09"
       ],
