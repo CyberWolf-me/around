@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/models/story_model.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/stories_repository.dart';
-import '../../../data/services/haptic_service.dart';
 
 class StoryRail extends ConsumerWidget {
   final Function(String placeId) onSelectPlace;
@@ -23,17 +24,20 @@ class StoryRail extends ConsumerWidget {
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: AppColors.paper,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: AppColors.ink, width: 2),
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: AppColors.borderSubtle, width: 1),
           ),
-          title: const Text('Add 24h Venue Story', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          title: Text(
+            'Share 24h Venue Story',
+            style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
                 initialValue: selectedPlace,
                 items: places
-                    .map((p) => DropdownMenuItem(value: p.id, child: Text(p.name, style: const TextStyle(fontSize: 13))))
+                    .map((p) => DropdownMenuItem(value: p.id, child: Text(p.name, style: GoogleFonts.instrumentSans(fontSize: 13))))
                     .toList(),
                 onChanged: (val) {
                   if (val != null) setDialogState(() => selectedPlace = val);
@@ -46,7 +50,7 @@ class StoryRail extends ConsumerWidget {
                 maxLength: 180,
                 decoration: const InputDecoration(
                   labelText: 'Caption',
-                  hintText: 'What is happening right now?',
+                  hintText: 'What is the vibe right now?',
                 ),
               ),
             ],
@@ -66,7 +70,10 @@ class StoryRail extends ConsumerWidget {
                     );
                 if (ctx.mounted) Navigator.pop(ctx);
               },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.ink, foregroundColor: AppColors.paper),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.orange,
+                foregroundColor: Colors.white,
+              ),
               child: const Text('Share Story'),
             ),
           ],
@@ -81,9 +88,9 @@ class StoryRail extends ConsumerWidget {
       builder: (ctx) => Dialog(
         backgroundColor: Colors.black,
         insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 40),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
           child: Stack(
             fit: StackFit.expand,
             children: [
@@ -113,7 +120,7 @@ class StoryRail extends ConsumerWidget {
                 bottom: 0,
                 left: 0,
                 right: 0,
-                height: 160,
+                height: 180,
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -126,37 +133,37 @@ class StoryRail extends ConsumerWidget {
               ),
               // Header
               Positioned(
-                top: 14,
-                left: 14,
-                right: 14,
+                top: 16,
+                left: 16,
+                right: 16,
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 16,
+                      radius: 17,
                       backgroundColor: AppColors.orange,
                       child: Text(
                         story.authorAvatar ?? story.authorName[0],
                         style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             story.authorName,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                            style: GoogleFonts.instrumentSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.5),
                           ),
                           Text(
                             story.placeName,
-                            style: const TextStyle(color: Colors.white70, fontSize: 11),
+                            style: GoogleFonts.instrumentSans(color: Colors.white70, fontSize: 11),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
+                      icon: const Icon(Icons.close_rounded, color: Colors.white),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
@@ -164,7 +171,7 @@ class StoryRail extends ConsumerWidget {
               ),
               // Caption & CTA
               Positioned(
-                bottom: 20,
+                bottom: 22,
                 left: 16,
                 right: 16,
                 child: Column(
@@ -173,14 +180,15 @@ class StoryRail extends ConsumerWidget {
                   children: [
                     if (story.caption.isNotEmpty)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.6),
-                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.black.withValues(alpha: 0.65),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white12),
                         ),
                         child: Text(
                           story.caption,
-                          style: const TextStyle(color: Colors.white, fontSize: 14, height: 1.3),
+                          style: GoogleFonts.instrumentSans(color: Colors.white, fontSize: 14, height: 1.35),
                         ),
                       ),
                     const SizedBox(height: 12),
@@ -191,12 +199,13 @@ class StoryRail extends ConsumerWidget {
                           Navigator.pop(ctx);
                           onSelectPlace(story.placeId);
                         },
-                        icon: const Icon(Icons.place, size: 16),
+                        icon: const Icon(Icons.place_rounded, size: 16),
                         label: Text('Visit ${story.placeName}'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.paper,
+                          backgroundColor: Colors.white,
                           foregroundColor: AppColors.ink,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                       ),
                     ),
@@ -215,41 +224,43 @@ class StoryRail extends ConsumerWidget {
     final stories = ref.watch(storiesRepositoryProvider);
 
     return SizedBox(
-      height: 86,
+      height: 94,
       child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
         itemCount: stories.length + 1,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        separatorBuilder: (_, __) => const SizedBox(width: 14),
         itemBuilder: (context, index) {
           if (index == 0) {
             // "Add Story" button
-            return GestureDetector(
-              onTap: () {
-                HapticService.light();
-                _showCreateStoryDialog(context, ref);
-              },
+            return BouncingWidget(
+              scaleFactor: 0.92,
+              onTap: () => _showCreateStoryDialog(context, ref),
               child: SizedBox(
-                width: 60,
+                width: 62,
                 child: Column(
                   children: [
                     Container(
-                      width: 58,
-                      height: 58,
+                      width: 60,
+                      height: 60,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.ink, width: 2, style: BorderStyle.solid),
                         color: AppColors.paper2,
-                        boxShadow: const [AppColors.shadowSm],
+                        border: Border.all(color: AppColors.borderMedium, width: 1.5),
+                        boxShadow: const [AppColors.shadowSubtle],
                       ),
                       child: const Center(
-                        child: Icon(Icons.add, color: AppColors.ink, size: 24),
+                        child: Icon(Icons.add_rounded, color: AppColors.ink, size: 22),
                       ),
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 6),
                     Text(
                       'Add Story',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 8.5, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.instrumentSans(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ink2,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
@@ -262,36 +273,54 @@ class StoryRail extends ConsumerWidget {
 
           final story = stories[index - 1];
 
-          return GestureDetector(
-            onTap: () {
-              HapticService.light();
-              _showStoryViewer(context, story);
-            },
+          return BouncingWidget(
+            scaleFactor: 0.92,
+            onTap: () => _showStoryViewer(context, story),
             child: SizedBox(
-              width: 60,
+              width: 62,
               child: Column(
                 children: [
                   Container(
-                    width: 58,
-                    height: 58,
+                    width: 60,
+                    height: 60,
                     padding: const EdgeInsets.all(2.5),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.orange, width: 2.2),
-                      color: AppColors.paper,
-                      boxShadow: const [AppColors.shadowSm],
+                      gradient: const LinearGradient(
+                        colors: [AppColors.orange, AppColors.butter],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.orange.withValues(alpha: 0.25),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    child: ClipOval(
-                      child: AppImage(
-                        path: story.mediaUrl,
-                        fit: BoxFit.cover,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.paper,
+                      ),
+                      padding: const EdgeInsets.all(1.5),
+                      child: ClipOval(
+                        child: AppImage(
+                          path: story.mediaUrl,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 6),
                   Text(
                     story.placeName.split(' ').first,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 8.5),
+                    style: GoogleFonts.instrumentSans(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,

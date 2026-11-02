@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
+import '../../../core/widgets/bookmark_button.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/models/collection_model.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/repositories/collections_repository.dart';
@@ -33,29 +35,32 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: AppColors.paper,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: AppColors.ink, width: 2),
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: AppColors.borderSubtle, width: 1.0),
           ),
-          title: Text('New Plan with Friends', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18)),
+          title: Text(
+            'New Plan with Friends',
+            style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18, letterSpacing: -0.2),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
                 initialValue: selectedPlaceId,
                 items: allPlaces
-                    .map((p) => DropdownMenuItem(value: p.id, child: Text(p.name, style: const TextStyle(fontSize: 13))))
+                    .map((p) => DropdownMenuItem(value: p.id, child: Text(p.name, style: GoogleFonts.instrumentSans(fontSize: 13))))
                     .toList(),
                 onChanged: (val) {
                   if (val != null) setDialogState(() => selectedPlaceId = val);
                 },
                 decoration: const InputDecoration(labelText: 'Venue'),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               TextField(
                 controller: timeCtrl,
                 decoration: const InputDecoration(labelText: 'When', hintText: 'e.g. Sat 4:00 PM'),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               TextField(
                 controller: noteCtrl,
                 decoration: const InputDecoration(labelText: 'Note', hintText: 'e.g. Coffee & study session'),
@@ -80,7 +85,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                     );
                 if (ctx.mounted) Navigator.pop(ctx);
               },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: AppColors.ink),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
               child: const Text('Create Plan'),
             ),
           ],
@@ -100,10 +105,13 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
         builder: (ctx, setDialogState) => AlertDialog(
           backgroundColor: AppColors.paper,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: AppColors.ink, width: 2),
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(color: AppColors.borderSubtle, width: 1.0),
           ),
-          title: Text('New Custom Collection', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18)),
+          title: Text(
+            'New Custom Collection',
+            style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18, letterSpacing: -0.2),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -111,12 +119,12 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                 controller: titleCtrl,
                 decoration: const InputDecoration(labelText: 'Collection Title', hintText: 'e.g. Tashkent Matcha Spots'),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               TextField(
                 controller: descCtrl,
                 decoration: const InputDecoration(labelText: 'Description', hintText: 'e.g. Best ceremonial matcha in town'),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               DropdownButtonFormField<String>(
                 initialValue: selectedAudience,
                 items: const [
@@ -146,7 +154,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                     );
                 if (ctx.mounted) Navigator.pop(ctx);
               },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.ink, foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
               child: const Text('Create'),
             ),
           ],
@@ -169,10 +177,13 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.paper,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.ink, width: 2),
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: AppColors.borderSubtle, width: 1.0),
         ),
-        title: Text('Add to "${collection.title}"', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 16)),
+        title: Text(
+          'Add to "${collection.title}"',
+          style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 16, letterSpacing: -0.2),
+        ),
         content: SizedBox(
           width: double.maxFinite,
           child: ListView.separated(
@@ -185,12 +196,12 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                 dense: true,
                 contentPadding: EdgeInsets.zero,
                 leading: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: SizedBox(width: 36, height: 36, child: AppImage(path: place.heroImageUrl, fit: BoxFit.cover)),
+                  borderRadius: BorderRadius.circular(8),
+                  child: SizedBox(width: 40, height: 40, child: AppImage(path: place.heroImageUrl, fit: BoxFit.cover)),
                 ),
-                title: Text(place.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                subtitle: Text(place.district, style: const TextStyle(fontSize: 11)),
-                trailing: const Icon(Icons.add_circle_outline, size: 20, color: AppColors.orange),
+                title: Text(place.name, style: GoogleFonts.instrumentSans(fontWeight: FontWeight.bold, fontSize: 13.5)),
+                subtitle: Text(place.district, style: GoogleFonts.instrumentSans(fontSize: 11, color: AppColors.ink2)),
+                trailing: const Icon(Icons.add_circle_outline_rounded, size: 22, color: AppColors.orange),
                 onTap: () {
                   HapticService.selection();
                   ref.read(collectionsRepositoryProvider.notifier).addPlaceToCollection(collection.id, place.id);
@@ -227,25 +238,39 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                 Text(
                   'Custom Collections',
                   style: GoogleFonts.bricolageGrotesque(
-                    fontSize: 16,
+                    fontSize: 17,
                     fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2,
                     color: AppColors.ink,
                   ),
                 ),
-                const Text(
+                const SizedBox(height: 2),
+                Text(
                   'Themed shortlists & collaborative guides',
-                  style: TextStyle(fontSize: 11, color: AppColors.ink3),
+                  style: GoogleFonts.instrumentSans(fontSize: 11.5, color: AppColors.ink3),
                 ),
               ],
             ),
-            ElevatedButton.icon(
-              onPressed: _showCreateCollectionDialog,
-              icon: const Icon(Icons.add, size: 14),
-              label: const Text('New List', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.ink,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            BouncingWidget(
+              onTap: _showCreateCollectionDialog,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                  color: AppColors.ink,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: const [AppColors.shadowSubtle],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.add_rounded, size: 15, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      'New List',
+                      style: GoogleFonts.instrumentSans(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -255,24 +280,28 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
           Container(
             padding: const EdgeInsets.all(32),
             alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: AppColors.cardSurface,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: AppColors.borderSubtle),
+            ),
             child: Column(
               children: [
-                const Icon(Icons.collections_bookmark_outlined, size: 36, color: AppColors.ink3),
+                const Icon(Icons.collections_bookmark_outlined, size: 40, color: AppColors.ink3),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'No collections created yet.',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Organize your favorite Tashkent spots into custom lists.',
-                  style: TextStyle(fontSize: 12, color: AppColors.ink3),
+                  style: GoogleFonts.instrumentSans(fontSize: 12.5, color: AppColors.ink3),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _showCreateCollectionDialog,
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: AppColors.ink),
                   child: const Text('Create Collection'),
                 ),
               ],
@@ -287,12 +316,12 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
 
             return Container(
               margin: const EdgeInsets.only(bottom: 14),
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.paper,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.ink, width: 2),
-                boxShadow: const [AppColors.shadowSm],
+                color: AppColors.cardSurface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                boxShadow: const [AppColors.shadowCard],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,41 +329,43 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                         decoration: BoxDecoration(
                           color: col.audience == 'public'
                               ? AppColors.ink
-                              : (col.audience == 'friends' ? AppColors.orange : AppColors.paper2),
-                          borderRadius: BorderRadius.circular(4),
+                              : (col.audience == 'friends' ? AppColors.orangeSubtle : AppColors.paper2),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           col.audience.toUpperCase(),
-                          style: TextStyle(
+                          style: GoogleFonts.spaceMono(
                             fontSize: 9,
                             fontWeight: FontWeight.w800,
-                            color: col.audience == 'private' ? AppColors.ink : Colors.white,
+                            color: col.audience == 'public'
+                                ? Colors.white
+                                : (col.audience == 'friends' ? AppColors.orange : AppColors.ink),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       if (col.isCollaborative)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
                           decoration: BoxDecoration(
-                            color: AppColors.mint,
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: AppColors.ink, width: 1),
+                            color: AppColors.mintSubtle,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: AppColors.mint),
                           ),
-                          child: const Text(
+                          child: Text(
                             'COLLABORATIVE',
-                            style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.bold, color: AppColors.ink),
+                            style: GoogleFonts.spaceMono(fontSize: 8.5, fontWeight: FontWeight.bold, color: AppColors.ink),
                           ),
                         ),
                       const Spacer(),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.ink3),
-                        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                        padding: const EdgeInsets.all(10),
+                        icon: const Icon(Icons.delete_outline_rounded, size: 20, color: AppColors.ink3),
+                        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                        padding: EdgeInsets.zero,
                         tooltip: 'Delete Collection',
                         onPressed: () {
                           HapticService.medium();
@@ -343,29 +374,30 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Text(
                     col.title,
                     style: GoogleFonts.bricolageGrotesque(
-                      fontSize: 16,
+                      fontSize: 16.5,
                       fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
                       color: AppColors.ink,
                     ),
                   ),
                   if (col.description.isNotEmpty) ...[
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
                       col.description,
-                      style: const TextStyle(fontSize: 11.5, color: AppColors.ink2),
+                      style: GoogleFonts.instrumentSans(fontSize: 12, color: AppColors.ink2, height: 1.35),
                     ),
                   ],
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   if (places.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       child: Text(
                         'No places added yet.',
-                        style: TextStyle(fontSize: 11, color: AppColors.ink3, fontStyle: FontStyle.italic),
+                        style: GoogleFonts.instrumentSans(fontSize: 12, color: AppColors.ink3, fontStyle: FontStyle.italic),
                       ),
                     )
                   else
@@ -374,45 +406,46 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppColors.paper2,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: AppColors.ink.withValues(alpha: 0.15)),
+                              color: AppColors.surfaceWarm,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: AppColors.borderHairline),
                             ),
                             child: Row(
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: SizedBox(
-                                    width: 40,
-                                    height: 40,
+                                    width: 42,
+                                    height: 42,
                                     child: AppImage(path: place.heroImageUrl, fit: BoxFit.cover),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 10),
                                 Expanded(
-                                  child: GestureDetector(
+                                  child: BouncingWidget(
+                                    scaleFactor: 0.98,
                                     onTap: () => context.push('/places/${place.id}'),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           place.name,
-                                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                          style: GoogleFonts.instrumentSans(fontSize: 13, fontWeight: FontWeight.bold),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                         Text(
                                           '${place.category} · ${place.district}',
-                                          style: const TextStyle(fontSize: 10, color: AppColors.ink2),
+                                          style: GoogleFonts.instrumentSans(fontSize: 11, color: AppColors.ink2),
                                         ),
                                       ],
                                     ),
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.close, size: 16, color: AppColors.ink2),
-                                  constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                                  padding: const EdgeInsets.all(12),
+                                  icon: const Icon(Icons.close_rounded, size: 17, color: AppColors.ink3),
+                                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                                  padding: EdgeInsets.zero,
                                   tooltip: 'Remove from Collection',
                                   onPressed: () {
                                     HapticService.selection();
@@ -428,8 +461,11 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton.icon(
                       onPressed: () => _showAddPlaceToCollectionDialog(col, allSavedVenues),
-                      icon: const Icon(Icons.add, size: 13, color: AppColors.ink),
-                      label: const Text('+ Add Saved Place', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.ink)),
+                      icon: const Icon(Icons.add_rounded, size: 15, color: AppColors.orange),
+                      label: Text(
+                        'Add Saved Place',
+                        style: GoogleFonts.instrumentSans(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.orange),
+                      ),
                     ),
                   ),
                 ],
@@ -470,7 +506,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Your shortlist', style: Theme.of(context).textTheme.labelSmall),
+            Text('Your shortlist', style: GoogleFonts.spaceMono(fontSize: 9.5, fontWeight: FontWeight.w600, color: AppColors.ink3)),
             Row(
               children: [
                 Text(
@@ -478,18 +514,26 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                   style: GoogleFonts.bricolageGrotesque(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
                     color: AppColors.ink,
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  _activeFilter == 'Collections'
-                      ? '${collections.length} lists'
-                      : '${filteredSavedVenues.length} places',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.orange,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.orangeSubtle,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    _activeFilter == 'Collections'
+                        ? '${collections.length} lists'
+                        : '${filteredSavedVenues.length} places',
+                    style: GoogleFonts.spaceMono(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.orange,
+                    ),
                   ),
                 ),
               ],
@@ -498,47 +542,62 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 14),
-            child: OutlinedButton.icon(
-              onPressed: () => _showAddPlanDialog(placesRepo.getAllPlaces()),
-              icon: const Icon(Icons.add, size: 14, color: AppColors.ink),
-              label: const Text('Plan', style: TextStyle(color: AppColors.ink, fontSize: 11.5, fontWeight: FontWeight.bold)),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: AppColors.ink, width: 1.5),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.only(right: 16),
+            child: BouncingWidget(
+              onTap: () => _showAddPlanDialog(placesRepo.getAllPlaces()),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                  color: AppColors.paper2,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.borderHairline),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.add_rounded, size: 16, color: AppColors.ink),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Plan',
+                      style: GoogleFonts.instrumentSans(color: AppColors.ink, fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         children: [
           Row(
             children: ['All', 'Want to go', 'Been', 'Collections'].map((filter) {
               final isSel = _activeFilter == filter;
               return Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  child: GestureDetector(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.5),
+                  child: BouncingWidget(
+                    scaleFactor: 0.94,
                     onTap: () {
-                      HapticService.selection();
                       setState(() => _activeFilter = filter);
                     },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 160),
+                      padding: const EdgeInsets.symmetric(vertical: 7),
                       decoration: BoxDecoration(
-                        color: isSel ? AppColors.ink : AppColors.paper2,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: AppColors.ink, width: 1.2),
+                        color: isSel ? AppColors.ink : AppColors.cardSurface,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: isSel ? AppColors.ink : AppColors.borderSubtle, width: 1.0),
+                        boxShadow: isSel ? const [AppColors.shadowSubtle] : null,
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         filter,
-                        style: TextStyle(
-                          fontSize: 10.5,
-                          fontWeight: FontWeight.bold,
-                          color: isSel ? AppColors.paper : AppColors.ink,
+                        style: GoogleFonts.instrumentSans(
+                          fontSize: 11.5,
+                          fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
+                          color: isSel ? Colors.white : AppColors.ink2,
                         ),
                       ),
                     ),
@@ -547,407 +606,292 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
               );
             }).toList(),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           if (_activeFilter == 'Collections')
             _buildCollectionsView(collections, placesRepo, allSavedVenues)
           else ...[
-          if (friendPlans.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.mint,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.ink, width: 2),
-                boxShadow: const [AppColors.shadow],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.group, size: 14, color: AppColors.ink),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${friendPlans.length} plans with friends in Tashkent',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  ...friendPlans.map((plan) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppColors.paper,
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: AppColors.ink.withValues(alpha: 0.15)),
+            if (friendPlans.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.mintSubtle,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.mint, width: 1.0),
+                  boxShadow: const [AppColors.shadowSubtle],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.group_rounded, size: 16, color: AppColors.ink),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${friendPlans.length} plans with friends in Tashkent',
+                            style: GoogleFonts.instrumentSans(fontWeight: FontWeight.bold, fontSize: 12.5),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              GestureDetector(
-                                onTap: () => context.push('/places/${plan.placeId}'),
-                                child: Row(
-                                  children: [
-                                    Row(
-                                      children: plan.attendeeInitials
-                                          .map(
-                                            (init) => Padding(
-                                              padding: const EdgeInsets.only(right: 4),
-                                              child: CircleAvatar(
-                                                radius: 9,
-                                                backgroundColor: AppColors.ink,
-                                                child: Text(init, style: const TextStyle(color: Colors.white, fontSize: 7)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ...friendPlans.map((plan) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.cardSurface,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: AppColors.borderHairline),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                BouncingWidget(
+                                  scaleFactor: 0.98,
+                                  onTap: () => context.push('/places/${plan.placeId}'),
+                                  child: Row(
+                                    children: [
+                                      Row(
+                                        children: plan.attendeeInitials
+                                            .map(
+                                              (init) => Padding(
+                                                padding: const EdgeInsets.only(right: 4),
+                                                child: CircleAvatar(
+                                                  radius: 10,
+                                                  backgroundColor: AppColors.ink,
+                                                  child: Text(init, style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
+                                                ),
                                               ),
-                                            ),
-                                          )
-                                          .toList(),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Expanded(
-                                      child: Text(
-                                        plan.placeName,
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                            )
+                                            .toList(),
                                       ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.ink,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        plan.scheduleTime,
-                                        style: const TextStyle(color: Colors.white, fontSize: 9.5),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (plan.note.isNotEmpty) ...[
-                                const SizedBox(height: 4),
-                                Text(
-                                  plan.note,
-                                  style: const TextStyle(fontSize: 10.5, color: AppColors.ink2),
-                                ),
-                              ],
-                              const SizedBox(height: 6),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      HapticService.selection();
-                                      ref.read(friendPlansProvider.notifier).rsvpToPlan(plan.id, 'going');
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                      decoration: BoxDecoration(
-                                        color: plan.myRsvp == 'going' ? AppColors.mint : AppColors.paper2,
-                                        borderRadius: BorderRadius.circular(999),
-                                        border: Border.all(
-                                          color: plan.myRsvp == 'going' ? AppColors.ink : AppColors.ink.withValues(alpha: 0.2),
-                                          width: plan.myRsvp == 'going' ? 1.5 : 1,
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          plan.placeName,
+                                          style: GoogleFonts.instrumentSans(fontWeight: FontWeight.bold, fontSize: 13),
                                         ),
                                       ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            plan.myRsvp == 'going' ? Icons.check_circle : Icons.check,
-                                            size: 11,
-                                            color: AppColors.ink,
-                                          ),
-                                          const SizedBox(width: 3),
-                                          const Text(
-                                            'Going',
-                                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.ink),
-                                          ),
-                                        ],
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.paper2,
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          plan.scheduleTime,
+                                          style: GoogleFonts.spaceMono(color: AppColors.ink, fontSize: 9.5, fontWeight: FontWeight.w700),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                  const SizedBox(width: 6),
-                                  GestureDetector(
-                                    onTap: () {
-                                      HapticService.selection();
-                                      ref.read(friendPlansProvider.notifier).rsvpToPlan(plan.id, 'declined');
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                      decoration: BoxDecoration(
-                                        color: plan.myRsvp == 'declined' ? AppColors.danger.withValues(alpha: 0.2) : AppColors.paper2,
-                                        borderRadius: BorderRadius.circular(999),
-                                        border: Border.all(
-                                          color: plan.myRsvp == 'declined' ? AppColors.danger : AppColors.ink.withValues(alpha: 0.2),
-                                          width: plan.myRsvp == 'declined' ? 1.5 : 1,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.close,
-                                            size: 11,
-                                            color: plan.myRsvp == 'declined' ? AppColors.danger : AppColors.ink3,
-                                          ),
-                                          const SizedBox(width: 3),
-                                          Text(
-                                            'Decline',
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                              color: plan.myRsvp == 'declined' ? AppColors.danger : AppColors.ink3,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                ),
+                                if (plan.note.isNotEmpty) ...[
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    plan.note,
+                                    style: GoogleFonts.instrumentSans(fontSize: 11.5, color: AppColors.ink2),
                                   ),
                                 ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      )),
-                ],
-              ),
-            ),
-          const SizedBox(height: 14),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Curated Collections',
-                style: GoogleFonts.bricolageGrotesque(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.ink,
-                ),
-              ),
-              GestureDetector(
-                onTap: _showCreateCollectionDialog,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: AppColors.paper2,
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppColors.ink, width: 1.2),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.add, size: 12, color: AppColors.ink),
-                      SizedBox(width: 2),
-                      Text('New', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.ink)),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 104,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: collections.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
-              itemBuilder: (ctx, idx) {
-                final col = collections[idx];
-                return Container(
-                  width: 220,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: AppColors.paper,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.ink, width: 1.5),
-                    boxShadow: const [AppColors.shadowSm],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              col.title,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                            decoration: BoxDecoration(
-                              color: col.audience == 'public' ? AppColors.ink : AppColors.butter,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              col.audience,
-                              style: TextStyle(
-                                fontSize: 8.5,
-                                fontWeight: FontWeight.bold,
-                                color: col.audience == 'public' ? Colors.white : AppColors.ink,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        col.description,
-                        style: const TextStyle(fontSize: 10, color: AppColors.ink2),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const Spacer(),
-                      Row(
-                        children: [
-                          Text(
-                            '${col.placeIds.length} spots',
-                            style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppColors.orange),
-                          ),
-                          const Spacer(),
-                          Wrap(
-                            spacing: 4,
-                            children: col.placeIds.take(2).map((pid) {
-                              final p = placesRepo.getPlaceById(pid);
-                              return GestureDetector(
-                                onTap: () => context.push('/places/$pid'),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.paper2,
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
-                                  ),
-                                  child: Text(
-                                    p?.name.split(' ').first ?? pid,
-                                    style: const TextStyle(fontSize: 8.5, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-          const SizedBox(height: 16),
-          if (filteredSavedVenues.isEmpty)
-            Container(
-              padding: const EdgeInsets.all(32),
-              alignment: Alignment.center,
-              child: Column(
-                children: [
-                  Text('No places in "$_activeFilter".'),
-                  const SizedBox(height: 12),
-                  ElevatedButton(
-                    onPressed: () => context.go('/explore'),
-                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange),
-                    child: const Text('Discover Venues', style: TextStyle(color: Colors.white)),
-                  ),
-                ],
-              ),
-            )
-          else
-            ...filteredSavedVenues.map((PlaceModel place) {
-              final currentStatus = statuses[place.id] ?? 'want_to_go';
-              final isBeen = currentStatus == 'been';
-
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => context.push('/places/${place.id}'),
-                        child: Container(
-                          padding: const EdgeInsets.all(9),
-                          decoration: BoxDecoration(
-                            color: AppColors.paper,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.ink, width: 1.8),
-                            boxShadow: const [AppColors.shadowSm],
-                          ),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: SizedBox(
-                                  width: 52,
-                                  height: 52,
-                                  child: AppImage(path: place.heroImageUrl, fit: BoxFit.cover),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    Text(
-                                      place.name,
-                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
-                                    ),
-                                    Text(
-                                      '${place.category} · ${place.walkDistanceLabel}',
-                                      style: Theme.of(context).textTheme.bodySmall,
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.star, size: 10, color: AppColors.orange),
-                                        const SizedBox(width: 2),
-                                        Text('${place.ratingAvg}', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                                        const SizedBox(width: 8),
-                                        GestureDetector(
-                                          onTap: () {
-                                            HapticService.selection();
-                                            statusNotifier.setStatus(place.id, isBeen ? 'want_to_go' : 'been');
-                                          },
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
-                                            decoration: BoxDecoration(
-                                              color: isBeen ? AppColors.mint : AppColors.butter,
-                                              borderRadius: BorderRadius.circular(999),
-                                              border: Border.all(color: AppColors.ink, width: 1),
-                                            ),
-                                            child: Text(
-                                              isBeen ? '✓ Been' : 'Want to go',
-                                              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.ink),
-                                            ),
+                                    BouncingWidget(
+                                      scaleFactor: 0.92,
+                                      onTap: () {
+                                        ref.read(friendPlansProvider.notifier).rsvpToPlan(plan.id, 'going');
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: plan.myRsvp == 'going' ? AppColors.mint : AppColors.paper2,
+                                          borderRadius: BorderRadius.circular(999),
+                                          border: Border.all(
+                                            color: plan.myRsvp == 'going' ? AppColors.ink : AppColors.borderHairline,
+                                            width: 1.0,
                                           ),
                                         ),
-                                      ],
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              plan.myRsvp == 'going' ? Icons.check_circle_rounded : Icons.check_rounded,
+                                              size: 13,
+                                              color: AppColors.ink,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              'Going',
+                                              style: GoogleFonts.instrumentSans(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.ink),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    BouncingWidget(
+                                      scaleFactor: 0.92,
+                                      onTap: () {
+                                        ref.read(friendPlansProvider.notifier).rsvpToPlan(plan.id, 'declined');
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: plan.myRsvp == 'declined' ? AppColors.danger.withValues(alpha: 0.15) : AppColors.paper2,
+                                          borderRadius: BorderRadius.circular(999),
+                                          border: Border.all(
+                                            color: plan.myRsvp == 'declined' ? AppColors.danger : AppColors.borderHairline,
+                                            width: 1.0,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.close_rounded,
+                                              size: 13,
+                                              color: plan.myRsvp == 'declined' ? AppColors.danger : AppColors.ink3,
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              'Decline',
+                                              style: GoogleFonts.instrumentSans(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold,
+                                                color: plan.myRsvp == 'declined' ? AppColors.danger : AppColors.ink3,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
+                        )),
+                  ],
+                ),
+              ),
+            const SizedBox(height: 14),
+            if (filteredSavedVenues.isEmpty)
+              Container(
+                padding: const EdgeInsets.all(36),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: AppColors.cardSurface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.borderSubtle),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'No places in "$_activeFilter".',
+                      style: GoogleFonts.bricolageGrotesque(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.bookmark, color: AppColors.orange),
-                      constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
-                      tooltip: 'Remove from Saved',
-                      onPressed: () {
-                        HapticService.medium();
-                        ref.read(savedPlacesProvider.notifier).remove(place.id);
-                      },
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: () => context.go('/explore'),
+                      child: const Text('Discover Venues'),
                     ),
                   ],
                 ),
-              );
-            }),
+              )
+            else
+              ...filteredSavedVenues.map((PlaceModel place) {
+                final currentStatus = statuses[place.id] ?? 'want_to_go';
+                final isBeen = currentStatus == 'been';
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: BouncingWidget(
+                    scaleFactor: 0.985,
+                    onTap: () => context.push('/places/${place.id}'),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardSurface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                        boxShadow: const [AppColors.shadowCard],
+                      ),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: SizedBox(
+                              width: 56,
+                              height: 56,
+                              child: AppImage(path: place.heroImageUrl, fit: BoxFit.cover),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  place.name,
+                                  style: GoogleFonts.bricolageGrotesque(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 15,
+                                    letterSpacing: -0.2,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${place.category} · ${place.walkDistanceLabel}',
+                                  style: GoogleFonts.instrumentSans(fontSize: 12, color: AppColors.ink2),
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.star_rounded, size: 13, color: AppColors.orange),
+                                    const SizedBox(width: 2),
+                                    Text('${place.ratingAvg}', style: GoogleFonts.instrumentSans(fontSize: 11, fontWeight: FontWeight.bold)),
+                                    const SizedBox(width: 8),
+                                    BouncingWidget(
+                                      scaleFactor: 0.92,
+                                      onTap: () {
+                                        statusNotifier.setStatus(place.id, isBeen ? 'want_to_go' : 'been');
+                                      },
+                                      child: AnimatedContainer(
+                                        duration: const Duration(milliseconds: 160),
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: isBeen ? AppColors.mintSubtle : AppColors.butterSubtle,
+                                          borderRadius: BorderRadius.circular(999),
+                                          border: Border.all(color: isBeen ? AppColors.mint : AppColors.butter, width: 1.0),
+                                        ),
+                                        child: Text(
+                                          isBeen ? '✓ Been' : 'Want to go',
+                                          style: GoogleFonts.instrumentSans(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.ink),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          BookmarkButton(
+                            isSaved: true,
+                            size: 34,
+                            onToggle: () {
+                              ref.read(savedPlacesProvider.notifier).remove(place.id);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
           ],
           const SizedBox(height: 70),
         ],

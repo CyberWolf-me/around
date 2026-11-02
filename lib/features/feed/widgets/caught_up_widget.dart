@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 
 class CaughtUpWidget extends StatelessWidget {
   final VoidCallback onExploreTapped;
@@ -10,44 +11,70 @@ class CaughtUpWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 20),
       decoration: BoxDecoration(
         color: AppColors.paper2,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.ink.withValues(alpha: 0.3), width: 1.5),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+        boxShadow: const [AppColors.shadowSubtle],
       ),
       child: Column(
         children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.paper,
+              border: Border.all(color: AppColors.borderSubtle),
+            ),
+            child: const Icon(Icons.done_all_rounded, color: AppColors.orange, size: 22),
+          ),
+          const SizedBox(height: 12),
           Text(
             "You're all caught up.",
             style: GoogleFonts.bricolageGrotesque(
-              fontSize: 16,
+              fontSize: 17,
               fontWeight: FontWeight.w800,
               color: AppColors.ink,
+              letterSpacing: -0.2,
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 6),
           Text(
             "That’s every recommendation from your friends in Tashkent today.",
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 11.5),
+            style: GoogleFonts.instrumentSans(
+              fontSize: 12.5,
+              color: AppColors.ink2,
+              height: 1.4,
+            ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 14),
-          ElevatedButton.icon(
-            onPressed: onExploreTapped,
-            icon: const Icon(Icons.explore, size: 15, color: Colors.white),
-            label: const Text(
-              'Explore Public Community',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.orange,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-                side: const BorderSide(color: AppColors.ink, width: 1.5),
+          const SizedBox(height: 16),
+          BouncingWidget(
+            onTap: onExploreTapped,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.ink,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: const [AppColors.shadowSm],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.explore_outlined, size: 16, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Explore Tashkent Spots',
+                    style: GoogleFonts.instrumentSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -10,6 +10,7 @@ class AppImage extends StatelessWidget {
   final double? height;
   final BoxFit fit;
   final BorderRadius? borderRadius;
+  final Widget? overlay;
 
   const AppImage({
     super.key,
@@ -18,6 +19,7 @@ class AppImage extends StatelessWidget {
     this.height,
     this.fit = BoxFit.cover,
     this.borderRadius,
+    this.overlay,
   });
 
   @override
@@ -34,6 +36,7 @@ class AppImage extends StatelessWidget {
             width: width,
             height: height,
             fit: fit,
+            gaplessPlayback: true,
             errorBuilder: (_, __, ___) => _errorPlaceholder(),
           );
         } catch (_) {
@@ -48,6 +51,7 @@ class AppImage extends StatelessWidget {
         width: width,
         height: height,
         fit: fit,
+        gaplessPlayback: true,
         errorBuilder: (_, __, ___) => _errorPlaceholder(),
         loadingBuilder: (context, child, progress) {
           if (progress == null) return child;
@@ -57,9 +61,9 @@ class AppImage extends StatelessWidget {
             color: AppColors.paper2,
             child: const Center(
               child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.ink),
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.orange),
               ),
             ),
           );
@@ -72,6 +76,7 @@ class AppImage extends StatelessWidget {
         width: width,
         height: height,
         fit: fit,
+        gaplessPlayback: true,
         errorBuilder: (_, __, ___) => _errorPlaceholder(),
       );
     } else {
@@ -81,7 +86,18 @@ class AppImage extends StatelessWidget {
         width: width,
         height: height,
         fit: fit,
+        gaplessPlayback: true,
         errorBuilder: (_, __, ___) => _errorPlaceholder(),
+      );
+    }
+
+    if (overlay != null) {
+      imageWidget = Stack(
+        fit: StackFit.passthrough,
+        children: [
+          imageWidget,
+          overlay!,
+        ],
       );
     }
 
@@ -96,8 +112,12 @@ class AppImage extends StatelessWidget {
       width: width,
       height: height,
       color: AppColors.paper2,
-      child: const Center(
-        child: Icon(Icons.image_outlined, color: AppColors.ink3, size: 28),
+      child: Center(
+        child: Icon(
+          Icons.image_outlined,
+          color: AppColors.inkLight.withValues(alpha: 0.6),
+          size: 24,
+        ),
       ),
     );
   }

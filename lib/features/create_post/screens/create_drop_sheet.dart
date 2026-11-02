@@ -7,6 +7,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/services/app_logger.dart';
 import '../../../core/services/exif_sanitizer.dart';
 import '../../../core/widgets/app_image.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/models/post_model.dart';
 import '../../../data/repositories/places_repository.dart';
@@ -27,7 +28,7 @@ class CreateDropSheet extends ConsumerStatefulWidget {
 class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
   int _currentStep = 0;
   bool _isNoteOnly = false;
-  Color _selectedTint = AppColors.butter;
+  Color _selectedTint = AppColors.butterSubtle;
   String? _selectedPhoto = 'assets/bakery-counter.jpg';
   late String _selectedPlaceId;
   final TextEditingController _noteController = TextEditingController();
@@ -38,10 +39,10 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
   final ImagePicker _picker = ImagePicker();
 
   static const List<Map<String, dynamic>> _tintOptions = [
-    {'name': 'Butter', 'color': AppColors.butter},
-    {'name': 'Mint', 'color': AppColors.mint},
-    {'name': 'Water', 'color': AppColors.water},
-    {'name': 'Blush', 'color': AppColors.blush},
+    {'name': 'Butter', 'color': AppColors.butterSubtle},
+    {'name': 'Mint', 'color': AppColors.mintSubtle},
+    {'name': 'Water', 'color': AppColors.cobaltSubtle},
+    {'name': 'Blush', 'color': AppColors.orangeSubtle},
     {'name': 'Paper', 'color': AppColors.paper2},
   ];
 
@@ -108,7 +109,6 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
           }
           return;
         }
-        // Persist as a base64 data URI so OS temporary cache purges never break local drops
         final persistentDataUri = 'data:image/jpeg;base64,${base64Encode(sanitizedBytes)}';
         setState(() {
           _selectedPhoto = persistentDataUri;
@@ -126,7 +126,6 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
   }
 
   void _nextStep() {
-    HapticService.medium();
     if (_currentStep < 3) {
       setState(() => _currentStep++);
     } else {
@@ -135,7 +134,6 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
   }
 
   void _prevStep() {
-    HapticService.light();
     if (_currentStep > 0) {
       setState(() => _currentStep--);
     } else {
@@ -229,10 +227,13 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.paper,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.ink, width: 2),
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: AppColors.borderSubtle, width: 1.0),
         ),
-        title: const Text('Add New Tashkent Venue', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text(
+          'Add New Tashkent Venue',
+          style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 17, letterSpacing: -0.2),
+        ),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -289,7 +290,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
               });
               if (ctx.mounted) Navigator.pop(ctx);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: AppColors.ink),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
             child: const Text('Add Venue'),
           ),
         ],
@@ -315,28 +316,24 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
       ),
       decoration: const BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border(
-          top: BorderSide(color: AppColors.ink, width: 2.5),
-          left: BorderSide(color: AppColors.ink, width: 2),
-          right: BorderSide(color: AppColors.ink, width: 2),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        boxShadow: [AppColors.shadowFloating],
       ),
       child: Column(
         children: [
           Center(
             child: Container(
-              margin: const EdgeInsets.only(top: 10, bottom: 6),
-              width: 44,
-              height: 5,
+              margin: const EdgeInsets.only(top: 12, bottom: 8),
+              width: 38,
+              height: 4,
               decoration: BoxDecoration(
-                color: AppColors.ink,
-                borderRadius: BorderRadius.circular(99),
+                color: AppColors.inkLight.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
             child: Row(
               children: [
                 Text(
@@ -344,38 +341,43 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                   style: GoogleFonts.spaceMono(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
+                    letterSpacing: 0.8,
                     color: AppColors.orange,
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  '· ${stepTitles[_currentStep]}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.ink,
+                Expanded(
+                  child: Text(
+                    '· ${stepTitles[_currentStep]}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.bricolageGrotesque(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                      letterSpacing: -0.2,
+                    ),
                   ),
                 ),
-                const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 20),
+                  icon: const Icon(Icons.close_rounded, size: 20, color: AppColors.ink2),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Row(
               children: List.generate(4, (i) {
                 final isDone = i <= _currentStep;
                 return Expanded(
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     height: 4,
                     margin: EdgeInsets.only(right: i < 3 ? 6 : 0),
                     decoration: BoxDecoration(
-                      color: isDone ? AppColors.orange : const Color(0x3015130F),
+                      color: isDone ? AppColors.orange : AppColors.paper2,
                       borderRadius: BorderRadius.circular(99),
                     ),
                   ),
@@ -383,67 +385,80 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
               }),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Expanded(
             child: SingleChildScrollView(
               keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 18),
               child: _buildStepContent(currentPlace),
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
             decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: Color(0x2015130F), width: 1.5)),
+              border: Border(top: BorderSide(color: AppColors.borderHairline, width: 1.0)),
             ),
             child: Row(
               children: [
                 if (_currentStep > 0) ...[
                   Expanded(
-                    child: OutlinedButton(
-                      onPressed: _prevStep,
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.ink, width: 1.8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                    child: BouncingWidget(
+                      scaleFactor: 0.95,
+                      onTap: _prevStep,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        decoration: BoxDecoration(
+                          color: AppColors.cardSurface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Back',
+                          style: GoogleFonts.instrumentSans(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 13.5),
+                        ),
                       ),
-                      child: const Text('Back', style: TextStyle(color: AppColors.ink)),
                     ),
                   ),
                   const SizedBox(width: 10),
                 ],
                 Expanded(
                   flex: 2,
-                  child: ElevatedButton(
-                    onPressed: _nextStep,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.orange,
-                      foregroundColor: AppColors.ink,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
+                  child: BouncingWidget(
+                    scaleFactor: 0.95,
+                    onTap: _nextStep,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      decoration: BoxDecoration(
+                        color: AppColors.orange,
                         borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: AppColors.ink, width: 2),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _currentStep == 3 ? 'Publish Drop' : 'Continue',
-                          style: const TextStyle(
-                            color: AppColors.ink,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.orange.withValues(alpha: 0.32),
+                            blurRadius: 10,
+                            offset: const Offset(0, 3),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        Icon(
-                          _currentStep == 3 ? Icons.send : Icons.arrow_forward,
-                          size: 16,
-                          color: AppColors.ink,
-                        ),
-                      ],
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _currentStep == 3 ? 'Publish Drop' : 'Continue',
+                            style: GoogleFonts.instrumentSans(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Icon(
+                            _currentStep == 3 ? Icons.send_rounded : Icons.arrow_forward_rounded,
+                            size: 16,
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -465,38 +480,38 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
             Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
+                  child: BouncingWidget(
+                    scaleFactor: 0.95,
                     onTap: () {
-                      HapticService.selection();
                       setState(() {
                         _isNoteOnly = false;
                         _selectedPhoto ??= 'assets/bakery-counter.jpg';
                       });
                     },
-                    child: Container(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 160),
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: !_isNoteOnly ? AppColors.butter : AppColors.paper,
+                        color: !_isNoteOnly ? AppColors.ink : AppColors.cardSurface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: !_isNoteOnly ? AppColors.ink : AppColors.ink.withValues(alpha: 0.25),
-                          width: !_isNoteOnly ? 2 : 1.2,
+                          color: !_isNoteOnly ? AppColors.ink : AppColors.borderSubtle,
+                          width: 1.0,
                         ),
-                        boxShadow: !_isNoteOnly ? const [AppColors.shadowSm] : null,
+                        boxShadow: !_isNoteOnly ? const [AppColors.shadowSubtle] : null,
                       ),
                       alignment: Alignment.center,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.photo_camera_outlined, size: 16, color: !_isNoteOnly ? AppColors.ink : AppColors.ink2),
+                          Icon(Icons.photo_camera_outlined, size: 16, color: !_isNoteOnly ? Colors.white : AppColors.ink2),
                           const SizedBox(width: 6),
                           Text(
                             'Photo Drop',
-                            style: TextStyle(
-                              color: !_isNoteOnly ? AppColors.ink : AppColors.ink2,
+                            style: GoogleFonts.instrumentSans(
+                              color: !_isNoteOnly ? Colors.white : AppColors.ink2,
                               fontWeight: FontWeight.bold,
-                              fontSize: 12.5,
+                              fontSize: 13,
                             ),
                           ),
                         ],
@@ -504,40 +519,40 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 10),
                 Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.opaque,
+                  child: BouncingWidget(
+                    scaleFactor: 0.95,
                     onTap: () {
-                      HapticService.selection();
                       setState(() {
                         _isNoteOnly = true;
                         _selectedPhoto = null;
                       });
                     },
-                    child: Container(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 160),
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
-                        color: _isNoteOnly ? AppColors.butter : AppColors.paper,
+                        color: _isNoteOnly ? AppColors.ink : AppColors.cardSurface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: _isNoteOnly ? AppColors.ink : AppColors.ink.withValues(alpha: 0.25),
-                          width: _isNoteOnly ? 2 : 1.2,
+                          color: _isNoteOnly ? AppColors.ink : AppColors.borderSubtle,
+                          width: 1.0,
                         ),
-                        boxShadow: _isNoteOnly ? const [AppColors.shadowSm] : null,
+                        boxShadow: _isNoteOnly ? const [AppColors.shadowSubtle] : null,
                       ),
                       alignment: Alignment.center,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.sticky_note_2_outlined, size: 16, color: _isNoteOnly ? AppColors.ink : AppColors.ink2),
+                          Icon(Icons.sticky_note_2_outlined, size: 16, color: _isNoteOnly ? Colors.white : AppColors.ink2),
                           const SizedBox(width: 6),
                           Text(
-                            'Note Card (No Photo)',
-                            style: TextStyle(
-                              color: _isNoteOnly ? AppColors.ink : AppColors.ink2,
+                            'Note Card',
+                            style: GoogleFonts.instrumentSans(
+                              color: _isNoteOnly ? Colors.white : AppColors.ink2,
                               fontWeight: FontWeight.bold,
-                              fontSize: 12.5,
+                              fontSize: 13,
                             ),
                           ),
                         ],
@@ -547,17 +562,17 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             if (_isNoteOnly) ...[
               // Note Card Preview
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   color: _selectedTint,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.ink, width: 2),
-                  boxShadow: const [AppColors.shadow],
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                  boxShadow: const [AppColors.shadowCard],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -565,7 +580,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                     Row(
                       children: [
                         CircleAvatar(
-                          radius: 12,
+                          radius: 13,
                           backgroundColor: AppColors.ink,
                           child: Text(
                             ref.read(currentProfileProvider).initials,
@@ -575,16 +590,16 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                         const SizedBox(width: 8),
                         Text(
                           ref.read(currentProfileProvider).fullName.split(' ').first,
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.ink),
+                          style: GoogleFonts.instrumentSans(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink),
                         ),
                         const Spacer(),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                           decoration: BoxDecoration(
                             color: AppColors.ink,
                             borderRadius: BorderRadius.circular(99),
                           ),
-                          child: const Text('NOTE DROP', style: TextStyle(color: AppColors.paper, fontSize: 8.5, fontWeight: FontWeight.bold)),
+                          child: const Text('NOTE DROP', style: TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -593,9 +608,9 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                       _noteController.text.trim().isEmpty
                           ? '“Your personal recommendation note will appear here with this card color…”'
                           : '“${_noteController.text.trim()}”',
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink, height: 1.35),
+                      style: GoogleFonts.instrumentSans(fontSize: 14.5, fontWeight: FontWeight.w600, color: AppColors.ink, height: 1.4),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     Text(
                       '· Venue: ${currentPlace?.name ?? 'Selected Spot'}',
                       style: GoogleFonts.spaceMono(fontSize: 10, color: AppColors.ink2),
@@ -603,28 +618,26 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
               Text(
                 'PICK CARD PAPER TINT:',
                 style: GoogleFonts.spaceMono(
                   fontSize: 10,
                   color: AppColors.ink3,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: _tintOptions.map((opt) {
                   final Color c = opt['color'] as Color;
                   final String name = opt['name'] as String;
                   final isSelected = _selectedTint == c;
-                  return GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      HapticService.selection();
-                      setState(() => _selectedTint = c);
-                    },
+                  return BouncingWidget(
+                    scaleFactor: 0.9,
+                    onTap: () => setState(() => _selectedTint = c),
                     child: Column(
                       children: [
                         Container(
@@ -634,15 +647,23 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                             color: c,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isSelected ? AppColors.orange : AppColors.ink,
-                              width: isSelected ? 3 : 1.5,
+                              color: isSelected ? AppColors.orange : AppColors.borderSubtle,
+                              width: isSelected ? 2.5 : 1.0,
                             ),
-                            boxShadow: isSelected ? const [AppColors.shadowSm] : null,
+                            boxShadow: isSelected
+                                ? [
+                                    BoxShadow(
+                                      color: AppColors.orange.withValues(alpha: 0.3),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
                           ),
-                          child: isSelected ? const Icon(Icons.check, size: 20, color: AppColors.ink) : null,
+                          child: isSelected ? const Icon(Icons.check_rounded, size: 20, color: AppColors.ink) : null,
                         ),
-                        const SizedBox(height: 4),
-                        Text(name, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.ink2)),
+                        const SizedBox(height: 6),
+                        Text(name, style: GoogleFonts.instrumentSans(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.ink2)),
                       ],
                     ),
                   );
@@ -653,9 +674,9 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                 height: 200,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.ink, width: 2),
-                  boxShadow: const [AppColors.shadow],
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                  boxShadow: const [AppColors.shadowCard],
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: _selectedPhoto != null
@@ -666,43 +687,79 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () => _pickPhoto(ImageSource.camera),
-                      icon: const Icon(Icons.camera_alt, size: 18),
-                      label: const Text('Take Photo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.ink,
-                        foregroundColor: AppColors.paper,
+                    child: BouncingWidget(
+                      scaleFactor: 0.95,
+                      onTap: () => _pickPhoto(ImageSource.camera),
+                      child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        decoration: BoxDecoration(
+                          color: AppColors.ink,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: const [AppColors.shadowSubtle],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.camera_alt_rounded, size: 18, color: Colors.white),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                'Take Photo',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.instrumentSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _pickPhoto(ImageSource.gallery),
-                      icon: const Icon(Icons.photo_library, size: 18, color: AppColors.ink),
-                      label: const Text('From Device', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.ink, width: 1.8),
+                    child: BouncingWidget(
+                      scaleFactor: 0.95,
+                      onTap: () => _pickPhoto(ImageSource.gallery),
+                      child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        decoration: BoxDecoration(
+                          color: AppColors.cardSurface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.photo_library_rounded, size: 18, color: AppColors.ink),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                'From Gallery',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.instrumentSans(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
               Text(
                 'OR SELECT CURATED TASHKENT PHOTO:',
                 style: GoogleFonts.spaceMono(
                   fontSize: 10,
                   color: AppColors.ink3,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -715,19 +772,25 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                 itemBuilder: (context, i) {
                   final photo = _curatedPhotos[i];
                   final isChosen = _selectedPhoto == photo;
-                  return GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onTap: () {
-                      HapticService.selection();
-                      setState(() => _selectedPhoto = photo);
-                    },
+                  return BouncingWidget(
+                    scaleFactor: 0.92,
+                    onTap: () => setState(() => _selectedPhoto = photo),
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isChosen ? AppColors.orange : AppColors.ink,
-                          width: isChosen ? 2.5 : 1.5,
+                          color: isChosen ? AppColors.orange : AppColors.borderHairline,
+                          width: isChosen ? 2.5 : 1.0,
                         ),
+                        boxShadow: isChosen
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.orange.withValues(alpha: 0.35),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : null,
                       ),
                       clipBehavior: Clip.antiAlias,
                       child: AppImage(path: photo, fit: BoxFit.cover),
@@ -750,25 +813,51 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                 Row(
                   children: [
                     Expanded(
-                      child: TextField(
-                        onChanged: (val) => setState(() => _venueSearch = val),
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.search, size: 18),
-                          hintText: 'Search Tashkent spots...',
-                          filled: true,
-                          fillColor: AppColors.paper2,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: AppColors.ink, width: 1.5),
-                          ),
+                      child: Container(
+                        height: 44,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: AppColors.cardSurface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.search_rounded, size: 18, color: AppColors.ink3),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: TextField(
+                                onChanged: (val) => setState(() => _venueSearch = val),
+                                decoration: InputDecoration(
+                                  hintText: 'Search Tashkent spots...',
+                                  hintStyle: GoogleFonts.instrumentSans(fontSize: 13, color: AppColors.inkLight),
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                  fillColor: Colors.transparent,
+                                  filled: false,
+                                ),
+                                style: GoogleFonts.instrumentSans(fontSize: 13.5, color: AppColors.ink),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.add_location_alt, color: AppColors.orange),
-                      tooltip: 'Add Custom Venue',
-                      onPressed: _showAddCustomPlaceDialog,
+                    BouncingWidget(
+                      scaleFactor: 0.9,
+                      onTap: _showAddCustomPlaceDialog,
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: AppColors.orangeSubtle,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: AppColors.orange.withValues(alpha: 0.4)),
+                        ),
+                        child: const Icon(Icons.add_location_alt_rounded, color: AppColors.orange, size: 20),
+                      ),
                     ),
                   ],
                 ),
@@ -781,51 +870,49 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                   itemBuilder: (context, i) {
                     final p = list[i];
                     final isSel = _selectedPlaceId == p.id;
-                    return GestureDetector(
-                      onTap: () {
-                        HapticService.selection();
-                        setState(() => _selectedPlaceId = p.id);
-                      },
+                    return BouncingWidget(
+                      scaleFactor: 0.98,
+                      onTap: () => setState(() => _selectedPlaceId = p.id),
                       child: Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isSel ? AppColors.butter : AppColors.paper,
+                          color: isSel ? AppColors.butterSubtle : AppColors.cardSurface,
                           border: Border.all(
-                            color: isSel ? AppColors.orange : const Color(0x3015130F),
-                            width: 1.8,
+                            color: isSel ? AppColors.orange : AppColors.borderHairline,
+                            width: isSel ? 1.5 : 1.0,
                           ),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: isSel ? const [AppColors.shadowSm] : null,
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: isSel ? const [AppColors.shadowSubtle] : null,
                         ),
                         child: Row(
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(10),
                               child: SizedBox(
-                                width: 42,
-                                height: 42,
+                                width: 44,
+                                height: 44,
                                 child: AppImage(path: p.heroImageUrl, fit: BoxFit.cover),
                               ),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     p.name,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                    style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 14, letterSpacing: -0.2),
                                   ),
                                   Text(
                                     '${p.district} · ${p.streetAddress}',
-                                    style: const TextStyle(fontSize: 10.5, color: AppColors.ink3),
+                                    style: GoogleFonts.instrumentSans(fontSize: 11, color: AppColors.ink3),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
                             ),
-                            if (isSel) const Icon(Icons.check_circle, color: AppColors.ink, size: 20),
+                            if (isSel) const Icon(Icons.check_circle_rounded, color: AppColors.orange, size: 22),
                           ],
                         ),
                       ),
@@ -843,33 +930,36 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
           children: [
             if (currentPlace != null)
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.paper2,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.ink, width: 1.2),
+                  color: AppColors.surfaceWarm,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderHairline),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.place, size: 16, color: AppColors.orange),
-                    const SizedBox(width: 6),
+                    const Icon(Icons.place_rounded, size: 18, color: AppColors.orange),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         currentPlace.name,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 14),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Text(
                       currentPlace.district,
-                      style: const TextStyle(fontSize: 10.5, color: AppColors.ink3),
+                      style: GoogleFonts.spaceMono(fontSize: 10, color: AppColors.ink3),
                     ),
                   ],
                 ),
               ),
-            const SizedBox(height: 14),
-            const Text('Your experience or recommendation:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-            const SizedBox(height: 6),
+            const SizedBox(height: 16),
+            Text(
+              'Your experience or recommendation:',
+              style: GoogleFonts.instrumentSans(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink),
+            ),
+            const SizedBox(height: 8),
             TextField(
               controller: _noteController,
               maxLines: 3,
@@ -877,55 +967,72 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
               decoration: InputDecoration(
                 hintText: 'e.g. Lavender matcha is unreal. Courtyard gets sun until noon, perfect for reading.',
                 filled: true,
-                fillColor: AppColors.paper,
+                fillColor: AppColors.cardSurface,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.ink, width: 1.8),
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: AppColors.borderSubtle, width: 1.0),
                 ),
               ),
+              style: GoogleFonts.instrumentSans(fontSize: 14, height: 1.4),
             ),
-            const SizedBox(height: 12),
-            const Text('Rating:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            const SizedBox(height: 14),
+            Text('Rating:', style: GoogleFonts.instrumentSans(fontWeight: FontWeight.bold, fontSize: 13)),
+            const SizedBox(height: 4),
             Row(
               children: List.generate(5, (index) {
                 final starVal = index + 1;
-                return IconButton(
-                  icon: Icon(
-                    starVal <= _rating ? Icons.star : Icons.star_border,
-                    color: starVal <= _rating ? AppColors.orange : AppColors.ink3,
+                return BouncingWidget(
+                  scaleFactor: 0.85,
+                  onTap: () => setState(() => _rating = starVal),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: Icon(
+                      starVal <= _rating ? Icons.star_rounded : Icons.star_border_rounded,
+                      color: starVal <= _rating ? AppColors.orange : AppColors.inkLight,
+                      size: 32,
+                    ),
                   ),
-                  onPressed: () {
-                    HapticService.selection();
-                    setState(() => _rating = starVal);
-                  },
                 );
               }),
             ),
-            const SizedBox(height: 12),
-            const Text('Tags:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-            const SizedBox(height: 6),
+            const SizedBox(height: 16),
+            Text('Tags:', style: GoogleFonts.instrumentSans(fontWeight: FontWeight.bold, fontSize: 13)),
+            const SizedBox(height: 8),
             Wrap(
-              spacing: 6,
-              runSpacing: 6,
+              spacing: 8,
+              runSpacing: 8,
               children: _availableTags.map((t) {
                 final isChosen = _selectedTags.contains(t);
-                return FilterChip(
-                  label: Text('#$t'),
-                  selected: isChosen,
-                  onSelected: (val) {
-                    HapticService.selection();
+                return BouncingWidget(
+                  scaleFactor: 0.94,
+                  onTap: () {
                     setState(() {
-                      if (val) {
-                        _selectedTags.add(t);
-                      } else {
+                      if (isChosen) {
                         _selectedTags.remove(t);
+                      } else {
+                        _selectedTags.add(t);
                       }
                     });
                   },
-                  selectedColor: AppColors.ink,
-                  labelStyle: TextStyle(
-                    color: isChosen ? AppColors.paper : AppColors.ink,
-                    fontSize: 10.5,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 160),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: isChosen ? AppColors.ink : AppColors.cardSurface,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                        color: isChosen ? AppColors.ink : AppColors.borderSubtle,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Text(
+                      '#$t',
+                      style: GoogleFonts.instrumentSans(
+                        color: isChosen ? Colors.white : AppColors.ink2,
+                        fontSize: 11,
+                        fontWeight: isChosen ? FontWeight.bold : FontWeight.w500,
+                      ),
+                    ),
                   ),
                 );
               }).toList(),
@@ -937,48 +1044,51 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Who can discover this drop?',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.ink3),
+              style: GoogleFonts.spaceMono(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.ink3),
             ),
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () {
-                HapticService.selection();
-                setState(() => _audience = PostAudience.friends);
-              },
-              child: Container(
-                padding: const EdgeInsets.all(14),
+            const SizedBox(height: 14),
+            BouncingWidget(
+              scaleFactor: 0.985,
+              onTap: () => setState(() => _audience = PostAudience.friends),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 160),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: _audience == PostAudience.friends ? AppColors.butter : AppColors.paper,
-                  borderRadius: BorderRadius.circular(14),
+                  color: _audience == PostAudience.friends ? AppColors.butterSubtle : AppColors.cardSurface,
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: _audience == PostAudience.friends ? AppColors.ink : const Color(0x3015130F),
-                    width: 2,
+                    color: _audience == PostAudience.friends ? AppColors.orange : AppColors.borderSubtle,
+                    width: _audience == PostAudience.friends ? 1.8 : 1.0,
                   ),
-                  boxShadow: _audience == PostAudience.friends ? const [AppColors.shadow] : null,
+                  boxShadow: _audience == PostAudience.friends ? const [AppColors.shadowSubtle] : null,
                 ),
-                child: const Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      backgroundColor: AppColors.paper,
-                      radius: 18,
-                      child: Icon(Icons.lock, size: 18, color: AppColors.ink),
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        color: AppColors.butter,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.lock_rounded, size: 20, color: AppColors.ink),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Friends Only (Recommended)',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 15),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             'Only mutual connections see this. Inaccessible to public search, unauthenticated users, or strangers.',
-                            style: TextStyle(fontSize: 11.5, color: AppColors.ink2, height: 1.35),
+                            style: GoogleFonts.instrumentSans(fontSize: 12, color: AppColors.ink2, height: 1.4),
                           ),
                         ],
                       ),
@@ -987,44 +1097,47 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-            GestureDetector(
-              onTap: () {
-                HapticService.selection();
-                setState(() => _audience = PostAudience.public);
-              },
-              child: Container(
-                padding: const EdgeInsets.all(14),
+            const SizedBox(height: 14),
+            BouncingWidget(
+              scaleFactor: 0.985,
+              onTap: () => setState(() => _audience = PostAudience.public),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 160),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: _audience == PostAudience.public ? AppColors.butter : AppColors.paper,
-                  borderRadius: BorderRadius.circular(14),
+                  color: _audience == PostAudience.public ? AppColors.orangeSubtle : AppColors.cardSurface,
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: _audience == PostAudience.public ? AppColors.ink : const Color(0x3015130F),
-                    width: 2,
+                    color: _audience == PostAudience.public ? AppColors.orange : AppColors.borderSubtle,
+                    width: _audience == PostAudience.public ? 1.8 : 1.0,
                   ),
-                  boxShadow: _audience == PostAudience.public ? const [AppColors.shadow] : null,
+                  boxShadow: _audience == PostAudience.public ? const [AppColors.shadowSubtle] : null,
                 ),
-                child: const Row(
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      backgroundColor: AppColors.paper,
-                      radius: 18,
-                      child: Icon(Icons.public, size: 18, color: AppColors.ink),
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        color: AppColors.orange,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.public_rounded, size: 20, color: Colors.white),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Public (Tashkent Community)',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 15),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             'Featured on the venue page and Tashkent Explore feed. Helps anyone discovering this neighborhood.',
-                            style: TextStyle(fontSize: 11.5, color: AppColors.ink2, height: 1.35),
+                            style: GoogleFonts.instrumentSans(fontSize: 12, color: AppColors.ink2, height: 1.4),
                           ),
                         ],
                       ),

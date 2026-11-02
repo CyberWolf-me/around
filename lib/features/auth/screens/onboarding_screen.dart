@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/services/haptic_service.dart';
 import '../../../data/services/storage_service.dart';
@@ -22,7 +23,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     {
       'id': 'Mirabad',
       'name': 'Mirabad District',
-      'tagline': 'Specialty coffee, artisan bakeries & evening social spots',
+      'tagline': 'Specialty coffee, artisan bakeries & evening wine bars',
       'badge': 'Most Active',
     },
     {
@@ -34,28 +35,28 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     {
       'id': 'Central Tashkent',
       'name': 'Central Tashkent (All)',
-      'tagline': 'Explore all curated venues across Mirabad, Yakkasaray & downtown',
+      'tagline': 'Curated venues across Mirabad, Yakkasaray & downtown avenues',
       'badge': 'Complete Map',
     },
   ];
 
   static const List<Map<String, String>> _steps = [
     {
-      'kicker': 'Around · Tashkent',
+      'kicker': 'AROUND · TASHKENT',
       'title': 'Where should\nwe go?',
-      'body': 'A living map built from places your friends actually went — not from ratings written by strangers.',
+      'body': 'A living map built from places your friends actually went — not ratings written by strangers.',
       'img': 'assets/kettle-hero.jpg',
     },
     {
-      'kicker': 'Step 1 of 2',
-      'title': 'Follow five\npeople.',
-      'body': 'Your feed is only as good as the people on it. Start with the friends you would message for coffee recommendations.',
+      'kicker': 'CURATE YOUR CIRCLE',
+      'title': 'Follow trusted\nlocals.',
+      'body': 'Your feed is only as good as the people on it. Start with friends whose taste you trust for coffee, food, and culture.',
       'img': 'assets/friends.jpg',
     },
     {
-      'kicker': 'Step 2 of 2',
-      'title': 'Pick a\nneighbourhood.',
-      'body': 'We start with Tashkent (Mirabad & Yakkasaray) so everything you see is walkable. You can widen your discovery radius anytime.',
+      'kicker': 'NEIGHBOURHOOD FIRST',
+      'title': 'Pick your\nneighborhood.',
+      'body': 'We start with Tashkent so everything you see is walkable. You can expand your radius anytime.',
       'img': 'assets/street.jpg',
     },
   ];
@@ -84,17 +85,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       backgroundColor: AppColors.paper,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   RichText(
                     text: TextSpan(
                       style: GoogleFonts.bricolageGrotesque(
-                        fontSize: 22,
+                        fontSize: 24,
                         fontWeight: FontWeight.w800,
                         color: AppColors.ink,
                       ),
@@ -104,43 +106,67 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       ],
                     ),
                   ),
-                  TextButton(
-                    onPressed: _finishOnboarding,
-                    child: const Text('Skip', style: TextStyle(color: AppColors.ink3)),
+                  BouncingWidget(
+                    onTap: () {
+                      HapticService.light();
+                      _finishOnboarding(asGuest: false);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.paper2,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.borderHairline),
+                      ),
+                      child: Text(
+                        'Skip',
+                        style: GoogleFonts.instrumentSans(
+                          color: AppColors.ink2,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
               const Spacer(),
+
+              // Interactive Visual Area
               if (_step == 1)
                 Container(
-                  height: 250,
+                  height: 270,
                   decoration: BoxDecoration(
-                    color: AppColors.paper2,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: AppColors.ink, width: 2),
+                    color: AppColors.cardSurface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.borderSubtle, width: 1),
+                    boxShadow: const [AppColors.shadowCard],
                   ),
                   child: ListView.separated(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(12),
                     itemCount: kTashkentCommunityMembers.take(5).length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 6),
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final member = kTashkentCommunityMembers[index];
                       final isFollowing = followedSet.contains(member.id);
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
                           color: AppColors.paper,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.ink, width: 1.5),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: isFollowing ? AppColors.orange.withValues(alpha: 0.3) : AppColors.borderHairline,
+                            width: 1,
+                          ),
                         ),
                         child: Row(
                           children: [
                             CircleAvatar(
-                              radius: 14,
-                              backgroundColor: AppColors.ink,
+                              radius: 16,
+                              backgroundColor: AppColors.butter,
                               child: Text(
                                 member.initials,
-                                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                style: const TextStyle(color: AppColors.ink, fontSize: 11, fontWeight: FontWeight.bold),
                               ),
                             ),
                             const SizedBox(width: 10),
@@ -148,25 +174,38 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(member.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5)),
+                                  Text(
+                                    member.name,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink),
+                                  ),
                                   Text(
                                     '@${member.handle} · ${member.neighborhood}',
-                                    style: const TextStyle(fontSize: 10, color: AppColors.ink3),
+                                    style: const TextStyle(fontSize: 10.5, color: AppColors.ink3),
                                   ),
                                 ],
                               ),
                             ),
-                            TextButton(
-                              onPressed: () {
+                            BouncingWidget(
+                              onTap: () {
                                 HapticService.selection();
                                 followedNotifier.toggleFollow(member.id);
                               },
-                              child: Text(
-                                isFollowing ? 'Following' : '+ Follow',
-                                style: TextStyle(
-                                  color: isFollowing ? AppColors.ink : AppColors.orange,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11.5,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: isFollowing ? AppColors.paper2 : AppColors.orange,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: isFollowing ? AppColors.borderSubtle : AppColors.orange,
+                                  ),
+                                ),
+                                child: Text(
+                                  isFollowing ? 'Following' : '+ Follow',
+                                  style: TextStyle(
+                                    color: isFollowing ? AppColors.ink : Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                  ),
                                 ),
                               ),
                             ),
@@ -179,51 +218,50 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               else if (_step == 2)
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.paper2,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: AppColors.ink, width: 2),
-                    boxShadow: const [AppColors.shadowSm],
+                    color: AppColors.cardSurface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: AppColors.borderSubtle, width: 1),
+                    boxShadow: const [AppColors.shadowCard],
                   ),
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(12),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: _districts.map((d) {
                       final isSelected = _selectedDistrict == d['id'];
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
+                        child: BouncingWidget(
                           onTap: () {
                             HapticService.selection();
                             setState(() => _selectedDistrict = d['id']!);
                           },
                           child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 160),
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            duration: const Duration(milliseconds: 180),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                             decoration: BoxDecoration(
                               color: isSelected ? AppColors.butter : AppColors.paper,
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(14),
                               border: Border.all(
-                                color: isSelected ? AppColors.ink : AppColors.ink.withValues(alpha: 0.3),
-                                width: isSelected ? 2 : 1.2,
+                                color: isSelected ? AppColors.ink : AppColors.borderHairline,
+                                width: isSelected ? 1.5 : 1,
                               ),
-                              boxShadow: isSelected ? const [AppColors.shadowSm] : null,
+                              boxShadow: isSelected ? const [AppColors.shadowTactile] : null,
                             ),
                             child: Row(
                               children: [
                                 Container(
-                                  width: 26,
-                                  height: 26,
+                                  width: 28,
+                                  height: 28,
                                   decoration: BoxDecoration(
                                     color: isSelected ? AppColors.orange : AppColors.paper2,
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: AppColors.ink, width: 1.5),
+                                    border: Border.all(color: isSelected ? AppColors.ink : AppColors.borderHairline, width: 1.2),
                                   ),
                                   child: isSelected
-                                      ? const Icon(Icons.check, size: 15, color: AppColors.ink)
-                                      : const Icon(Icons.location_on_outlined, size: 14, color: AppColors.ink2),
+                                      ? const Icon(Icons.check, size: 16, color: Colors.white)
+                                      : const Icon(Icons.location_on_outlined, size: 15, color: AppColors.ink2),
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -234,15 +272,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                             d['name']!,
                                             style: GoogleFonts.bricolageGrotesque(
                                               fontWeight: FontWeight.w800,
-                                              fontSize: 13,
+                                              fontSize: 14,
                                               color: AppColors.ink,
                                             ),
                                           ),
-                                          const SizedBox(width: 6),
+                                          const SizedBox(width: 8),
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                             decoration: BoxDecoration(
-                                              color: isSelected ? AppColors.orange.withValues(alpha: 0.2) : AppColors.paper3,
+                                              color: isSelected ? AppColors.paper.withValues(alpha: 0.6) : AppColors.paper2,
                                               borderRadius: BorderRadius.circular(6),
                                             ),
                                             child: Text(
@@ -256,10 +294,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 2),
+                                      const SizedBox(height: 3),
                                       Text(
                                         d['tagline']!,
-                                        style: const TextStyle(fontSize: 10.5, color: AppColors.ink2, height: 1.25),
+                                        style: const TextStyle(fontSize: 11, color: AppColors.ink2, height: 1.25),
                                       ),
                                     ],
                                   ),
@@ -275,85 +313,112 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               else
                 Center(
                   child: Container(
-                    height: 240,
+                    height: 250,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColors.ink, width: 2.5),
-                      boxShadow: const [AppColors.shadowLg],
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: AppColors.borderSubtle, width: 1),
+                      boxShadow: const [AppColors.shadowCard],
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: Image.asset(s['img']!, fit: BoxFit.cover),
                   ),
                 ),
+
               const Spacer(),
+
+              // Text Kicker & Content
               Text(
                 s['kicker']!,
                 style: GoogleFonts.spaceMono(
-                  fontSize: 10,
+                  fontSize: 10.5,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 1.1,
                   color: AppColors.orange,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                s['title']!,
-                style: GoogleFonts.bricolageGrotesque(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.ink,
-                  height: 1.1,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                s['body']!,
-                style: const TextStyle(fontSize: 13.5, color: AppColors.ink2, height: 1.4),
+                s['title']!,
+                style: GoogleFonts.bricolageGrotesque(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                  height: 1.05,
+                ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+              Text(
+                s['body']!,
+                style: GoogleFonts.instrumentSans(
+                  fontSize: 14,
+                  color: AppColors.ink2,
+                  height: 1.45,
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Bottom Control Bar
               if (_step == 2) ...[
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
+                      child: BouncingWidget(
+                        onTap: () {
                           HapticService.light();
                           _finishOnboarding(asGuest: true);
                         },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: AppColors.ink, width: 1.8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        child: const Text(
-                          'Browse as Guest',
-                          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.paper,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: AppColors.borderSubtle, width: 1.2),
+                            boxShadow: const [AppColors.shadowTactile],
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Browse as Guest',
+                            style: GoogleFonts.instrumentSans(
+                              color: AppColors.ink,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Expanded(
                       flex: 2,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
+                      child: BouncingWidget(
+                        onTap: () {
                           HapticService.medium();
                           _finishOnboarding(asGuest: false);
                         },
-                        iconAlignment: IconAlignment.end,
-                        icon: const Icon(Icons.arrow_forward, size: 16, color: AppColors.ink),
-                        label: Text(
-                          'Launch $_selectedDistrict',
-                          style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.orange,
-                          foregroundColor: AppColors.ink,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: const BorderSide(color: AppColors.ink, width: 2),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: AppColors.orange,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: const [AppColors.shadowTactile],
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          alignment: Alignment.center,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Launch $_selectedDistrict',
+                                style: GoogleFonts.instrumentSans(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13.5,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward, size: 16, color: Colors.white),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -364,38 +429,45 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   children: [
                     Row(
                       children: List.generate(3, (i) {
-                        return Container(
-                          margin: const EdgeInsets.only(right: 5),
-                          width: i == _step ? 18 : 6,
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          margin: const EdgeInsets.only(right: 6),
+                          width: i == _step ? 22 : 6,
                           height: 6,
                           decoration: BoxDecoration(
-                            color: i == _step ? AppColors.ink : const Color(0x3015130F),
+                            color: i == _step ? AppColors.ink : AppColors.borderHairline,
                             borderRadius: BorderRadius.circular(99),
                           ),
                         );
                       }),
                     ),
                     const Spacer(),
-                    ElevatedButton.icon(
-                      onPressed: () {
+                    BouncingWidget(
+                      onTap: () {
                         HapticService.medium();
                         setState(() => _step++);
                       },
-                      iconAlignment: IconAlignment.end,
-                      icon: const Icon(Icons.arrow_forward, size: 16, color: AppColors.ink),
-                      label: const Text(
-                        'Next',
-                        style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.orange,
-                        foregroundColor: AppColors.ink,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: const BorderSide(color: AppColors.ink, width: 2),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+                        decoration: BoxDecoration(
+                          color: AppColors.orange,
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: const [AppColors.shadowTactile],
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Next',
+                              style: GoogleFonts.instrumentSans(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13.5,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            const Icon(Icons.arrow_forward, size: 16, color: Colors.white),
+                          ],
+                        ),
                       ),
                     ),
                   ],

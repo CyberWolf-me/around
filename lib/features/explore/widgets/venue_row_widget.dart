@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
+import '../../../core/widgets/bookmark_button.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/repositories/saved_places_repository.dart';
-import '../../../data/services/haptic_service.dart';
 
 class VenueRowWidget extends ConsumerWidget {
   final PlaceModel place;
@@ -21,28 +23,25 @@ class VenueRowWidget extends ConsumerWidget {
     final savedPlaces = ref.watch(savedPlacesProvider);
     final isSaved = savedPlaces.contains(place.id);
 
-    return GestureDetector(
-      onTap: () {
-        HapticService.light();
-        onTap();
-      },
+    return BouncingWidget(
+      scaleFactor: 0.985,
+      onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(9),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.paper,
-          border: Border.all(color: AppColors.ink, width: 1.8),
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: const [AppColors.shadowSm],
+          color: AppColors.cardSurface,
+          border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [AppColors.shadowCard],
         ),
         child: Row(
           children: [
             // Thumbnail
             Container(
-              width: 58,
-              height: 58,
+              width: 64,
+              height: 64,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.ink, width: 1.5),
+                borderRadius: BorderRadius.circular(12),
               ),
               clipBehavior: Clip.antiAlias,
               child: AppImage(
@@ -50,7 +49,7 @@ class VenueRowWidget extends ConsumerWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             // Venue Details
             Expanded(
               child: Column(
@@ -61,54 +60,74 @@ class VenueRowWidget extends ConsumerWidget {
                       Expanded(
                         child: Text(
                           place.name,
-                          style: const TextStyle(
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w700,
+                          style: GoogleFonts.bricolageGrotesque(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.2,
                             color: AppColors.ink,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      Text(
-                        place.priceTier,
-                        style: Theme.of(context).textTheme.labelSmall,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.paper2,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          place.priceTier,
+                          style: GoogleFonts.spaceMono(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.ink2,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
                   Text(
                     '${place.category} · ${place.walkDistanceLabel}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 10),
+                    style: GoogleFonts.instrumentSans(
+                      fontSize: 11.5,
+                      color: AppColors.ink2,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 5),
                   Row(
                     children: [
-                      const Icon(Icons.star, size: 11, color: AppColors.orange),
+                      const Icon(Icons.star_rounded, size: 14, color: AppColors.orange),
                       const SizedBox(width: 3),
                       Text(
                         '${place.ratingAvg}',
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.instrumentSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.ink,
+                        ),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '(${place.ratingCount})',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9),
+                        style: GoogleFonts.spaceMono(
+                          fontSize: 9.5,
+                          color: AppColors.ink3,
+                        ),
                       ),
                     ],
                   ),
                 ],
               ),
             ),
+            const SizedBox(width: 8),
             // Bookmark Action
-            IconButton(
-              icon: Icon(
-                isSaved ? Icons.bookmark : Icons.bookmark_border,
-                size: 18,
-                color: isSaved ? AppColors.orange : AppColors.ink3,
-              ),
-              onPressed: () {
-                HapticService.medium();
+            BookmarkButton(
+              isSaved: isSaved,
+              size: 36,
+              onToggle: () {
                 ref.read(savedPlacesProvider.notifier).toggleSave(place.id);
               },
             ),

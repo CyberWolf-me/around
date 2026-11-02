@@ -7,6 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/deep_link_service.dart';
 import '../../../core/widgets/app_image.dart';
+import '../../../core/widgets/bookmark_button.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/models/post_model.dart';
 import '../../../data/repositories/collections_repository.dart';
@@ -33,7 +35,6 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
   int _tabIndex = 0; // 0 = Friends' Drops, 1 = Public Reviews
 
   Future<void> _copyShareLink(PlaceModel place) async {
-    HapticService.light();
     final link = await DeepLinkService.copyPlaceShareLink(place.slug);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -46,52 +47,55 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
   }
 
   void _showAddToCollectionSheet(String placeId) {
-    HapticService.light();
     showModalBottomSheet(
       context: context,
       backgroundColor: AppColors.paper,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) {
         final collections = ref.watch(collectionsRepositoryProvider);
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Center(
                 child: Container(
-                  width: 40,
+                  width: 36,
                   height: 4,
-                  margin: const EdgeInsets.only(bottom: 12),
+                  margin: const EdgeInsets.only(bottom: 14),
                   decoration: BoxDecoration(
-                    color: AppColors.ink3.withValues(alpha: 0.4),
+                    color: AppColors.inkLight.withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
               Row(
                 children: [
-                  const Icon(Icons.collections_bookmark_outlined, size: 18, color: AppColors.orange),
-                  const SizedBox(width: 6),
+                  const Icon(Icons.collections_bookmark_rounded, size: 20, color: AppColors.orange),
+                  const SizedBox(width: 8),
                   Text(
                     'Save to Collection',
                     style: GoogleFonts.bricolageGrotesque(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                       color: AppColors.ink,
+                      letterSpacing: -0.2,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               if (collections.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
                   child: Center(
-                    child: Text('No collections created yet. Go to Saved tab to create one.'),
+                    child: Text(
+                      'No collections created yet. Go to Saved tab to create one.',
+                      style: GoogleFonts.instrumentSans(fontSize: 13, color: AppColors.ink3),
+                    ),
                   ),
                 )
               else
@@ -100,11 +104,12 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                   return ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(
-                      inCol ? Icons.check_circle : Icons.radio_button_unchecked,
+                      inCol ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
                       color: inCol ? AppColors.orange : AppColors.ink3,
+                      size: 22,
                     ),
-                    title: Text(col.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5)),
-                    subtitle: Text('${col.placeIds.length} spots · ${col.audience}', style: const TextStyle(fontSize: 11)),
+                    title: Text(col.title, style: GoogleFonts.instrumentSans(fontWeight: FontWeight.bold, fontSize: 14)),
+                    subtitle: Text('${col.placeIds.length} spots · ${col.audience}', style: GoogleFonts.instrumentSans(fontSize: 12, color: AppColors.ink3)),
                     onTap: () {
                       HapticService.selection();
                       if (inCol) {
@@ -122,7 +127,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                     },
                   );
                 }),
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
             ],
           ),
         );
@@ -152,79 +157,113 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
   }
 
   void _showDirectionsDialog(PlaceModel place) {
-    HapticService.light();
     final coordsText = '${place.latitude.toStringAsFixed(4)}, ${place.longitude.toStringAsFixed(4)}';
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
         decoration: const BoxDecoration(
           color: AppColors.paper,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border(
-            top: BorderSide(color: AppColors.ink, width: 2.5),
-            left: BorderSide(color: AppColors.ink, width: 2),
-            right: BorderSide(color: AppColors.ink, width: 2),
-          ),
+          boxShadow: [AppColors.shadowFloating],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: AppColors.inkLight.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
             Text(
               'Walk to ${place.name}',
-              style: GoogleFonts.bricolageGrotesque(fontSize: 20, fontWeight: FontWeight.w800),
+              style: GoogleFonts.bricolageGrotesque(fontSize: 20, fontWeight: FontWeight.w800, letterSpacing: -0.3),
             ),
             const SizedBox(height: 6),
             Text(
               '${place.streetAddress}, ${place.district}, ${place.city}',
-              style: const TextStyle(fontSize: 13, color: AppColors.ink2),
+              style: GoogleFonts.instrumentSans(fontSize: 13.5, color: AppColors.ink2),
             ),
             const SizedBox(height: 4),
             Text(
               'Estimated: ${place.walkDistanceLabel} (${place.distanceMeters.round()}m) · GPS: $coordsText',
-              style: GoogleFonts.spaceMono(fontSize: 10.5, color: AppColors.ink3),
+              style: GoogleFonts.spaceMono(fontSize: 10, color: AppColors.ink3),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
             // Yandex Maps (Primary in Tashkent)
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
+              child: BouncingWidget(
+                onTap: () {
                   final native = Uri.parse('yandexmaps://build_route_on_map?lat_to=${place.latitude}&lon_to=${place.longitude}');
                   final web = Uri.parse('https://yandex.com/maps/?rtext=~${place.latitude}%2C${place.longitude}&rtt=pd');
                   _launchMapsUrl(ctx, native, web);
                 },
-                icon: const Icon(Icons.navigation, size: 16, color: AppColors.ink),
-                label: const Text('Open in Yandex Maps (Tashkent Standard)', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.orange,
-                  foregroundColor: AppColors.ink,
+                child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 13),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.ink, width: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.orange,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.orange.withValues(alpha: 0.32),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.navigation_rounded, size: 17, color: Colors.white),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Open in Yandex Maps (Tashkent Standard)',
+                        style: GoogleFonts.instrumentSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.5),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             // Google Maps
             SizedBox(
               width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: () {
+              child: BouncingWidget(
+                onTap: () {
                   final native = Uri.parse('geo:${place.latitude},${place.longitude}?q=${place.latitude},${place.longitude}(${Uri.encodeComponent(place.name)})');
                   final web = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}');
                   _launchMapsUrl(ctx, native, web);
                 },
-                icon: const Icon(Icons.map_outlined, size: 16, color: AppColors.ink),
-                label: const Text('Open in Google Maps', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.ink, width: 1.8),
+                child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 13),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardSurface,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                  ),
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.map_outlined, size: 17, color: AppColors.ink),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Open in Google Maps',
+                        style: GoogleFonts.instrumentSans(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 13.5),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -242,8 +281,11 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                     );
                   }
                 },
-                icon: const Icon(Icons.copy, size: 15, color: AppColors.ink2),
-                label: const Text('Copy Address & GPS Coordinates', style: TextStyle(color: AppColors.ink2, fontSize: 12)),
+                icon: const Icon(Icons.copy_rounded, size: 15, color: AppColors.ink2),
+                label: Text(
+                  'Copy Address & GPS Coordinates',
+                  style: GoogleFonts.instrumentSans(color: AppColors.ink2, fontSize: 12.5),
+                ),
               ),
             ),
           ],
@@ -253,7 +295,6 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
   }
 
   void _showReportOrBlockSheet({required String targetType, required String targetId, String? authorId, String? authorName}) {
-    HapticService.medium();
     final myId = SupabaseService.currentUser?.id ?? ref.read(currentProfileProvider).id;
     final reasons = [
       'Inappropriate photo or text',
@@ -266,11 +307,11 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(20),
         decoration: const BoxDecoration(
           color: AppColors.paper,
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          border: Border(top: BorderSide(color: AppColors.ink, width: 2.5)),
+          boxShadow: [AppColors.shadowFloating],
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -278,14 +319,14 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           children: [
             Text(
               'Safety & Moderation',
-              style: GoogleFonts.bricolageGrotesque(fontSize: 18, fontWeight: FontWeight.w800),
+              style: GoogleFonts.bricolageGrotesque(fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.2),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             ...reasons.map((r) => ListTile(
                   dense: true,
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.flag_outlined, color: AppColors.orange, size: 18),
-                  title: Text(r, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                  title: Text(r, style: GoogleFonts.instrumentSans(fontSize: 13.5, fontWeight: FontWeight.w600)),
                   onTap: () async {
                     var quarantined = false;
                     if (targetType == 'post') {
@@ -313,14 +354,14 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                   },
                 )),
             if (authorId != null && authorId != myId && authorId != 'you') ...[
-              const Divider(),
+              const Divider(color: AppColors.borderHairline),
               ListTile(
                 dense: true,
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.block, color: AppColors.danger, size: 18),
+                leading: const Icon(Icons.block_rounded, color: AppColors.danger, size: 18),
                 title: Text(
                   'Block @${authorName ?? authorId}',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.danger),
+                  style: GoogleFonts.instrumentSans(fontSize: 13.5, fontWeight: FontWeight.bold, color: AppColors.danger),
                 ),
                 onTap: () async {
                   await ref.read(blockedUsersProvider.notifier).blockUser(authorId);
@@ -376,21 +417,18 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           SliverAppBar(
             pinned: true,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppColors.ink),
+              icon: const Icon(Icons.arrow_back_rounded, color: AppColors.ink),
               onPressed: () => context.pop(),
             ),
             title: Text(
               'Place · ${place.shortCategory}',
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 11),
+              style: GoogleFonts.spaceMono(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.ink3),
             ),
             actions: [
-              IconButton(
-                icon: Icon(
-                  isSaved ? Icons.bookmark : Icons.bookmark_border,
-                  color: isSaved ? AppColors.orange : AppColors.ink,
-                ),
-                onPressed: () {
-                  HapticService.medium();
+              BookmarkButton(
+                isSaved: isSaved,
+                size: 36,
+                onToggle: () {
                   ref.read(savedPlacesProvider.notifier).toggleSave(place.id);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -401,12 +439,12 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.playlist_add, color: AppColors.ink),
+                icon: const Icon(Icons.playlist_add_rounded, color: AppColors.ink),
                 tooltip: 'Add to Collection',
                 onPressed: () => _showAddToCollectionSheet(place.id),
               ),
               IconButton(
-                icon: const Icon(Icons.share, color: AppColors.ink),
+                icon: const Icon(Icons.share_rounded, color: AppColors.ink, size: 20),
                 onPressed: () => _copyShareLink(place),
               ),
               IconButton(
@@ -414,17 +452,18 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                 tooltip: 'Report Venue',
                 onPressed: () => _showReportOrBlockSheet(targetType: 'place', targetId: place.id),
               ),
+              const SizedBox(width: 8),
             ],
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Container(
-                height: 230,
+                height: 240,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.ink, width: 2),
-                  boxShadow: const [AppColors.shadow],
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                  boxShadow: const [AppColors.shadowCard],
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: Stack(
@@ -441,74 +480,77 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                           end: Alignment.bottomCenter,
                           colors: [
                             Colors.transparent,
-                            Color(0x3015130F),
-                            Color(0xBB15130F),
+                            Color(0x2515130F),
+                            Color(0xC815130F),
                           ],
                         ),
                       ),
                     ),
                     Positioned(
-                      bottom: 14,
-                      left: 14,
-                      right: 14,
+                      bottom: 16,
+                      left: 16,
+                      right: 16,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
                                 decoration: BoxDecoration(
                                   color: AppColors.orange,
                                   borderRadius: BorderRadius.circular(999),
-                                  border: Border.all(color: Colors.white, width: 1.2),
                                 ),
                                 child: Text(
                                   place.shortCategory,
-                                  style: const TextStyle(
+                                  style: GoogleFonts.instrumentSans(
                                     color: Colors.white,
-                                    fontSize: 9.5,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.95),
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Text(
-                                  place.statusLine,
-                                  style: const TextStyle(
-                                    color: AppColors.ink,
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.bold,
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.95),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    place.statusLine,
+                                    style: GoogleFonts.spaceMono(
+                                      color: AppColors.ink,
+                                      fontSize: 9.5,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           Text(
                             place.name,
                             style: GoogleFonts.bricolageGrotesque(
                               color: Colors.white,
-                              fontSize: 26,
+                              fontSize: 27,
                               fontWeight: FontWeight.w800,
                               letterSpacing: -0.6,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 3),
                           Row(
                             children: [
-                              const Icon(Icons.location_on, size: 12, color: Colors.white),
+                              const Icon(Icons.location_on_rounded, size: 14, color: Colors.white70),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
                                   '${place.streetAddress} · ${place.walkDistanceLabel}',
-                                  style: const TextStyle(color: Colors.white, fontSize: 11),
+                                  style: GoogleFonts.instrumentSans(color: Colors.white, fontSize: 12),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -524,17 +566,17 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               child: Row(
                 children: [
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: AppColors.paper2,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppColors.ink, width: 1.8),
-                        boxShadow: const [AppColors.shadowSm],
+                        color: AppColors.cardSurface,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                        boxShadow: const [AppColors.shadowSubtle],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -544,31 +586,31 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                               Text(
                                 '${place.ratingAvg}',
                                 style: GoogleFonts.bricolageGrotesque(
-                                  fontSize: 18,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
-                              const SizedBox(width: 3),
-                              const Icon(Icons.star, size: 14, color: AppColors.orange),
+                              const SizedBox(width: 4),
+                              const Icon(Icons.star_rounded, size: 16, color: AppColors.orange),
                             ],
                           ),
                           Text(
-                            '${place.ratingCount} public ratings',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9),
+                            '${place.ratingCount} community ratings',
+                            style: GoogleFonts.instrumentSans(fontSize: 11, color: AppColors.ink3),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: AppColors.butter,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: AppColors.ink, width: 1.8),
-                        boxShadow: const [AppColors.shadowSm],
+                        color: AppColors.butterSubtle,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.butter, width: 1.0),
+                        boxShadow: const [AppColors.shadowSubtle],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -576,13 +618,14 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                           Text(
                             '${friendDrops.length} ${friendDrops.length == 1 ? 'friend' : 'friends'}',
                             style: GoogleFonts.bricolageGrotesque(
-                              fontSize: 18,
+                              fontSize: 20,
                               fontWeight: FontWeight.w800,
+                              color: AppColors.ink,
                             ),
                           ),
                           Text(
                             'dropped this spot',
-                            style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9),
+                            style: GoogleFonts.instrumentSans(fontSize: 11, color: AppColors.ink2),
                           ),
                         ],
                       ),
@@ -594,36 +637,39 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.paper,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.ink, width: 1.5),
+                  color: AppColors.surfaceWarm,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.borderHairline),
                 ),
                 child: Text(
                   '“${place.description}”',
-                  style: const TextStyle(fontSize: 12.5, fontStyle: FontStyle.italic, color: AppColors.ink2),
+                  style: GoogleFonts.instrumentSans(fontSize: 13, fontStyle: FontStyle.italic, color: AppColors.ink2, height: 1.4),
                 ),
               ),
             ),
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Wrap(
                 spacing: 6,
-                runSpacing: 4,
+                runSpacing: 6,
                 children: place.tags.map(
                   (t) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.paper2,
                       borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+                      border: Border.all(color: AppColors.borderHairline),
                     ),
-                    child: Text('#$t', style: const TextStyle(fontSize: 10.5, color: AppColors.ink2)),
+                    child: Text(
+                      '#$t',
+                      style: GoogleFonts.instrumentSans(fontSize: 11, color: AppColors.ink2, fontWeight: FontWeight.w500),
+                    ),
                   ),
                 ).toList(),
               ),
@@ -631,59 +677,59 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Container(
                 padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
                   color: AppColors.paper2,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.ink, width: 1.5),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderHairline),
                 ),
                 child: Row(
                   children: [
                     Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticService.selection();
-                          setState(() => _tabIndex = 0);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 7),
+                      child: BouncingWidget(
+                        scaleFactor: 0.95,
+                        onTap: () => setState(() => _tabIndex = 0),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 160),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
                             color: _tabIndex == 0 ? AppColors.ink : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: _tabIndex == 0 ? const [AppColors.shadowSubtle] : null,
                           ),
                           alignment: Alignment.center,
                           child: Text(
                             "Friends' Drops (${friendDrops.length})",
-                            style: TextStyle(
-                              fontSize: 11.5,
+                            style: GoogleFonts.instrumentSans(
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: _tabIndex == 0 ? AppColors.paper : AppColors.ink,
+                              color: _tabIndex == 0 ? Colors.white : AppColors.ink,
                             ),
                           ),
                         ),
                       ),
                     ),
                     Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          HapticService.selection();
-                          setState(() => _tabIndex = 1);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 7),
+                      child: BouncingWidget(
+                        scaleFactor: 0.95,
+                        onTap: () => setState(() => _tabIndex = 1),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 160),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
                           decoration: BoxDecoration(
                             color: _tabIndex == 1 ? AppColors.ink : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: _tabIndex == 1 ? const [AppColors.shadowSubtle] : null,
                           ),
                           alignment: Alignment.center,
                           child: Text(
                             "Public Reviews (${publicDrops.length})",
-                            style: TextStyle(
-                              fontSize: 11.5,
+                            style: GoogleFonts.instrumentSans(
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
-                              color: _tabIndex == 1 ? AppColors.paper : AppColors.ink,
+                              color: _tabIndex == 1 ? Colors.white : AppColors.ink,
                             ),
                           ),
                         ),
@@ -695,37 +741,38 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
             ),
           ),
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
                   final List<PostModel> list = _tabIndex == 0 ? friendDrops : publicDrops;
                   if (list.isEmpty) {
                     return Container(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(28),
                       alignment: Alignment.center,
                       child: Text(
                         _tabIndex == 0 ? 'No drops from friends yet.' : 'No public reviews yet.',
-                        style: Theme.of(context).textTheme.bodySmall,
+                        style: GoogleFonts.instrumentSans(fontSize: 13, color: AppColors.ink3),
                       ),
                     );
                   }
                   final post = list[index];
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: AppColors.paper,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.ink, width: 1.8),
-                      boxShadow: const [AppColors.shadowSm],
+                      color: AppColors.cardSurface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                      boxShadow: const [AppColors.shadowCard],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           children: [
-                            GestureDetector(
+                            BouncingWidget(
+                              scaleFactor: 0.94,
                               onTap: () => context.push('/users/${post.authorId}'),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -735,21 +782,21 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                                     backgroundColor: AppColors.ink,
                                     child: Text(
                                       post.authorAvatar ?? post.authorName[0],
-                                      style: const TextStyle(color: Colors.white, fontSize: 9),
+                                      style: const TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.bold),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     post.authorName,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                    style: GoogleFonts.instrumentSans(fontWeight: FontWeight.bold, fontSize: 13),
                                   ),
                                 ],
                               ),
                             ),
                             const Spacer(),
-                            Text(post.timeAgo, style: Theme.of(context).textTheme.labelSmall),
+                            Text(post.timeAgo, style: GoogleFonts.spaceMono(fontSize: 9.5, color: AppColors.ink3)),
                             IconButton(
-                              icon: const Icon(Icons.more_horiz, size: 16, color: AppColors.ink3),
+                              icon: const Icon(Icons.more_horiz_rounded, size: 18, color: AppColors.ink3),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
                               onPressed: () => _showReportOrBlockSheet(
@@ -762,11 +809,11 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                           ],
                         ),
                         if (post.mediaUrl != null) ...[
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 10),
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
                             child: SizedBox(
-                              height: 120,
+                              height: 130,
                               width: double.infinity,
                               child: AppImage(path: post.mediaUrl!, fit: BoxFit.cover),
                             ),
@@ -775,24 +822,24 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                         const SizedBox(height: 8),
                         Text(
                           '“${post.note}”',
-                          style: const TextStyle(fontSize: 12.5, color: AppColors.ink),
+                          style: GoogleFonts.instrumentSans(fontSize: 13.5, color: AppColors.ink, height: 1.4),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 10),
                         Row(
                           children: [
-                            GestureDetector(
+                            BouncingWidget(
+                              scaleFactor: 0.92,
                               onTap: () {
-                                HapticService.selection();
                                 ref.read(postsRepositoryProvider.notifier).reactToPost(post.id, reaction: post.userReaction ?? 'heart');
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: post.userReaction != null ? AppColors.orange.withValues(alpha: 0.18) : AppColors.paper2,
+                                  color: post.userReaction != null ? AppColors.orangeSubtle : AppColors.paper2,
                                   borderRadius: BorderRadius.circular(999),
                                   border: Border.all(
-                                    color: post.userReaction != null ? AppColors.orange : AppColors.ink.withValues(alpha: 0.2),
-                                    width: post.userReaction != null ? 1.5 : 1,
+                                    color: post.userReaction != null ? AppColors.orange : AppColors.borderHairline,
+                                    width: 1.2,
                                   ),
                                 ),
                                 child: Row(
@@ -800,28 +847,28 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                                   children: [
                                     Icon(
                                       post.userReaction == 'fire'
-                                          ? Icons.local_fire_department
+                                          ? Icons.local_fire_department_rounded
                                           : (post.userReaction == 'coffee'
-                                              ? Icons.coffee
+                                              ? Icons.coffee_rounded
                                               : (post.userReaction == 'bookmark_nod'
-                                                  ? Icons.bookmark
-                                                  : Icons.favorite)),
-                                      size: 12,
-                                      color: post.userReaction != null ? AppColors.danger : AppColors.danger.withValues(alpha: 0.6),
+                                                  ? Icons.bookmark_rounded
+                                                  : Icons.favorite_rounded)),
+                                      size: 13,
+                                      color: post.userReaction != null ? AppColors.danger : AppColors.danger.withValues(alpha: 0.65),
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
                                       '${post.savesCount}',
-                                      style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.ink),
+                                      style: GoogleFonts.instrumentSans(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.ink),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 6),
-                            GestureDetector(
+                            const SizedBox(width: 8),
+                            BouncingWidget(
+                              scaleFactor: 0.92,
                               onTap: () {
-                                HapticService.selection();
                                 CommentsSheet.show(
                                   context,
                                   postId: post.id,
@@ -829,20 +876,20 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                                 );
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                                 decoration: BoxDecoration(
                                   color: AppColors.paper2,
                                   borderRadius: BorderRadius.circular(999),
-                                  border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+                                  border: Border.all(color: AppColors.borderHairline),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.chat_bubble_outline, size: 12, color: AppColors.ink2),
-                                    SizedBox(width: 4),
+                                    const Icon(Icons.chat_bubble_outline_rounded, size: 12, color: AppColors.ink2),
+                                    const SizedBox(width: 4),
                                     Text(
                                       'Comment',
-                                      style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.ink),
+                                      style: GoogleFonts.instrumentSans(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.ink),
                                     ),
                                   ],
                                 ),
@@ -860,43 +907,60 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 80)),
+          const SliverToBoxAdapter(child: SizedBox(height: 90)),
         ],
       ),
       bottomSheet: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: const BoxDecoration(
           color: AppColors.paper,
-          border: Border(top: BorderSide(color: AppColors.ink, width: 1.5)),
+          border: Border(top: BorderSide(color: AppColors.borderHairline, width: 1.0)),
+          boxShadow: [AppColors.shadowSubtle],
         ),
         child: Row(
           children: [
             Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () => _showDirectionsDialog(place),
-                icon: const Icon(Icons.navigation, size: 16, color: AppColors.ink),
-                label: const Text('Directions', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.ink, width: 1.8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: BouncingWidget(
+                onTap: () => _showDirectionsDialog(place),
+                child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.cardSurface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+                  ),
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.navigation_rounded, size: 15, color: AppColors.ink),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          'Directions',
+                          style: GoogleFonts.instrumentSans(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 13),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
               flex: 2,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  HapticService.medium();
+              child: BouncingWidget(
+                onTap: () {
                   if (!SupabaseService.isAuthenticated) {
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
                         backgroundColor: AppColors.paper,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: const BorderSide(color: AppColors.ink, width: 2),
+                          borderRadius: BorderRadius.circular(20),
+                          side: const BorderSide(color: AppColors.borderSubtle, width: 1.2),
                         ),
                         title: Text('Account Required', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800)),
                         content: const Text('Sign in or create an account to drop recommendations and share spots with friends.'),
@@ -907,7 +971,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                               Navigator.pop(ctx);
                               context.push('/auth');
                             },
-                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: AppColors.ink),
+                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
                             child: const Text('Sign In'),
                           ),
                         ],
@@ -922,16 +986,35 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                     builder: (_) => CreateDropSheet(presetPlaceId: place.id),
                   );
                 },
-                icon: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
-                label: const Text('Drop This Place', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.orange,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: const BorderSide(color: AppColors.ink, width: 2),
-                  ),
+                child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.orange,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.orange.withValues(alpha: 0.32),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.camera_alt_rounded, size: 16, color: Colors.white),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          'Drop This Place',
+                          style: GoogleFonts.instrumentSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13.5),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

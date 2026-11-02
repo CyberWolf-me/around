@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/biometric_service.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
@@ -41,28 +42,40 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.paper,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.ink, width: 2),
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: AppColors.borderSubtle, width: 1),
         ),
-        title: Text('GDPR Data Export (JSON)', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text(
+          'GDPR Data Export',
+          style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.ink),
+        ),
         content: SizedBox(
           width: double.maxFinite,
-          height: 220,
-          child: SingleChildScrollView(
-            child: SelectableText(
-              exportPayload,
-              style: GoogleFonts.spaceMono(fontSize: 10, color: AppColors.ink2),
+          height: 240,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.paper2,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderHairline),
+            ),
+            child: SingleChildScrollView(
+              child: SelectableText(
+                exportPayload,
+                style: GoogleFonts.spaceMono(fontSize: 10, color: AppColors.ink2),
+              ),
             ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close', style: TextStyle(color: AppColors.ink3)),
+            child: const Text('Close', style: TextStyle(color: AppColors.ink3, fontWeight: FontWeight.bold)),
           ),
-          ElevatedButton.icon(
-            onPressed: () async {
+          BouncingWidget(
+            onTap: () async {
               await Clipboard.setData(ClipboardData(text: exportPayload));
               if (ctx.mounted) Navigator.pop(ctx);
               if (mounted) {
@@ -71,9 +84,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 );
               }
             },
-            icon: const Icon(Icons.copy, size: 14, color: Colors.white),
-            label: const Text('Copy JSON', style: TextStyle(color: Colors.white)),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.orange,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.copy, size: 14, color: Colors.white),
+                  SizedBox(width: 6),
+                  Text('Copy JSON', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5)),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -88,34 +113,51 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           final blockedIds = dialogRef.watch(blockedUsersProvider);
           return AlertDialog(
             backgroundColor: AppColors.paper,
+            surfaceTintColor: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: const BorderSide(color: AppColors.ink, width: 2),
+              borderRadius: BorderRadius.circular(20),
+              side: const BorderSide(color: AppColors.borderSubtle, width: 1),
             ),
-            title: Text('Blocked Accounts', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18)),
+            title: Text(
+              'Blocked Accounts',
+              style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.ink),
+            ),
             content: blockedIds.isEmpty
-                ? const Text('You have not blocked any accounts.', style: TextStyle(fontSize: 13))
+                ? const Text('You have not blocked any accounts.', style: TextStyle(fontSize: 13, color: AppColors.ink2))
                 : SizedBox(
                     width: double.maxFinite,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: blockedIds.map((id) {
-                        return ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          title: Text('@$id', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                          trailing: TextButton(
-                            onPressed: () => dialogRef.read(blockedUsersProvider.notifier).unblockUser(id),
-                            child: const Text('Unblock', style: TextStyle(color: AppColors.orange, fontWeight: FontWeight.bold)),
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.paper2,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text('@$id', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
+                              ),
+                              BouncingWidget(
+                                onTap: () => dialogRef.read(blockedUsersProvider.notifier).unblockUser(id),
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  child: Text('Unblock', style: TextStyle(color: AppColors.orange, fontWeight: FontWeight.bold, fontSize: 12)),
+                                ),
+                              ),
+                            ],
                           ),
                         );
                       }).toList(),
                     ),
                   ),
             actions: [
-              ElevatedButton(
+              TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.ink),
-                child: const Text('Done', style: TextStyle(color: Colors.white)),
+                child: const Text('Done', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)),
               ),
             ],
           );
@@ -130,17 +172,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.paper,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.ink, width: 2),
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: AppColors.borderSubtle, width: 1),
         ),
-        title: Text('Report a Safety or Venue Issue', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 17)),
+        title: Text(
+          'Report an Issue',
+          style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.ink),
+        ),
         content: TextField(
           controller: detailsCtrl,
-          maxLines: 3,
+          maxLines: 4,
           maxLength: 500,
-          decoration: const InputDecoration(
-            hintText: 'Describe the inappropriate content, bug, or venue inaccuracy...',
+          decoration: InputDecoration(
+            hintText: 'Describe inappropriate content, bugs, or venue inaccuracies...',
+            filled: true,
+            fillColor: AppColors.paper2,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.borderHairline),
+            ),
           ),
         ),
         actions: [
@@ -148,8 +200,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancel', style: TextStyle(color: AppColors.ink3)),
           ),
-          ElevatedButton(
-            onPressed: () async {
+          BouncingWidget(
+            onTap: () async {
               if (detailsCtrl.text.trim().length < 3) return;
               await StorageService.addReport({
                 'target_type': 'place',
@@ -164,8 +216,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 );
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger, foregroundColor: Colors.white),
-            child: const Text('Submit Report'),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.danger,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text('Submit Report', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5)),
+            ),
           ),
         ],
       ),
@@ -177,24 +235,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.paper,
+        surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: AppColors.ink, width: 2),
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: AppColors.borderSubtle, width: 1),
         ),
-        title: const Text('Delete Account & Reset Data?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text(
+          'Delete Account & Reset Data?',
+          style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.danger),
+        ),
         content: const Text(
           'This invokes the server-side account deletion procedure (cascading all drops, friendships, saved places, and media) and resets local device storage.',
-          style: TextStyle(fontSize: 13),
+          style: TextStyle(fontSize: 13, color: AppColors.ink2, height: 1.4),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: const Text('Cancel', style: TextStyle(color: AppColors.ink3)),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger, foregroundColor: Colors.white),
-            child: const Text('Delete Account'),
+          BouncingWidget(
+            onTap: () => Navigator.pop(ctx, true),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.danger,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text('Delete Account', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5)),
+            ),
           ),
         ],
       ),
@@ -250,23 +318,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Settings', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Settings',
+          style: GoogleFonts.bricolageGrotesque(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: AppColors.ink,
+          ),
+        ),
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         children: [
-          Text(
-            'WHO SEES YOUR DROPS BY DEFAULT',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9.5),
-          ),
-          const SizedBox(height: 6),
+          // Section: Default Visibility
+          const _SectionTitle(title: 'DEFAULT VISIBILITY'),
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.paper,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.ink, width: 1.8),
-              boxShadow: const [AppColors.shadowSm],
+              color: AppColors.cardSurface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: AppColors.borderSubtle, width: 1),
+              boxShadow: const [AppColors.shadowCard],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,66 +346,83 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: GestureDetector(
+                      child: BouncingWidget(
                         onTap: () {
                           HapticService.selection();
                           profileNotifier.updatePrivacySettings(defaultAud: 'friends');
                         },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
-                            color: profile.defaultAudience == 'friends' ? AppColors.butter : Colors.transparent,
+                            color: profile.defaultAudience == 'friends' ? AppColors.butter : AppColors.paper2,
                             border: Border.all(
-                              color: profile.defaultAudience == 'friends' ? AppColors.ink : const Color(0x3015130F),
-                              width: 1.5,
+                              color: profile.defaultAudience == 'friends' ? AppColors.ink : AppColors.borderHairline,
+                              width: profile.defaultAudience == 'friends' ? 1.5 : 1,
                             ),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: profile.defaultAudience == 'friends' ? const [AppColors.shadowTactile] : null,
                           ),
                           alignment: Alignment.center,
                           child: const Row(
                             mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.lock, size: 12),
-                              SizedBox(width: 4),
-                              Text('Friends only', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                              Icon(Icons.lock_outline, size: 14, color: AppColors.ink),
+                              SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  'Friends only',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.ink),
+                                ),
+                              ),
                             ],
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     Expanded(
-                      child: GestureDetector(
+                      child: BouncingWidget(
                         onTap: () {
                           HapticService.selection();
                           profileNotifier.updatePrivacySettings(defaultAud: 'public');
                         },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
-                            color: profile.defaultAudience == 'public' ? AppColors.ink : Colors.transparent,
+                            color: profile.defaultAudience == 'public' ? AppColors.ink : AppColors.paper2,
                             border: Border.all(
-                              color: profile.defaultAudience == 'public' ? AppColors.ink : const Color(0x3015130F),
-                              width: 1.5,
+                              color: profile.defaultAudience == 'public' ? AppColors.ink : AppColors.borderHairline,
+                              width: 1,
                             ),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: profile.defaultAudience == 'public' ? const [AppColors.shadowTactile] : null,
                           ),
                           alignment: Alignment.center,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 Icons.public,
-                                size: 12,
-                                color: profile.defaultAudience == 'public' ? AppColors.paper : AppColors.ink,
+                                size: 14,
+                                color: profile.defaultAudience == 'public' ? Colors.white : AppColors.ink,
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Public',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                  color: profile.defaultAudience == 'public' ? AppColors.paper : AppColors.ink,
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  'Public',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                    color: profile.defaultAudience == 'public' ? Colors.white : AppColors.ink,
+                                  ),
                                 ),
                               ),
                             ],
@@ -343,32 +432,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 const Text(
                   'Every new drop starts with this visibility. You can customize per drop anytime.',
-                  style: TextStyle(fontSize: 11, color: AppColors.ink2),
+                  style: TextStyle(fontSize: 11.5, color: AppColors.ink2, height: 1.3),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 18),
-          Text(
-            'PRIVACY & SAFETY',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9.5),
-          ),
-          const SizedBox(height: 6),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.paper,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.ink, width: 1.8),
-              boxShadow: const [AppColors.shadowSm],
+
+          const SizedBox(height: 22),
+
+          // Section: Privacy & Safety
+          const _SectionTitle(title: 'PRIVACY & SECURITY'),
+          Material(
+            color: AppColors.cardSurface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: const BorderSide(color: AppColors.borderSubtle, width: 1),
             ),
+            clipBehavior: Clip.antiAlias,
             child: Column(
               children: [
                 SwitchListTile(
-                  title: const Text('Require Biometrics on Resume', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: const Text('Prompt for biometric lock if app is backgrounded for >60s.', style: TextStyle(fontSize: 10.5)),
+                  title: const Text('Require Biometrics on Resume', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
+                  subtitle: const Text('Prompt for Face ID / Fingerprint after 60s backgrounded.', style: TextStyle(fontSize: 11, color: AppColors.ink2)),
                   value: ref.watch(biometricLockEnabledProvider),
                   activeThumbColor: AppColors.orange,
                   onChanged: (val) {
@@ -376,10 +464,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ref.read(biometricLockEnabledProvider.notifier).setEnabled(val);
                   },
                 ),
-                const Divider(height: 1, indent: 14, endIndent: 14),
+                const Divider(height: 1, color: AppColors.borderHairline, indent: 16, endIndent: 16),
                 SwitchListTile(
-                  title: const Text('Keep my visits private', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: const Text('Places you visit are never shown as a chronological timeline.', style: TextStyle(fontSize: 10.5)),
+                  title: const Text('Keep my visits private', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
+                  subtitle: const Text('Places you visit are never shown as a chronological timeline.', style: TextStyle(fontSize: 11, color: AppColors.ink2)),
                   value: profile.hideVisitsHistory,
                   activeThumbColor: AppColors.orange,
                   onChanged: (val) {
@@ -387,10 +475,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     profileNotifier.updatePrivacySettings(hideVisits: val);
                   },
                 ),
-                const Divider(height: 1, indent: 14, endIndent: 14),
+                const Divider(height: 1, color: AppColors.borderHairline, indent: 16, endIndent: 16),
                 SwitchListTile(
-                  title: const Text('Let friends find me', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: const Text('Allow mutual connections to discover your profile.', style: TextStyle(fontSize: 10.5)),
+                  title: const Text('Let friends find me', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
+                  subtitle: const Text('Allow mutual connections to discover your profile.', style: TextStyle(fontSize: 11, color: AppColors.ink2)),
                   value: profile.discoverableByFriends,
                   activeThumbColor: AppColors.orange,
                   onChanged: (val) {
@@ -398,10 +486,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     profileNotifier.updatePrivacySettings(discoverableByFriends: val);
                   },
                 ),
-                const Divider(height: 1, indent: 14, endIndent: 14),
+                const Divider(height: 1, color: AppColors.borderHairline, indent: 16, endIndent: 16),
                 SwitchListTile(
-                  title: const Text('Quiet hours', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: const Text('No notifications between 11pm and 8am.', style: TextStyle(fontSize: 10.5)),
+                  title: const Text('Quiet hours', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
+                  subtitle: const Text('Silence notifications between 11pm and 8am.', style: TextStyle(fontSize: 11, color: AppColors.ink2)),
                   value: profile.quietHours,
                   activeThumbColor: AppColors.orange,
                   onChanged: (val) {
@@ -409,10 +497,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     profileNotifier.updatePrivacySettings(quietHours: val);
                   },
                 ),
-                const Divider(height: 1, indent: 14, endIndent: 14),
+                const Divider(height: 1, color: AppColors.borderHairline, indent: 16, endIndent: 16),
                 SwitchListTile(
-                  title: const Text('Allow friend requests', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: const Text('Let Tashkent community members request connection.', style: TextStyle(fontSize: 10.5)),
+                  title: const Text('Allow friend requests', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
+                  subtitle: const Text('Let Tashkent community members request connection.', style: TextStyle(fontSize: 11, color: AppColors.ink2)),
                   value: profile.allowFriendRequests,
                   activeThumbColor: AppColors.orange,
                   onChanged: (val) {
@@ -420,38 +508,37 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     profileNotifier.updatePrivacySettings(allowFriendRequests: val);
                   },
                 ),
-                const Divider(height: 1, indent: 14, endIndent: 14),
+                const Divider(height: 1, color: AppColors.borderHairline, indent: 16, endIndent: 16),
                 ListTile(
-                  leading: const Icon(Icons.shield_outlined, color: AppColors.ink),
-                  title: const Text('Blocked accounts', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: Text('${blockedUsers.length} users blocked', style: const TextStyle(fontSize: 10.5)),
-                  trailing: const Icon(Icons.chevron_right, size: 18),
+                  leading: const Icon(Icons.shield_outlined, color: AppColors.ink, size: 20),
+                  title: const Text('Blocked accounts', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
+                  subtitle: Text('${blockedUsers.length} users blocked', style: const TextStyle(fontSize: 11, color: AppColors.ink2)),
+                  trailing: const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3),
                   onTap: _showBlockedUsersDialog,
                 ),
-                const Divider(height: 1, indent: 14, endIndent: 14),
+                const Divider(height: 1, color: AppColors.borderHairline, indent: 16, endIndent: 16),
                 ListTile(
-                  leading: const Icon(Icons.flag_outlined, color: AppColors.danger),
+                  leading: const Icon(Icons.flag_outlined, color: AppColors.danger, size: 20),
                   title: const Text('Report an issue', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.danger)),
-                  subtitle: const Text('Report inappropriate content or venue inaccuracies', style: TextStyle(fontSize: 10.5)),
-                  trailing: const Icon(Icons.chevron_right, size: 18),
+                  subtitle: const Text('Report inappropriate content or venue inaccuracies', style: TextStyle(fontSize: 11, color: AppColors.ink2)),
+                  trailing: const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3),
                   onTap: _showReportIssueDialog,
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 18),
-          Text(
-            'ACCOUNT & SESSION',
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9.5),
-          ),
-          const SizedBox(height: 6),
+
+          const SizedBox(height: 22),
+
+          // Section: Account & Session
+          const _SectionTitle(title: 'ACCOUNT & SESSION'),
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.paper,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.ink, width: 1.8),
-              boxShadow: const [AppColors.shadowSm],
+              color: AppColors.cardSurface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: AppColors.borderSubtle, width: 1),
+              boxShadow: const [AppColors.shadowCard],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -459,8 +546,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 Row(
                   children: [
                     Container(
-                      width: 8,
-                      height: 8,
+                      width: 9,
+                      height: 9,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: authEmail != null ? const Color(0xFF10B981) : AppColors.orange,
@@ -470,38 +557,55 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     Expanded(
                       child: Text(
                         authEmail != null ? 'Signed in as $authEmail' : 'Local Explorer Session (@${profile.username})',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5, color: AppColors.ink),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () => context.push('/auth'),
-                    icon: const Icon(Icons.login, size: 16),
-                    label: Text(authEmail != null ? 'Switch Account' : 'Sign In / Create Account'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.ink,
-                      foregroundColor: AppColors.paper,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                const SizedBox(height: 14),
+                BouncingWidget(
+                  onTap: () => context.push('/auth'),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.ink,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.login, size: 16, color: Colors.white),
+                        const SizedBox(width: 8),
+                        Text(
+                          authEmail != null ? 'Switch Account' : 'Sign In / Create Account',
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 if (authEmail != null || SupabaseService.isAuthenticated) ...[
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: _handleSignOut,
-                      icon: const Icon(Icons.logout, size: 16, color: AppColors.danger),
-                      label: const Text('Sign Out', style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.bold)),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.danger, width: 1.5),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  const SizedBox(height: 10),
+                  BouncingWidget(
+                    onTap: _handleSignOut,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.paper,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.danger.withValues(alpha: 0.5), width: 1),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.logout, size: 16, color: AppColors.danger),
+                          SizedBox(width: 8),
+                          Text('Sign Out', style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.bold, fontSize: 13)),
+                        ],
                       ),
                     ),
                   ),
@@ -509,46 +613,67 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: () => context.push('/onboarding'),
-            icon: const Icon(Icons.explore_outlined, size: 16),
-            label: const Text('Replay Onboarding Walkthrough'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.paper2,
-              foregroundColor: AppColors.ink,
-              elevation: 0,
-              side: const BorderSide(color: AppColors.ink, width: 1.5),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+
+          const SizedBox(height: 22),
+
+          // Secondary Utilities
+          const _SectionTitle(title: 'PREFERENCES & DATA'),
+          Material(
+            color: AppColors.cardSurface,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: const BorderSide(color: AppColors.borderSubtle, width: 1),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.explore_outlined, color: AppColors.ink, size: 20),
+                  title: const Text('Replay Onboarding Walkthrough', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
+                  trailing: const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3),
+                  onTap: () => context.push('/onboarding'),
+                ),
+                const Divider(height: 1, color: AppColors.borderHairline, indent: 16, endIndent: 16),
+                ListTile(
+                  leading: const Icon(Icons.download_outlined, color: AppColors.ink, size: 20),
+                  title: const Text('Export My Data (GDPR JSON)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
+                  trailing: const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3),
+                  onTap: _showExportDataDialog,
+                ),
+                const Divider(height: 1, color: AppColors.borderHairline, indent: 16, endIndent: 16),
+                ListTile(
+                  leading: const Icon(Icons.delete_outline, color: AppColors.danger, size: 20),
+                  title: const Text('Delete Account & Reset Data', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.danger)),
+                  trailing: const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3),
+                  onTap: _confirmDeleteOrResetAccount,
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          ElevatedButton.icon(
-            onPressed: _showExportDataDialog,
-            icon: const Icon(Icons.download, size: 16),
-            label: const Text('Export My Data (GDPR JSON format)'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.paper2,
-              foregroundColor: AppColors.ink,
-              elevation: 0,
-              side: const BorderSide(color: AppColors.ink, width: 1.5),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-          ),
-          const SizedBox(height: 8),
-          ElevatedButton.icon(
-            onPressed: _confirmDeleteOrResetAccount,
-            icon: const Icon(Icons.delete_outline, size: 16, color: Colors.white),
-            label: const Text('Delete Account & Reset Data', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.danger,
-              elevation: 0,
-              side: const BorderSide(color: AppColors.ink, width: 1.5),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 36),
         ],
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String title;
+
+  const _SectionTitle({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      child: Text(
+        title,
+        style: GoogleFonts.spaceMono(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.1,
+          color: AppColors.ink3,
+        ),
       ),
     );
   }

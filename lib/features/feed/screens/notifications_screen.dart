@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/repositories/notifications_repository.dart';
 import '../../../data/services/haptic_service.dart';
 
@@ -21,19 +22,34 @@ class NotificationsScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Activity', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Activity',
+          style: GoogleFonts.bricolageGrotesque(
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: AppColors.ink,
+          ),
+        ),
         actions: [
           if (unreadCount > 0)
             Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: TextButton(
-                onPressed: () {
+              padding: const EdgeInsets.only(right: 14),
+              child: BouncingWidget(
+                onTap: () {
                   HapticService.selection();
                   ref.read(notificationsProvider.notifier).markAllRead();
                 },
-                child: Text(
-                  'Mark all read ($unreadCount)',
-                  style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.bold, fontSize: 12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.orangeSubtle,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.orange.withValues(alpha: 0.3)),
+                  ),
+                  child: Text(
+                    'Mark all read ($unreadCount)',
+                    style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.bold, fontSize: 11.5),
+                  ),
                 ),
               ),
             ),
@@ -47,15 +63,15 @@ class NotificationsScreen extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 56,
-                      height: 56,
+                      width: 58,
+                      height: 58,
                       decoration: const BoxDecoration(
                         color: AppColors.paper2,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.notifications_none, size: 28, color: AppColors.ink3),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 16),
                     Text(
                       'No new activity',
                       style: GoogleFonts.bricolageGrotesque(
@@ -67,7 +83,7 @@ class NotificationsScreen extends ConsumerWidget {
                     const SizedBox(height: 6),
                     Text(
                       'When friends drop places or invite you to plans in Tashkent, notifications will appear here.',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 12),
+                      style: GoogleFonts.instrumentSans(fontSize: 12.5, color: AppColors.ink2, height: 1.4),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -75,79 +91,94 @@ class NotificationsScreen extends ConsumerWidget {
               ),
             )
           : ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               itemCount: notifications.length,
-              separatorBuilder: (context, index) => const Divider(height: 1, color: Color(0x2015130F)),
+              separatorBuilder: (context, index) => const SizedBox(height: 8),
               itemBuilder: (context, i) {
                 final n = notifications[i];
                 final placeId = n.placeId;
                 final isUnread = n.unread;
 
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 2),
-                  decoration: BoxDecoration(
-                    color: isUnread ? AppColors.butter.withValues(alpha: 0.28) : Colors.transparent,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isUnread ? AppColors.orange : AppColors.butter,
-                        border: Border.all(color: AppColors.ink, width: 1.5),
+                return BouncingWidget(
+                  onTap: () {
+                    HapticService.light();
+                    if (isUnread) {
+                      ref.read(notificationsProvider.notifier).markAsRead(n.id);
+                    }
+                    if (placeId != null && placeId.isNotEmpty) {
+                      context.push('/places/$placeId');
+                    } else if (n.actorId.isNotEmpty) {
+                      context.push('/users/${n.actorId}');
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isUnread ? AppColors.butterSubtle : AppColors.cardSurface,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: isUnread ? AppColors.butter : AppColors.borderHairline,
+                        width: 1,
                       ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        n.actorInitials,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isUnread ? Colors.white : AppColors.ink,
-                          fontSize: 12,
-                        ),
-                      ),
+                      boxShadow: const [AppColors.shadowSubtle],
                     ),
-                    title: RichText(
-                      text: TextSpan(
-                        style: const TextStyle(fontSize: 12.5, color: AppColors.ink),
-                        children: [
-                          TextSpan(text: '${n.actorName} ', style: const TextStyle(fontWeight: FontWeight.bold)),
-                          TextSpan(text: n.message, style: const TextStyle(color: AppColors.ink2)),
-                        ],
-                      ),
-                    ),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Text(n.timeAgo, style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 10)),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isUnread ? AppColors.orange : AppColors.butter,
+                            border: Border.all(color: Colors.white, width: 1.5),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            n.actorInitials,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isUnread ? Colors.white : AppColors.ink,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  style: GoogleFonts.instrumentSans(fontSize: 13, color: AppColors.ink),
+                                  children: [
+                                    TextSpan(text: '${n.actorName} ', style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    TextSpan(text: n.message, style: const TextStyle(color: AppColors.ink2)),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                n.timeAgo,
+                                style: GoogleFonts.spaceMono(fontSize: 10, color: AppColors.ink3),
+                              ),
+                            ],
+                          ),
+                        ),
                         if (isUnread)
                           Container(
                             width: 8,
                             height: 8,
-                            margin: const EdgeInsets.only(right: 6),
+                            margin: const EdgeInsets.only(top: 4, left: 6),
                             decoration: const BoxDecoration(
                               color: AppColors.orange,
                               shape: BoxShape.circle,
                             ),
                           ),
-                        if (placeId != null || n.actorId.isNotEmpty)
-                          const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3),
+                        const SizedBox(width: 4),
+                        const Icon(Icons.chevron_right, size: 16, color: AppColors.ink3),
                       ],
                     ),
-                    onTap: () {
-                      HapticService.light();
-                      ref.read(notificationsProvider.notifier).markAsRead(n.id);
-                      if (placeId != null && placeId.isNotEmpty) {
-                        context.push('/places/$placeId');
-                      } else if (n.actorId.isNotEmpty && n.actorId != 'you') {
-                        context.push('/users/${n.actorId}');
-                      }
-                    },
                   ),
                 );
               },

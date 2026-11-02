@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/services/haptic_service.dart';
 
@@ -43,13 +44,11 @@ class _CityMapWidgetState extends State<CityMapWidget> {
   }
 
   void _zoomIn() {
-    HapticService.light();
     final zoom = _mapController.camera.zoom + 1.0;
     _mapController.move(_mapController.camera.center, zoom.clamp(10.0, 18.0));
   }
 
   void _zoomOut() {
-    HapticService.light();
     final zoom = _mapController.camera.zoom - 1.0;
     _mapController.move(_mapController.camera.center, zoom.clamp(10.0, 18.0));
   }
@@ -64,10 +63,10 @@ class _CityMapWidgetState extends State<CityMapWidget> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFF3F0E4),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.ink, width: 2),
-        boxShadow: const [AppColors.shadow],
+        color: AppColors.paper2,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.borderSubtle, width: 1.0),
+        boxShadow: const [AppColors.shadowCard],
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
@@ -95,43 +94,51 @@ class _CityMapWidgetState extends State<CityMapWidget> {
                   return Marker(
                     point: LatLng(place.latitude, place.longitude),
                     width: isSelected ? 140 : 100,
-                    height: isSelected ? 50 : 36,
-                    child: GestureDetector(
+                    height: isSelected ? 48 : 36,
+                    child: BouncingWidget(
+                      scaleFactor: 0.94,
                       onTap: () {
-                        HapticService.selection();
                         widget.onSelectPlace(place.id);
                         _mapController.move(LatLng(place.latitude, place.longitude), 14.5);
                       },
                       child: AnimatedScale(
                         duration: const Duration(milliseconds: 200),
-                        scale: isSelected ? 1.08 : 0.95,
+                        scale: isSelected ? 1.08 : 0.96,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            color: isSelected ? AppColors.orange : AppColors.paper,
+                            color: isSelected ? AppColors.orange : Colors.white,
                             borderRadius: BorderRadius.circular(999),
                             border: Border.all(
-                              color: AppColors.ink,
-                              width: isSelected ? 2.2 : 1.5,
+                              color: isSelected ? AppColors.orange : AppColors.borderSubtle,
+                              width: 1.2,
                             ),
-                            boxShadow: const [AppColors.shadowSm],
+                            boxShadow: [
+                              BoxShadow(
+                                color: isSelected
+                                    ? AppColors.orange.withValues(alpha: 0.35)
+                                    : Colors.black.withValues(alpha: 0.12),
+                                blurRadius: isSelected ? 8 : 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                isSelected ? Icons.place : Icons.location_on_outlined,
-                                size: isSelected ? 16 : 13,
+                                isSelected ? Icons.place_rounded : Icons.location_on_rounded,
+                                size: isSelected ? 15 : 12,
                                 color: isSelected ? Colors.white : AppColors.ink,
                               ),
                               const SizedBox(width: 4),
                               Flexible(
                                 child: Text(
                                   place.name.split(' ').first,
-                                  style: TextStyle(
-                                    fontSize: isSelected ? 11.5 : 10.0,
-                                    fontWeight: FontWeight.bold,
+                                  style: GoogleFonts.instrumentSans(
+                                    fontSize: isSelected ? 11.5 : 10.5,
+                                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                                     color: isSelected ? Colors.white : AppColors.ink,
                                   ),
                                   overflow: TextOverflow.ellipsis,
@@ -148,15 +155,15 @@ class _CityMapWidgetState extends State<CityMapWidget> {
             ],
           ),
           Positioned(
-            top: 10,
-            left: 10,
+            top: 12,
+            left: 12,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: AppColors.paper,
+                color: Colors.white.withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: AppColors.ink, width: 1.5),
-                boxShadow: const [AppColors.shadowSm],
+                border: Border.all(color: AppColors.borderHairline),
+                boxShadow: const [AppColors.shadowSubtle],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -174,7 +181,7 @@ class _CityMapWidgetState extends State<CityMapWidget> {
                     'Tashkent, UZ · Live Map',
                     style: GoogleFonts.spaceMono(
                       fontSize: 9.5,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                       color: AppColors.ink,
                     ),
                   ),
@@ -183,25 +190,25 @@ class _CityMapWidgetState extends State<CityMapWidget> {
             ),
           ),
           Positioned(
-            bottom: 10,
-            right: 10,
+            bottom: 12,
+            right: 12,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 _MapControlButton(
-                  icon: Icons.add,
+                  icon: Icons.add_rounded,
                   tooltip: 'Zoom In',
                   onTap: _zoomIn,
                 ),
                 const SizedBox(height: 6),
                 _MapControlButton(
-                  icon: Icons.remove,
+                  icon: Icons.remove_rounded,
                   tooltip: 'Zoom Out',
                   onTap: _zoomOut,
                 ),
                 const SizedBox(height: 6),
                 _MapControlButton(
-                  icon: Icons.my_location,
+                  icon: Icons.my_location_rounded,
                   tooltip: 'Recenter Tashkent',
                   onTap: _recenterTashkent,
                 ),
@@ -229,16 +236,17 @@ class _MapControlButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: GestureDetector(
+      child: BouncingWidget(
+        scaleFactor: 0.9,
         onTap: onTap,
         child: Container(
-          width: 34,
-          height: 34,
+          width: 36,
+          height: 36,
           decoration: BoxDecoration(
-            color: AppColors.paper,
+            color: Colors.white.withValues(alpha: 0.94),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: AppColors.ink, width: 1.8),
-            boxShadow: const [AppColors.shadowSm],
+            border: Border.all(color: AppColors.borderHairline),
+            boxShadow: const [AppColors.shadowSubtle],
           ),
           child: Icon(icon, size: 18, color: AppColors.ink),
         ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/models/comment_model.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/services/haptic_service.dart';
@@ -81,15 +83,20 @@ class _CommentsSheetState extends ConsumerState<CommentsSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.65,
+      height: MediaQuery.of(context).size.height * 0.70,
       decoration: const BoxDecoration(
         color: AppColors.paper,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         border: Border(
-          top: BorderSide(color: AppColors.ink, width: 2),
-          left: BorderSide(color: AppColors.ink, width: 2),
-          right: BorderSide(color: AppColors.ink, width: 2),
+          top: BorderSide(color: AppColors.borderSubtle, width: 1),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Color(0x20000000),
+            blurRadius: 24,
+            offset: Offset(0, -4),
+          ),
+        ],
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -99,31 +106,36 @@ class _CommentsSheetState extends ConsumerState<CommentsSheet> {
           // Drag handle
           Center(
             child: Container(
-              margin: const EdgeInsets.only(top: 10, bottom: 6),
+              margin: const EdgeInsets.only(top: 12, bottom: 8),
               width: 36,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.ink.withValues(alpha: 0.2),
+                color: AppColors.ink.withValues(alpha: 0.18),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
           // Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             child: Row(
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Comments',
-                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.ink),
+                      Text(
+                        'Discussion',
+                        style: GoogleFonts.bricolageGrotesque(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 18,
+                          color: AppColors.ink,
+                        ),
                       ),
+                      const SizedBox(height: 2),
                       Text(
                         widget.postTitle,
-                        style: const TextStyle(fontSize: 12, color: AppColors.ink2),
+                        style: GoogleFonts.instrumentSans(fontSize: 12.5, color: AppColors.ink2),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -131,34 +143,48 @@ class _CommentsSheetState extends ConsumerState<CommentsSheet> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close, size: 20),
+                  icon: const Icon(Icons.close, size: 20, color: AppColors.ink2),
                   onPressed: () => Navigator.pop(context),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: AppColors.paper3),
+          const Divider(height: 1, color: AppColors.borderHairline),
           // Comments list
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(
+                    child: CircularProgressIndicator(color: AppColors.orange, strokeWidth: 2.5),
+                  )
                 : _comments.isEmpty
                     ? Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.chat_bubble_outline, size: 36, color: AppColors.ink.withValues(alpha: 0.3)),
-                            const SizedBox(height: 8),
+                            Container(
+                              padding: const EdgeInsets.all(14),
+                              decoration: const BoxDecoration(
+                                color: AppColors.paper2,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.chat_bubble_outline, size: 30, color: AppColors.ink3),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'No comments yet',
+                              style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.ink),
+                            ),
+                            const SizedBox(height: 4),
                             const Text(
-                              'No comments yet.\nBe the first to share your thoughts!',
+                              'Be the first to share your recommendation!',
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: AppColors.ink2, fontSize: 13),
+                              style: TextStyle(color: AppColors.ink2, fontSize: 12.5),
                             ),
                           ],
                         ),
                       )
                     : ListView.separated(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                         itemCount: _comments.length,
                         separatorBuilder: (_, __) => const SizedBox(height: 12),
                         itemBuilder: (ctx, idx) {
@@ -167,33 +193,33 @@ class _CommentsSheetState extends ConsumerState<CommentsSheet> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               CircleAvatar(
-                                radius: 14,
+                                radius: 15,
                                 backgroundColor: AppColors.butter,
                                 child: Text(
-                                  comment.authorAvatar ?? comment.authorName[0],
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: AppColors.ink),
+                                  comment.authorAvatar ?? (comment.authorName.isNotEmpty ? comment.authorName[0] : 'U'),
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: AppColors.ink),
                                 ),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Container(
-                                  padding: const EdgeInsets.all(10),
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                                   decoration: BoxDecoration(
-                                    color: AppColors.paper2,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: AppColors.ink.withValues(alpha: 0.1)),
+                                    color: AppColors.cardSurface,
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: AppColors.borderHairline),
                                   ),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         comment.authorName,
-                                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                        style: GoogleFonts.instrumentSans(fontWeight: FontWeight.bold, fontSize: 12.5, color: AppColors.ink),
                                       ),
-                                      const SizedBox(height: 3),
+                                      const SizedBox(height: 4),
                                       Text(
                                         comment.body,
-                                        style: const TextStyle(fontSize: 12.5, color: AppColors.ink),
+                                        style: const TextStyle(fontSize: 13, color: AppColors.ink, height: 1.35),
                                       ),
                                     ],
                                   ),
@@ -204,10 +230,10 @@ class _CommentsSheetState extends ConsumerState<CommentsSheet> {
                         },
                       ),
           ),
-          const Divider(height: 1, color: AppColors.paper3),
+          const Divider(height: 1, color: AppColors.borderHairline),
           // Input bar
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
                 Expanded(
@@ -215,29 +241,47 @@ class _CommentsSheetState extends ConsumerState<CommentsSheet> {
                     controller: _commentCtrl,
                     maxLength: 300,
                     decoration: InputDecoration(
-                      hintText: 'Add a comment...',
+                      hintText: 'Share a note or question...',
+                      hintStyle: const TextStyle(color: AppColors.ink3, fontSize: 13),
                       counterText: '',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       filled: true,
                       fillColor: AppColors.paper2,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: const BorderSide(color: AppColors.ink, width: 1.2),
+                        borderRadius: BorderRadius.circular(22),
+                        borderSide: const BorderSide(color: AppColors.borderHairline),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(22),
+                        borderSide: const BorderSide(color: AppColors.borderHairline),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: const BorderSide(color: AppColors.ink, width: 1.8),
+                        borderRadius: BorderRadius.circular(22),
+                        borderSide: const BorderSide(color: AppColors.orange, width: 1.5),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                IconButton.filled(
-                  onPressed: _isSubmitting ? null : _submitComment,
-                  style: IconButton.styleFrom(backgroundColor: AppColors.ink),
-                  icon: _isSubmitting
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Icon(Icons.arrow_upward, color: Colors.white, size: 18),
+                const SizedBox(width: 10),
+                BouncingWidget(
+                  onTap: _isSubmitting ? null : _submitComment,
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    decoration: const BoxDecoration(
+                      color: AppColors.orange,
+                      shape: BoxShape.circle,
+                      boxShadow: [AppColors.shadowTactile],
+                    ),
+                    alignment: Alignment.center,
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          )
+                        : const Icon(Icons.arrow_upward, color: Colors.white, size: 20),
+                  ),
                 ),
               ],
             ),

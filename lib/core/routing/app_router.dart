@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
+import '../widgets/bouncing_widget.dart';
 import '../../data/repositories/posts_repository.dart';
 import '../../data/services/haptic_service.dart';
 import '../../features/feed/screens/feed_screen.dart';
@@ -189,7 +190,6 @@ class ScaffoldWithNavBar extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
   void _onTap(BuildContext context, int index) {
-    HapticService.selection();
     if (index == 2) {
       HapticService.medium();
       if (!SupabaseService.isAuthenticated) {
@@ -198,11 +198,14 @@ class ScaffoldWithNavBar extends StatelessWidget {
           builder: (ctx) => AlertDialog(
             backgroundColor: AppColors.paper,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: const BorderSide(color: AppColors.ink, width: 2),
+              borderRadius: BorderRadius.circular(20),
+              side: const BorderSide(color: AppColors.borderSubtle, width: 1.2),
             ),
             title: Text('Account Required', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800)),
-            content: const Text('You are browsing as a Guest. Sign in or create an account to drop recommendations and share spots with your circle.'),
+            content: const Text(
+              'You are browsing as a Guest. Sign in or create an account to drop recommendations and share spots with your circle.',
+              style: TextStyle(height: 1.4, color: AppColors.ink2),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
@@ -213,7 +216,11 @@ class ScaffoldWithNavBar extends StatelessWidget {
                   Navigator.pop(ctx);
                   context.push('/auth');
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: AppColors.ink),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.orange,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
                 child: const Text('Sign In'),
               ),
             ],
@@ -248,13 +255,14 @@ class ScaffoldWithNavBar extends StatelessWidget {
         decoration: const BoxDecoration(
           color: AppColors.paper,
           border: Border(
-            top: BorderSide(color: AppColors.ink, width: 2),
+            top: BorderSide(color: AppColors.borderHairline, width: 1.0),
           ),
+          boxShadow: [AppColors.shadowSubtle],
         ),
         child: SafeArea(
           top: false,
           child: SizedBox(
-            height: 60,
+            height: 62,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -300,21 +308,27 @@ class ScaffoldWithNavBar extends StatelessWidget {
   }
 
   Widget _buildDropButton(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
+    return BouncingWidget(
       onTap: () => _onTap(context, 2),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
           color: AppColors.orange,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppColors.ink, width: 2),
-          boxShadow: const [AppColors.shadowSm],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.borderHairline, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.orange.withValues(alpha: 0.32),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+            AppColors.shadowSm,
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.add, color: Colors.white, size: 18),
+            const Icon(Icons.add_rounded, color: Colors.white, size: 17),
             const SizedBox(width: 4),
             Text(
               'DROP',
@@ -322,7 +336,7 @@ class ScaffoldWithNavBar extends StatelessWidget {
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
-                letterSpacing: 0.5,
+                letterSpacing: 0.6,
               ),
             ),
           ],
@@ -340,29 +354,38 @@ class ScaffoldWithNavBar extends StatelessWidget {
     required String label,
   }) {
     return Expanded(
-      child: InkWell(
+      child: BouncingWidget(
         onTap: () => _onTap(context, index),
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isSelected ? selectedIcon : icon,
-              size: 22,
-              color: isSelected ? AppColors.orange : AppColors.ink2,
-            ),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              style: GoogleFonts.spaceMono(
-                fontSize: 9.5,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
-                color: isSelected ? AppColors.orange : AppColors.ink2,
-                letterSpacing: 0.3,
+        scaleFactor: 0.92,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedScale(
+                scale: isSelected ? 1.08 : 1.0,
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOutBack,
+                child: Icon(
+                  isSelected ? selectedIcon : icon,
+                  size: 21,
+                  color: isSelected ? AppColors.orange : AppColors.ink3,
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 3),
+              Text(
+                label,
+                style: GoogleFonts.spaceMono(
+                  fontSize: 9.5,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? AppColors.orange : AppColors.ink3,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

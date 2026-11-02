@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/services/haptic_service.dart';
@@ -64,7 +65,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     }
 
     if (!SupabaseService.isInitialized) {
-      setState(() => _errorMessage = 'Backend connection is offline. Please rebuild the app with valid Supabase cloud configuration.');
+      setState(() => _errorMessage = 'Backend connection is offline. Please rebuild the app with valid Supabase configuration.');
       return;
     }
 
@@ -87,7 +88,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
           throw 'Failed to create user account. Please check your credentials.';
         }
 
-        // If session was not automatically established, perform explicit sign in
         if (authRes.session == null) {
           await SupabaseService.signInWithEmail(email, password);
         }
@@ -101,7 +101,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       await StorageService.setAuthUserEmail(email);
       await StorageService.setGuestMode(false);
 
-      // Hydrate live profile & feed from Supabase
       await ref.read(currentProfileProvider.notifier).syncRemoteProfile();
       await ref.read(postsRepositoryProvider.notifier).syncRemoteFeed();
 
@@ -109,7 +108,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_isSignUp ? 'Account created! Welcome to Around, $email' : 'Signed in as $email'),
+            content: Text(_isSignUp ? 'Welcome to Around, $email' : 'Signed in as $email'),
             backgroundColor: AppColors.ink,
           ),
         );
@@ -164,41 +163,50 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           child: Container(
-            padding: const EdgeInsets.all(18),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.paper,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: AppColors.ink, width: 2),
-              boxShadow: const [AppColors.shadow],
+              color: AppColors.cardSurface,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: AppColors.borderSubtle, width: 1),
+              boxShadow: const [AppColors.shadowCard],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Around · Tashkent',
-                  style: GoogleFonts.spaceMono(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.orange),
+                  'AROUND · TASHKENT',
+                  style: GoogleFonts.spaceMono(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1, color: AppColors.orange),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   _isSignUp ? 'Join your trusted circle.' : 'Welcome back.',
-                  style: GoogleFonts.bricolageGrotesque(fontSize: 24, fontWeight: FontWeight.w800),
+                  style: GoogleFonts.bricolageGrotesque(fontSize: 26, fontWeight: FontWeight.w800, color: AppColors.ink),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 18),
                 if (_errorMessage != null)
                   Container(
                     width: double.infinity,
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: AppColors.blush,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.danger, width: 1.5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.danger.withValues(alpha: 0.4), width: 1),
                     ),
-                    child: Text(
-                      _errorMessage!,
-                      style: const TextStyle(color: AppColors.danger, fontSize: 12, fontWeight: FontWeight.bold),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.info_outline, color: AppColors.danger, size: 16),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(color: AppColors.danger, fontSize: 12, fontWeight: FontWeight.w600, height: 1.3),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 if (_isSignUp) ...[
@@ -206,75 +214,110 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     controller: _fullNameCtrl,
                     decoration: const InputDecoration(labelText: 'Full Name *', hintText: 'e.g. Kamila Rahimova'),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   TextField(
                     controller: _usernameCtrl,
                     decoration: const InputDecoration(labelText: 'Username (@handle) *', hintText: 'e.g. kamilar'),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   TextField(
                     controller: _neighborhoodCtrl,
                     decoration: const InputDecoration(labelText: 'Tashkent District', hintText: 'e.g. Mirabad, Yakkasaray'),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                 ],
                 TextField(
                   controller: _emailCtrl,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(labelText: 'Email Address *', hintText: 'you@example.com'),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 TextField(
                   controller: _passwordCtrl,
                   obscureText: true,
                   decoration: const InputDecoration(labelText: 'Password (min 8 chars) *'),
                 ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.orange,
-                      foregroundColor: AppColors.ink,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: AppColors.ink, width: 2),
-                      ),
+                const SizedBox(height: 22),
+                BouncingWidget(
+                  onTap: _isLoading ? null : _submit,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.orange,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: const [AppColors.shadowTactile],
                     ),
-                    child: Text(
-                      _isLoading ? 'Authenticating...' : (_isSignUp ? 'Create Account' : 'Sign In'),
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
+                    alignment: Alignment.center,
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          )
+                        : Text(
+                            _isSignUp ? 'Create Account' : 'Sign In',
+                            style: GoogleFonts.instrumentSans(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Center(
-                  child: TextButton(
-                    onPressed: () => setState(() {
+                  child: BouncingWidget(
+                    onTap: () => setState(() {
                       _isSignUp = !_isSignUp;
                       _errorMessage = null;
                     }),
-                    child: Text(
-                      _isSignUp ? 'Already have an account? Sign In' : 'Need an account? Create one',
-                      style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 12.5),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                      child: Text(
+                        _isSignUp ? 'Already have an account? Sign In' : 'Need an account? Create one',
+                        style: GoogleFonts.instrumentSans(
+                          color: AppColors.ink,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                const Divider(height: 28, color: Color(0x3015130F)),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  child: Divider(height: 1, color: AppColors.borderHairline),
+                ),
                 Center(
-                  child: OutlinedButton.icon(
-                    onPressed: _continueAsGuest,
-                    icon: const Icon(Icons.explore_outlined, size: 16, color: AppColors.ink),
-                    label: const Text(
-                      'Continue as Guest (Read-Only)',
-                      style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 12),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.ink, width: 1.5),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  child: BouncingWidget(
+                    onTap: _continueAsGuest,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: AppColors.paper2,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.borderSubtle, width: 1),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.explore_outlined, size: 16, color: AppColors.ink2),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              'Continue as Guest (Read-Only)',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.instrumentSans(
+                                color: AppColors.ink,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
