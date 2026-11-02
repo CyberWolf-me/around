@@ -1454,6 +1454,115 @@
         "flutter test test/unit/weekly_digest_test.dart"
       ],
       "riskAssessment": "Low: Local computation engine."
+    },
+    {
+      "id": "P15-01",
+      "title": "Weekend Rhythm Feed Banner & Social Coordination Sheet",
+      "domain": "Retention & Engagement",
+      "description": "Tactile WeeklyDigestBanner mounted at head of FeedScreen during weekend windows (Fri 16:00 – Sun 23:59), opening coordination sheet with top district stats and instant Telegram invite generator.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P14-04"
+      ],
+      "affectedPaths": [
+        "lib/features/feed/widgets/weekly_digest_banner.dart",
+        "lib/features/feed/screens/feed_screen.dart",
+        "test/widget/weekly_digest_banner_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "WeeklyDigestBanner renders only during weekend windows (or forced preview) with top district badge and drop volume.",
+        "Tapping banner opens bottom sheet displaying localized weekend prompt and one-tap invite generator.",
+        "Copying or sharing invite invokes HapticService and copies canonical deep link.",
+        "Widget test validates rendering, visibility gate, and bottom sheet interactions."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/weekly_digest_banner_test.dart"
+      ],
+      "riskAssessment": "Low: UI layer and weekend trigger."
+    },
+    {
+      "id": "P15-02",
+      "title": "Multi-Axis Taste Radar & Explorer Archetype Engine",
+      "domain": "Gamification & Retention",
+      "description": "Build TasteRadarWidget in TastePassportScreen rendering category distribution, diversity ratio, and calculated explorer archetype (Specialty Connoisseur, Old City Nomad, etc.).",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P15-01"
+      ],
+      "affectedPaths": [
+        "lib/features/profile/widgets/taste_radar_widget.dart",
+        "lib/core/services/taste_archetype_engine.dart",
+        "test/unit/taste_archetype_test.dart",
+        "test/widget/taste_radar_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "TasteArchetypeEngine calculates category distribution and assigns archetype based on dominant categories.",
+        "TasteRadarWidget displays high-aesthetic category bars and archetype badge.",
+        "Unit and widget tests pass with non-empty assertions."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/taste_archetype_test.dart",
+        "flutter test test/widget/taste_radar_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Presentation and classification calculation."
+    },
+    {
+      "id": "P15-03",
+      "title": "Telegram WebApp Native MainButton & Haptic Bridge",
+      "domain": "Social Graph & Distribution",
+      "description": "Upgrade src/services/telegramWebApp.ts and PlaceDetailModal with native Telegram.WebApp.MainButton controls, clipboard link sync, and Vitest test assertions.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P15-02"
+      ],
+      "affectedPaths": [
+        "src/services/telegramWebApp.ts",
+        "src/__tests__/telegramWebApp.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "MainButton helpers configure text, color, active state, and click handlers.",
+        "HapticFeedback helper wraps impactOccurred, notificationOccurred, and selectionChanged safely.",
+        "Vitest test suite validates MainButton lifecycle and fallback behavior."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion TWA enhancements."
+    },
+    {
+      "id": "P15-04",
+      "title": "District Tastemaker & Rolling 30-Day Local Legend Engine",
+      "domain": "Social Graph & Reputation",
+      "description": "Compute top explorer for each Tashkent district over the rolling 30-day window, awarding visible Local Legend profile badge flair.",
+      "ownerRole": "Backend & Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P15-03"
+      ],
+      "affectedPaths": [
+        "lib/core/services/district_legend_engine.dart",
+        "test/unit/district_legend_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Calculates drop counts per user per district over 30 days.",
+        "Awards Local Legend status to top user in each district with >= 3 drops.",
+        "Unit tests verify edge cases (ties, expired drops, multiple districts)."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/district_legend_test.dart"
+      ],
+      "riskAssessment": "Low: In-memory calculation with local caching."
     }
   ],
   "loopConfig": {

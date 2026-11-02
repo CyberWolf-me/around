@@ -127,3 +127,57 @@ With Phase 13 fully delivered (Taste Quests, District Density RPC, Telegram TWA 
 - **Domain**: Retention & Engagement
 - **Owner**: Mobile Engineering
 - **Deliverables**: `WeeklyDigestEngine` computing weekly district drop volumes, peak atmosphere hours, and inviting friends to weekend meetups.
+
+
+---
+
+# Phase 15 Audit — Weekend Rhythm Feed UI, Taste Radar Visualization, Telegram MainButton Integration & District Tastemaker Badges
+
+**Audit Date**: November 3, 2026  
+**Auditor Personas**: CTO & Autonomous Loop Orchestrator, Growth & Viral Mechanics Lead, Senior Flutter Engineer  
+**Target Milestone**: Phase 15 — Habitual Weekend Loops, Visual Taste Radar & Local Legend Leaderboards  
+**Branch**: `feat/phase-12-strava-for-places`  
+
+## Executive Summary & Strategic Position
+
+With Phase 14 fully delivered (Map Heat Navigation, Multilingual Transliteration Engine, Viral 9:16 Story Exporter, and WeeklyDigestEngine, tagged `v1.4.0-staging.1`):
+- **174 / 174 Flutter tests** passing with zero errors.
+- **30 / 30 Web Vitest tests** passing with zero errors.
+- **0 static analysis warnings** across all Dart & TypeScript code.
+
+### The Adversarial Growth Audit
+
+1. **Invisible Weekly Digest**:
+   - `WeeklyDigestEngine` (`P14-04`) computes aggregate 7-day momentum and Friday/Saturday prompts, but users on `FeedScreen` have no visual UI card surfacing this insight during the weekend window.
+   - **Remedy**: Create `WeeklyDigestBanner` widget on `FeedScreen` displaying weekly top district momentum and a one-tap "Gather Circle" Telegram invite trigger.
+2. **Taste Passport Lacks Visual Metric Radar**:
+   - Taste Passports track badge counts, but lack a visual multi-axis footprint (Coffee, Dining, Nightlife, Culture, Parks) analogous to Strava's training breakdown.
+   - **Remedy**: Build `TasteRadarWidget` rendering dynamic category weight meters and culinary personality archetype ("Specialty Connoisseur", "Old City Nomad", etc.).
+3. **Telegram WebApp Native UI Bridge**:
+   - In `src/`, expand the Telegram Mini App bridge to wire Telegram's native bottom `MainButton` ("Share to Telegram Story / Friends") and `HapticFeedback` to place detail actions.
+4. **District Tastemaker & Local Legend Mechanics**:
+   - Build `DistrictLegendEngine` computing the top explorer for each Tashkent district over the rolling 30-day window, awarding visible "Local Legend" profile badge flair.
+
+---
+
+## Phase 15 Backlog Roadmap (`tasks.json`)
+
+### `P15-01`: Weekend Rhythm Feed Banner & Social Coordination Sheet
+- **Domain**: Retention & Engagement
+- **Owner**: Mobile Engineering
+- **Deliverables**: Tactile `WeeklyDigestBanner` mounted at the head of `FeedScreen` during weekend windows (Fri 16:00 – Sun 23:59), launching an interactive bottom sheet with top district stats and instant Telegram friend invite generator.
+
+### `P15-02`: Multi-Axis Taste Radar & Explorer Archetype Engine
+- **Domain**: Gamification & Retention
+- **Owner**: Flutter & Web Product Engineer
+- **Deliverables**: `TasteRadarWidget` in `TastePassportScreen` rendering category momentum bars, diversity ratio, and calculated explorer archetype with unit/widget tests.
+
+### `P15-03`: Telegram WebApp Native MainButton & Haptic Bridge
+- **Domain**: Social Graph & Distribution
+- **Owner**: Web Companion Engineer
+- **Deliverables**: Upgrade `src/services/telegramWebApp.ts` and `src/components/PlaceDetailModal.tsx` with native `Telegram.WebApp.MainButton` controls, clipboard link sync, and Vitest test assertions.
+
+### `P15-04`: District Tastemaker & Rolling 30-Day Local Legend Engine
+- **Domain**: Social Graph & Reputation
+- **Owner**: Backend & Mobile Engineering
+- **Deliverables**: `DistrictLegendEngine` computing per-district drop rankings and awarding "Mirabad Legend", "Old City Nomad", and "Yunusabad Pioneer" badges.
