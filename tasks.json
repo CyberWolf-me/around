@@ -2375,7 +2375,7 @@
       "description": "CuratorLevelBadge.tsx in src/components/ displaying curator tier badges, XP meters, and sound effects on web companion profile surfaces.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P23-02"
       ],
@@ -2401,7 +2401,7 @@
       "description": "SubwaySyncDiagnosticsService in lib/core/services/subway_sync_diagnostics_service.dart tracking cache hit rates and offline duration metrics during metro commutes.",
       "ownerRole": "Core Engineering & Backend Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P23-03"
       ],
