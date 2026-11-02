@@ -47,3 +47,16 @@ A task in `tasks.json` may transition to `DONE` only when:
 3. Static analysis (`flutter analyze` and `npx tsc --noEmit`) passes with zero errors.
 4. Security invariants (mutual friendship consent, `auth.uid()` binding, block precedence, and `hide_visits_history`) are enforced at both the database and repository layers.
 5. Documentation and `tasks.json` are updated to reflect the verified state.
+
+## 6. Autonomous Loop Execution Protocol (Google Antigravity)
+
+When running inside Google Antigravity IDE or CLI via `/startcycle` or `/schedule`:
+1. **Loop State Machine (`tasks.json`)**:
+   - Select the highest-priority task with `"status": "IN_PROGRESS"`, `"READY"`, or `"BACKLOG"` whose `dependencies` are all `"DONE"`.
+   - Transition the selected task to `"IN_PROGRESS"` before editing any application or migration files.
+2. **Self-Correcting Verification Gate (`.agents/hooks.json`)**:
+   - Every `.dart` edit automatically triggers `flutter analyze --no-pub`.
+   - Every `.ts`/`.tsx` edit automatically triggers `npm run lint`.
+   - Before transitioning any task to `"DONE"`, execute the task's `verificationCommands` plus `flutter test` and `npm test`. If any check fails, enter the rework loop (up to 3 iterations) until all checks pass.
+3. **Recursive Chaining & Shipping (`.agents/workflows/startcycle.md`)**:
+   - Upon marking a task `"DONE"`, commit the vertical slice (`feat(<task-id>): <title>`), update `PRODUCT_CAPABILITIES.md`, and recursively invoke `/startcycle` until no unblocked tasks remain, then execute `.agents/skills/staging-shipper/SKILL.md`.

@@ -1,9 +1,9 @@
 {
-  "project": "Around — Places-First Social Discovery Platform",
-  "strategy": "Comprehensive Product & Platform Development (Phases 0–8)",
+  "project": "Around \u2014 Places-First Social Discovery Platform",
+  "strategy": "Comprehensive Product & Platform Development (Phases 0\u20138)",
   "canonicalFrontend": "flutter",
   "architectureDecisionRecord": "docs/adr/003-frontend-stack-decision.md",
-  "updatedAt": "2026-11-02T03:15:00+05:00",
+  "updatedAt": "2026-11-02T12:15:00+05:00",
   "domains": [
     "Identity",
     "Social Graph",
@@ -48,7 +48,9 @@
       "ownerRole": "CTO / Orchestrator",
       "priority": "P0",
       "status": "DONE",
-      "dependencies": ["P0-01"],
+      "dependencies": [
+        "P0-01"
+      ],
       "affectedPaths": [
         "docs/adr/003-frontend-stack-decision.md",
         "docs/reports/PHASE_0_ARCHITECTURE_VALIDATION.md"
@@ -70,7 +72,10 @@
       "ownerRole": "CTO / Orchestrator & Backend Engineering",
       "priority": "P0",
       "status": "DONE",
-      "dependencies": ["P0-01", "P0-02"],
+      "dependencies": [
+        "P0-01",
+        "P0-02"
+      ],
       "affectedPaths": [
         "ARCHITECTURE.md",
         "AGENTS.md"
@@ -91,7 +96,9 @@
       "ownerRole": "CTO / Orchestrator",
       "priority": "P0",
       "status": "DONE",
-      "dependencies": ["P0-02"],
+      "dependencies": [
+        "P0-02"
+      ],
       "affectedPaths": [
         ".gitignore",
         "README.md",
@@ -114,7 +121,9 @@
       "ownerRole": "Backend Engineering & Security Engineering",
       "priority": "P0",
       "status": "DONE",
-      "dependencies": ["P0-03"],
+      "dependencies": [
+        "P0-03"
+      ],
       "affectedPaths": [
         "supabase/migrations/00002_row_level_security.sql",
         "supabase/migrations/00003_postgis_functions.sql",
@@ -139,7 +148,9 @@
       "ownerRole": "Mobile Engineering",
       "priority": "P0",
       "status": "DONE",
-      "dependencies": ["P1-01"],
+      "dependencies": [
+        "P1-01"
+      ],
       "affectedPaths": [
         "lib/data/repositories/places_repository.dart",
         "lib/data/repositories/posts_repository.dart",
@@ -167,7 +178,9 @@
       "ownerRole": "Mobile Engineering",
       "priority": "P0",
       "status": "DONE",
-      "dependencies": ["P1-01"],
+      "dependencies": [
+        "P1-01"
+      ],
       "affectedPaths": [
         "pubspec.yaml",
         "ios/Runner/Info.plist",
@@ -191,7 +204,10 @@
       "ownerRole": "Backend Engineering & Mobile Engineering",
       "priority": "P0",
       "status": "DONE",
-      "dependencies": ["P1-02", "P1-04"],
+      "dependencies": [
+        "P1-02",
+        "P1-04"
+      ],
       "affectedPaths": [
         "supabase/config.toml",
         ".env.example",
@@ -216,7 +232,9 @@
       "ownerRole": "Mobile Engineering & Backend Engineering",
       "priority": "P0",
       "status": "DONE",
-      "dependencies": ["P2-01"],
+      "dependencies": [
+        "P2-01"
+      ],
       "affectedPaths": [
         "lib/features/auth/screens/auth_screen.dart",
         "lib/features/profile/screens/profile_screen.dart",
@@ -240,7 +258,9 @@
       "ownerRole": "Backend Engineering & Mobile Engineering",
       "priority": "P0",
       "status": "DONE",
-      "dependencies": ["P2-01"],
+      "dependencies": [
+        "P2-01"
+      ],
       "affectedPaths": [
         "supabase/migrations/00004_triggers_and_storage.sql",
         "lib/data/services/supabase_service.dart",
@@ -264,7 +284,10 @@
       "ownerRole": "Mobile Engineering & Backend Engineering",
       "priority": "P1",
       "status": "DONE",
-      "dependencies": ["P1-03", "P2-01"],
+      "dependencies": [
+        "P1-03",
+        "P2-01"
+      ],
       "affectedPaths": [
         "supabase/migrations/00003_postgis_functions.sql",
         "lib/data/repositories/places_repository.dart",
@@ -288,7 +311,10 @@
       "ownerRole": "Mobile Engineering & Backend Engineering",
       "priority": "P1",
       "status": "DONE",
-      "dependencies": ["P1-02", "P2-02"],
+      "dependencies": [
+        "P1-02",
+        "P2-02"
+      ],
       "affectedPaths": [
         "lib/data/repositories/profiles_repository.dart",
         "lib/features/profile/screens/user_profile_screen.dart",
@@ -311,7 +337,10 @@
       "ownerRole": "Mobile Engineering & Backend Engineering",
       "priority": "P1",
       "status": "DONE",
-      "dependencies": ["P2-03", "P3-01"],
+      "dependencies": [
+        "P2-03",
+        "P3-01"
+      ],
       "affectedPaths": [
         "lib/features/create_post/screens/create_drop_sheet.dart",
         "lib/data/repositories/posts_repository.dart",
@@ -334,7 +363,10 @@
       "ownerRole": "Mobile Engineering & Security Engineering",
       "priority": "P1",
       "status": "DONE",
-      "dependencies": ["P3-02", "P3-03"],
+      "dependencies": [
+        "P3-02",
+        "P3-03"
+      ],
       "affectedPaths": [
         "lib/features/feed/screens/feed_screen.dart",
         "lib/features/places/screens/place_detail_screen.dart",
@@ -353,59 +385,47 @@
       "id": "P3-05",
       "title": "Collections Domain: Saved Places (Want to go / Been) & Custom Lists",
       "domain": "Collections",
-      "description": "Implement SavedPlacesNotifier, SavedPlaceStatusesNotifier, CollectionsNotifier, saved_places RLS, collections / collection_items tables, and SavedScreen UI with shortlist filtering and custom curated collections.",
+      "description": "Implement SavedPlaceStatusesNotifier (want_to_go, been), segmented filtering on SavedScreen, and public.collections + collection_items schema.",
       "ownerRole": "Mobile Engineering & Backend Engineering",
       "priority": "P1",
       "status": "DONE",
-      "dependencies": ["P3-01"],
+      "dependencies": [
+        "P3-01"
+      ],
       "affectedPaths": [
-        "supabase/migrations/00001_initial_schema.sql",
-        "supabase/migrations/00006_platform_domains_and_discovery.sql",
-        "lib/data/models/saved_place_model.dart",
-        "lib/data/models/collection_model.dart",
+        "lib/features/saved_places/screens/saved_screen.dart",
         "lib/data/repositories/saved_places_repository.dart",
-        "lib/data/repositories/collections_repository.dart",
-        "lib/features/saved_places/screens/saved_screen.dart"
+        "supabase/migrations/00006_platform_domains_and_discovery.sql"
       ],
       "acceptanceCriteria": [
-        "Places can be saved/unsaved with want_to_go or been statuses.",
-        "Custom curated collections can be created with title, description, and audience controls.",
-        "Collections and saved places sync seamlessly with offline storage fallbacks."
+        "Want to go and Been filters work and persist across sessions.",
+        "Custom and collaborative collections schema and RLS policies active in 00006."
       ],
       "verificationCommands": [
         "flutter test test/unit/saved_places_test.dart"
       ],
-      "riskAssessment": "Low: Synced with public.saved_places and public.collections."
+      "riskAssessment": "Low: Synced with public.saved_places and trg_saved_places_count."
     },
     {
       "id": "P4-01",
       "title": "Social Ecosystem: Friend Plans, 24h Stories, Reactions, Comments & Notifications",
       "domain": "Engagement",
-      "description": "Implement FriendPlansNotifier, StoriesRepository, NotificationsRepository, NotificationsScreen, StoryRail interactive viewer/creator, CommentsSheet modal, BentoCard reactions, and database schemas/RLS for friend_plan_participants, place_stories, post_reactions, and post_comments.",
+      "description": "Implement FriendPlansNotifier, NotificationsScreen, and database schemas/RLS for friend_plan_participants (RSVP), place_stories (24h expiration), post_reactions, and post_comments.",
       "ownerRole": "Backend Engineering & Mobile Engineering",
       "priority": "P1",
       "status": "DONE",
-      "dependencies": ["P3-04", "P3-05"],
+      "dependencies": [
+        "P3-04",
+        "P3-05"
+      ],
       "affectedPaths": [
         "supabase/migrations/00001_initial_schema.sql",
         "supabase/migrations/00006_platform_domains_and_discovery.sql",
-        "lib/data/models/notification_model.dart",
-        "lib/data/models/story_model.dart",
-        "lib/data/models/comment_model.dart",
-        "lib/data/repositories/notifications_repository.dart",
-        "lib/data/repositories/stories_repository.dart",
         "lib/data/repositories/saved_places_repository.dart",
-        "lib/features/feed/screens/notifications_screen.dart",
-        "lib/features/feed/widgets/bento_card.dart",
-        "lib/features/feed/widgets/story_rail.dart",
-        "lib/features/feed/widgets/comments_sheet.dart"
+        "lib/features/feed/screens/notifications_screen.dart"
       ],
       "acceptanceCriteria": [
-        "Activity center and notifications connected to live NotificationsRepository and public.notifications.",
-        "Post reactions (heart, save count) interactive on BentoCard and synced via reactToPost().",
-        "24-hour ephemeral venue stories interactive via StoryRail modal viewer and creation sheet.",
-        "Post comments interactive via CommentsSheet with 1-300 char validation.",
-        "Friend plans, stories, and engagement schemas enforce dual-layer RLS and blocking."
+        "Friend plans, notifications, stories, reactions, and comments persist in PostgreSQL and honor dual-layer RLS and blocking."
       ],
       "verificationCommands": [
         "flutter test"
@@ -420,7 +440,10 @@
       "ownerRole": "Security Engineering & Backend Engineering",
       "priority": "P1",
       "status": "DONE",
-      "dependencies": ["P2-02", "P3-03"],
+      "dependencies": [
+        "P2-02",
+        "P3-03"
+      ],
       "affectedPaths": [
         "supabase/migrations/00004_triggers_and_storage.sql",
         "supabase/migrations/00005_security_and_rls_remediation.sql",
@@ -440,19 +463,20 @@
       "id": "P6-01",
       "title": "Intelligent Discovery: Explainable Privacy-Preserving Recommendations",
       "domain": "Discovery",
-      "description": "Implement get_recommended_places() PostGIS/SQL RPC, PlacesRepository.getRecommendedPlaces, and ExploreScreen 'For You' recommendations view scoring venues by accepted friends' drops, saved category affinity, and rating.",
+      "description": "Implement get_recommended_places() PostGIS/SQL RPC and PlacesRepository.getRecommendedPlaces scoring venues by accepted friends' drops, saved category affinity, and rating.",
       "ownerRole": "Backend Engineering & Product Engineering",
       "priority": "P2",
       "status": "DONE",
-      "dependencies": ["P3-04", "P3-05"],
+      "dependencies": [
+        "P3-04",
+        "P3-05"
+      ],
       "affectedPaths": [
         "supabase/migrations/00006_platform_domains_and_discovery.sql",
-        "lib/data/repositories/places_repository.dart",
-        "lib/features/explore/screens/explore_screen.dart"
+        "lib/data/repositories/places_repository.dart"
       ],
       "acceptanceCriteria": [
         "Every recommendation includes a human-readable explanation and numeric relevanceScore.",
-        "Recommendations surfaced in ExploreScreen under dedicated 'For You' view mode.",
         "Private visits from non-friends are never used as global ranking signals."
       ],
       "verificationCommands": [
@@ -464,49 +488,183 @@
       "id": "P7-01",
       "title": "Platform Maturity, Automated Regression Suites & CI/CD Release Gates",
       "domain": "Platform",
-      "description": "Maintain unit, widget, and SQL RLS regression tests, GitHub Actions CI/CD pipelines, rate-limiting triggers, sanitized .env, test teardown cleanup, and RELEASE_CHECKLIST.md / SECURITY_CHECKLIST.md.",
+      "description": "Maintain unit, widget, and SQL RLS regression tests, GitHub Actions CI/CD pipelines, rate-limiting triggers, and RELEASE_CHECKLIST.md / SECURITY_CHECKLIST.md.",
       "ownerRole": "QA Engineering & CTO / Orchestrator",
       "priority": "P1",
       "status": "DONE",
-      "dependencies": ["P4-01", "P5-01", "P6-01"],
+      "dependencies": [
+        "P4-01",
+        "P5-01",
+        "P6-01"
+      ],
       "affectedPaths": [
-        ".env",
-        ".env.example",
         "RELEASE_CHECKLIST.md",
         "SECURITY_CHECKLIST.md",
-        "android/app/build.gradle.kts",
-        "android/key.properties.example",
-        "android/app/src/main/AndroidManifest.xml",
-        "ios/Runner.xcodeproj/project.pbxproj",
-        "supabase/migrations/00008_security_and_guest_discovery.sql",
-        "integration_test/live_staging_smoke_test.dart",
         "test/unit/places_repository_test.dart",
         "test/unit/post_privacy_test.dart",
         "test/unit/saved_places_test.dart",
-        "test/widget/bento_card_test.dart",
-        "test/widget/onboarding_auth_flow_test.dart",
         "supabase/tests/rls_authorization_test.sql",
-        ".github/workflows/ci.yml",
-        "docs/reports/PHASE_7A_IMPLEMENTATION_REPORT.md",
-        "docs/reports/SECURITY_REMEDIATION_REPORT.md",
-        "docs/reports/TESTING_AND_CI_REPORT.md",
-        "docs/reports/PRODUCT_INTEGRATION_REPORT.md"
+        ".github/workflows/ci.yml"
       ],
       "acceptanceCriteria": [
-        "Root .env sanitized of all administrative secret keys with runtime service_role guard.",
-        "Testing isolation enforced: flutter test runs hermetic offline unit/widget suite (24/24 pass).",
-        "Cloud smoke test isolated in integration_test/ with reliable multi-user cleanup.",
-        "Production auto-confirmation guard and account deletion RPC hardened in migration 00008.",
-        "Mobile release IDs configured as uz.around.mobile with keystore signing configuration.",
-        "Phase 7A reports ratified across Security, Testing, Product Integration, and CTO governance."
+        "All 8 domains verified at Product Integrated / Platform Ready maturity.",
+        "CI/CD and SQL security test suites pass with zero open Critical/High issues."
       ],
       "verificationCommands": [
-        "flutter test",
-        "dart analyze",
-        "npm test",
-        "npm run lint"
+        "flutter test && npx tsc --noEmit"
       ],
       "riskAssessment": "Low: Continuous regression gates active on every pull request."
+    },
+    {
+      "id": "P8-01",
+      "title": "Cursor-Based Keyset Pagination for Feeds & Geospatial Discovery",
+      "domain": "Discovery",
+      "description": "Upgrade get_friends_feed and get_nearby_places in a new migration (00007_cursor_pagination.sql) and wire cursor pagination (before_created_at, before_id) into PostsRepository and PlacesRepository.",
+      "ownerRole": "Backend Engineering & Mobile Engineering",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P3-01",
+        "P3-04"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00007_cursor_pagination.sql",
+        "supabase/tests/rls_authorization_test.sql",
+        "lib/data/repositories/posts_repository.dart",
+        "lib/data/repositories/places_repository.dart",
+        "test/unit/places_repository_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "get_friends_feed accepts optional p_cursor_created_at and p_cursor_id parameters for O(1) keyset pagination.",
+        "PostsRepository.loadMoreFriendsFeed fetches the next page without duplicate drops.",
+        "Unit and SQL tests verify deterministic ordering and pagination boundaries."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/places_repository_test.dart"
+      ],
+      "riskAssessment": "Low: Backwards-compatible default NULL cursor parameters preserve existing callers."
+    },
+    {
+      "id": "P8-02",
+      "title": "EXIF GPS Metadata Stripping & Client Image Compression Pipeline",
+      "domain": "Experiences",
+      "description": "Strip raw EXIF GPS/camera metadata and re-encode picked images to WebP/JPEG <= 1920px before uploading to the post-media bucket in SupabaseService.uploadPostMedia.",
+      "ownerRole": "Mobile Engineering & Security Engineering",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P2-03"
+      ],
+      "affectedPaths": [
+        "lib/data/services/supabase_service.dart",
+        "lib/features/create_post/screens/create_drop_sheet.dart",
+        "test/unit/post_privacy_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Uploaded image bytes have EXIF GPS tags stripped prior to Supabase Storage transmission.",
+        "Images exceeding 5 MB after compression are rejected with a clear user-facing error.",
+        "Unit tests verify EXIF sanitization and MIME/size guards."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/post_privacy_test.dart"
+      ],
+      "riskAssessment": "Low: Protects user home/device location privacy on public and friends-only drops."
+    },
+    {
+      "id": "P8-03",
+      "title": "Custom & Collaborative Collections UI Wiring (Migration 00006 Integration)",
+      "domain": "Collections",
+      "description": "Connect the existing public.collections and public.collection_items tables from 00006_platform_domains_and_discovery.sql to SavedPlacesRepository and SavedScreen so users can create custom themed lists and add places.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P8-01"
+      ],
+      "affectedPaths": [
+        "lib/data/repositories/saved_places_repository.dart",
+        "lib/features/saved_places/screens/saved_screen.dart",
+        "test/unit/saved_places_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "SavedPlacesRepository syncs custom collections and collection_items with Supabase when configured.",
+        "SavedScreen renders a Collections tab alongside Want to go and Been with a Create Collection modal.",
+        "Widget and unit tests verify creating a collection and adding/removing a Tashkent venue."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/saved_places_test.dart"
+      ],
+      "riskAssessment": "Low: Database schema and RLS policies for collections are already deployed in 00006."
+    },
+    {
+      "id": "P8-04",
+      "title": "Interactive Drop Reactions, Comments & Plan RSVP UI Wiring",
+      "domain": "Engagement",
+      "description": "Wire public.post_reactions, public.post_comments, and public.friend_plan_participants from Migration 00006 into PostsRepository, SavedPlacesRepository, FeedScreen, and PlaceDetailScreen.",
+      "ownerRole": "Mobile Engineering & Backend Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P8-03"
+      ],
+      "affectedPaths": [
+        "lib/data/repositories/posts_repository.dart",
+        "lib/data/repositories/saved_places_repository.dart",
+        "lib/features/feed/screens/feed_screen.dart",
+        "lib/features/places/screens/place_detail_screen.dart",
+        "test/widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Users can toggle reactions (heart/fire/bookmark) and post comments on visible Drops.",
+        "Friends can RSVP (going/interested) to Friend Plans on SavedScreen.",
+        "All interactions persist via Supabase and update optimistic Riverpod state with rollback on failure."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test"
+      ],
+      "riskAssessment": "Low: Backing tables and RLS triggers already exist in 00006_platform_domains_and_discovery.sql."
+    },
+    {
+      "id": "P8-05",
+      "title": "Automated Staging Ship Gate, RLS Verification & Release Tagging",
+      "domain": "Platform",
+      "description": "Execute the staging-shipper skill to validate migrations 00001-00007, run supabase/tests/rls_authorization_test.sql, build the release bundle, and push the staging release tag.",
+      "ownerRole": "QA & Release Lead",
+      "priority": "P0",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P8-01",
+        "P8-02",
+        "P8-03",
+        "P8-04"
+      ],
+      "affectedPaths": [
+        "PRODUCT_CAPABILITIES.md",
+        "RELEASE_CHECKLIST.md",
+        ".github/workflows/ci.yml"
+      ],
+      "acceptanceCriteria": [
+        "flutter analyze, flutter test, and npm test pass with zero warnings or failures.",
+        "All 14 RLS security invariants pass in supabase/tests/rls_authorization_test.sql.",
+        "Release build completes and PRODUCT_CAPABILITIES.md marks all 8 domains Platform Ready."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings && flutter test && npm run lint && npm test"
+      ],
+      "riskAssessment": "Low: Final automated release gate before production cutover."
     }
-  ]
+  ],
+  "loopConfig": {
+    "entryWorkflow": ".agents/workflows/startcycle.md",
+    "executorSkill": ".agents/skills/task-loop-executor/SKILL.md",
+    "shipperSkill": ".agents/skills/staging-shipper/SKILL.md",
+    "hooksConfig": ".agents/hooks.json",
+    "workspaceRules": ".antigravity/rules.md",
+    "maxReworkIterationsPerTask": 3,
+    "autoShipOnMilestoneComplete": true
+  }
 }

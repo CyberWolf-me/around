@@ -1,0 +1,21 @@
+{
+  "hooks": [
+    {
+      "event": "afterFileEdit",
+      "match": "lib/**/*.dart",
+      "command": "flutter analyze --no-pub",
+      "description": "Automatically run Dart static analysis after editing Flutter source files so the agent self-corrects before moving on."
+    },
+    {
+      "event": "afterFileEdit",
+      "match": "src/**/*.{ts,tsx}",
+      "command": "npm run lint",
+      "description": "Automatically typecheck TypeScript/React files after edits."
+    },
+    {
+      "event": "beforeTaskComplete",
+      "command": "npm test && flutter test",
+      "description": "Block task completion unless both test suites pass."
+    }
+  ]
+}
