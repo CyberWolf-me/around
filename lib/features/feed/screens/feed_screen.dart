@@ -1,3 +1,7 @@
+import '../../../core/services/sunday_retrospective_service.dart';
+import '../../../core/services/locale_service.dart';
+import '../../../data/repositories/places_repository.dart';
+import '../widgets/weekly_retrospective_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -29,7 +33,23 @@ class FeedScreen extends ConsumerWidget {
     final outboxCount = ref.watch(outboxCountProvider);
     final unreadNotifs = ref.watch(notificationsProvider).where((n) => n.unread).length;
 
-    final visibleDrops = postsNotifier.getFriendsDrops(
+        final now = DateTime.now();
+    final isSundayRetroWindow = SundayRetrospectiveService.isRetrospectiveWindow(now);
+    final userDrops = ref.watch(postsRepositoryProvider).where((d) => d.authorId == userProfile.id).toList();
+    final allDrops = ref.watch(postsRepositoryProvider);
+    final places = ref.watch(placesRepositoryProvider).getAllPlaces();
+    final lang = ref.watch(appLocaleProvider);
+    final retroCard = SundayRetrospectiveService.generateDigest(
+      userId: userProfile.id,
+      userDrops: userDrops,
+      friendIds: followedFriends.toList(),
+      allDrops: allDrops,
+      places: places,
+      lang: lang,
+      referenceTime: now,
+    );
+
+final visibleDrops = postsNotifier.getFriendsDrops(
       followedFriends,
       blockedIds: blockedUsers,
     );
@@ -163,6 +183,70 @@ class FeedScreen extends ConsumerWidget {
             const SliverToBoxAdapter(
               child: WeeklyDigestBanner(),
             ),
+            if (isSundayRetroWindow || retroCard.isAtRisk)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  child: BouncingWidget(
+                    key: const Key('btn_open_sunday_retrospective'),
+                    scaleFactor: 0.98,
+                    onTap: () {
+                      WeeklyRetrospectiveModal.show(
+                        context: context,
+                        card: retroCard,
+                        onAction: () => context.push(retroCard.ctaRoute),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: retroCard.isAtRisk ? AppColors.orangeSubtle : AppColors.paper2,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: retroCard.isAtRisk ? AppColors.orange : AppColors.borderSubtle,
+                          width: 1.2,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            retroCard.isAtRisk ? '⚠️' : '🎉',
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  retroCard.title,
+                                  style: GoogleFonts.bricolageGrotesque(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.ink,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  retroCard.isAtRisk
+                                      ? 'Tap to rescue your streak'
+                                      : 'Tap to view your Sunday recap',
+                                  style: GoogleFonts.instrumentSans(
+                                    fontSize: 11,
+                                    color: AppColors.ink3,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppColors.ink3),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             const SliverToBoxAdapter(
               child: FriendPresenceRail(),
             ),

@@ -11,6 +11,9 @@ import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/services/haptic_service.dart';
+import '../../../core/services/sunday_retrospective_service.dart';
+import '../../../data/repositories/profiles_repository.dart';
+import 'weekly_retrospective_modal.dart';
 
 /// Provider providing the active WeeklyDigest for Tashkent.
 final weeklyDigestProvider = Provider<WeeklyDigest>((ref) {
@@ -376,6 +379,56 @@ class WeeklyDigestBanner extends ConsumerWidget {
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 10),
+                BouncingWidget(
+                  scaleFactor: 0.95,
+                  onTap: () {
+                    HapticService.selection();
+                    Navigator.pop(bottomSheetContext);
+                    final profile = ref.read(currentProfileProvider);
+                    final card = SundayRetrospectiveService.generateDigest(
+                      userId: profile.id,
+                      userDrops: ref
+                          .read(postsRepositoryProvider)
+                          .where((d) => d.authorId == profile.id)
+                          .toList(),
+                      friendIds: ref.read(followedFriendsProvider).toList(),
+                      allDrops: ref.read(postsRepositoryProvider),
+                      places: ref.read(placesRepositoryProvider).getAllPlaces(),
+                      lang: lang,
+                    );
+                    WeeklyRetrospectiveModal.show(
+                      context: context,
+                      card: card,
+                      onAction: () => Navigator.of(context).pushNamed(card.ctaRoute),
+                    );
+                  },
+                  child: Container(
+                    key: const Key('btn_open_retrospective_modal'),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: AppColors.paper2,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.borderSubtle),
+                    ),
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('✨', style: TextStyle(fontSize: 13)),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Sunday Retrospective & Streak Status',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.ink2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),

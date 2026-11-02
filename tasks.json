@@ -1,6 +1,6 @@
 {
-  "project": "Around \u2014 Places-First Social Discovery Platform",
-  "strategy": "Comprehensive Product & Platform Development (Phases 0\u20138)",
+  "project": "Around — Places-First Social Discovery Platform",
+  "strategy": "Comprehensive Product & Platform Development (Phases 0–8)",
   "canonicalFrontend": "flutter",
   "architectureDecisionRecord": "docs/adr/003-frontend-stack-decision.md",
   "updatedAt": "2026-11-02T12:15:00+05:00",
@@ -2031,7 +2031,7 @@
       "description": "WeeklyRetrospectiveModal on FeedScreen triggering during Sunday retrospective window or at-risk streak state, celebrating weekly milestones or offering immediate drop creation.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P20-01"
       ],
@@ -2058,7 +2058,7 @@
       "description": "CuratorLeaderboard.tsx in src/components/ rendering district crown holders, streak rankings, and direct passport link previews with Vitest tests.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P20-02"
       ],
