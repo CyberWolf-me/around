@@ -244,5 +244,49 @@ void main() {
       expect(invalidType, isNotNull);
       expect(invalidType!.code, equals('INVALID_IMAGE_TYPE'));
     });
+
+    test('reactToPost toggles reactions and updates savesCount optimistically (P8-04)', () async {
+      final initialPost = notifier.state.firstWhere((p) => p.id == 'drop_tash_1');
+      final initialCount = initialPost.savesCount;
+      expect(initialPost.userReaction, isNull);
+
+      // React with heart
+      await notifier.reactToPost('drop_tash_1', reaction: 'heart');
+      final reactedPost = notifier.state.firstWhere((p) => p.id == 'drop_tash_1');
+      expect(reactedPost.userReaction, equals('heart'));
+      expect(reactedPost.savesCount, equals(initialCount + 1));
+
+      // Toggle off by reacting with heart again
+      await notifier.reactToPost('drop_tash_1', reaction: 'heart');
+      final unreactedPost = notifier.state.firstWhere((p) => p.id == 'drop_tash_1');
+      expect(unreactedPost.userReaction, isNull);
+      expect(unreactedPost.savesCount, equals(initialCount));
+
+      // React with fire
+      await notifier.reactToPost('drop_tash_1', reaction: 'fire');
+      final firePost = notifier.state.firstWhere((p) => p.id == 'drop_tash_1');
+      expect(firePost.userReaction, equals('fire'));
+      expect(firePost.savesCount, equals(initialCount + 1));
+    });
+
+    test('addCommentToPost validates length and caches comments for authorized drops (P8-04)', () async {
+      // 1. Empty comment rejected
+      final emptyErr = await notifier.addCommentToPost('drop_tash_1', '   ');
+      expect(emptyErr, isNotNull);
+      expect(emptyErr!.code, equals('INVALID_COMMENT'));
+
+      // 2. >300 char comment rejected
+      final tooLongErr = await notifier.addCommentToPost('drop_tash_1', 'A' * 301);
+      expect(tooLongErr, isNotNull);
+      expect(tooLongErr!.code, equals('INVALID_COMMENT'));
+
+      // 3. Valid comment accepted
+      final validErr = await notifier.addCommentToPost('drop_tash_1', 'Great cardamom bun recommendation!');
+      expect(validErr, isNull);
+
+      final comments = await notifier.fetchCommentsForPost('drop_tash_1');
+      expect(comments.isNotEmpty, isTrue);
+      expect(comments.any((c) => c.body == 'Great cardamom bun recommendation!'), isTrue);
+    });
   });
 }

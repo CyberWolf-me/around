@@ -550,23 +550,55 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     return true;
   }
 
-  /// Adds a reaction (`heart`, `fire`, `bookmark_nod`, `coffee`) to an authorized Drop (Phase 4.3).
+  /// Toggles a reaction (`heart`, `fire`, `bookmark_nod`, `coffee`) on an authorized Drop (Phase 4.3).
   Future<void> reactToPost(String postId, {String reaction = 'heart'}) async {
-    state = state.map((p) {
-      if (p.id != postId) return p;
-      return p.copyWith(savesCount: p.savesCount + 1);
-    }).toList();
+    final idx = state.indexWhere((p) => p.id == postId);
+    if (idx == -1) return;
+    final currentPost = state[idx];
+    final isAlreadyActive = currentPost.userReaction == reaction;
+
+    final newCount = isAlreadyActive
+        ? (currentPost.savesCount > 0 ? currentPost.savesCount - 1 : 0)
+        : currentPost.savesCount + 1;
+
+    // Optimistic state update
+    state = [
+      for (final p in state)
+        if (p.id == postId)
+          p.copyWith(
+            userReaction: isAlreadyActive ? null : reaction,
+            clearUserReaction: isAlreadyActive,
+            savesCount: newCount,
+          )
+        else
+          p,
+    ];
     await StorageService.persistDrops(state);
 
     if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
       try {
-        await SupabaseService.client.from('post_reactions').upsert({
-          'post_id': postId,
-          'user_id': SupabaseService.currentUser!.id,
-          'reaction': reaction,
-        });
+        if (isAlreadyActive) {
+          await SupabaseService.client
+              .from('post_reactions')
+              .delete()
+              .eq('post_id', postId)
+              .eq('user_id', SupabaseService.currentUser!.id)
+              .eq('reaction', reaction);
+        } else {
+          await SupabaseService.client.from('post_reactions').upsert({
+            'post_id': postId,
+            'user_id': SupabaseService.currentUser!.id,
+            'reaction': reaction,
+          });
+        }
       } catch (e) {
-        AppLogger.warn('PostsRepository', 'Supabase post_reactions sync skipped', e);
+        AppLogger.warn('PostsRepository', 'Supabase post_reactions sync failed, rolling back', e);
+        // Rollback on failure
+        state = [
+          for (final p in state)
+            if (p.id == postId) currentPost else p,
+        ];
+        await StorageService.persistDrops(state);
       }
     }
   }
@@ -598,7 +630,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     return _commentsCache[postId] ?? [];
   }
 
-  /// Adds a comment (1–300 chars) to an authorized Drop (Phase 4.3).
+  /// Adds a comment (1–300 chars) to an authorized Drop with optimistic state & rollback (Phase 4.3).
   Future<AppFailure?> addCommentToPost(String postId, String body) async {
     final trimmed = body.trim();
     if (trimmed.isEmpty || trimmed.length > 300) {
@@ -627,7 +659,9 @@ class PostsNotifier extends Notifier<List<PostModel>> {
           'body': trimmed,
         });
       } catch (e) {
-        AppLogger.warn('PostsRepository', 'Supabase post_comments sync skipped', e);
+        AppLogger.warn('PostsRepository', 'Supabase post_comments sync failed, rolling back', e);
+        _commentsCache[postId] = current;
+        return const AppFailure('Failed to post comment. Please try again.', code: 'COMMENT_POST_FAILED');
       }
     }
     return null;

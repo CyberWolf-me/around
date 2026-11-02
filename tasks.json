@@ -607,7 +607,7 @@
       "description": "Wire public.post_reactions, public.post_comments, and public.friend_plan_participants from Migration 00006 into PostsRepository, SavedPlacesRepository, FeedScreen, and PlaceDetailScreen.",
       "ownerRole": "Mobile Engineering & Backend Engineering",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P8-03"
       ],
@@ -636,7 +636,7 @@
       "description": "Execute the staging-shipper skill to validate migrations 00001-00007, run supabase/tests/rls_authorization_test.sql, build the release bundle, and push the staging release tag.",
       "ownerRole": "QA & Release Lead",
       "priority": "P0",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P8-01",
         "P8-02",

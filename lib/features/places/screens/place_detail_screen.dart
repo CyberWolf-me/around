@@ -726,19 +726,32 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                             GestureDetector(
                               onTap: () {
                                 HapticService.selection();
-                                ref.read(postsRepositoryProvider.notifier).reactToPost(post.id, reaction: 'heart');
+                                ref.read(postsRepositoryProvider.notifier).reactToPost(post.id, reaction: post.userReaction ?? 'heart');
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: AppColors.paper2,
+                                  color: post.userReaction != null ? AppColors.orange.withValues(alpha: 0.18) : AppColors.paper2,
                                   borderRadius: BorderRadius.circular(999),
-                                  border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+                                  border: Border.all(
+                                    color: post.userReaction != null ? AppColors.orange : AppColors.ink.withValues(alpha: 0.2),
+                                    width: post.userReaction != null ? 1.5 : 1,
+                                  ),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(Icons.favorite, size: 12, color: AppColors.danger),
+                                    Icon(
+                                      post.userReaction == 'fire'
+                                          ? Icons.local_fire_department
+                                          : (post.userReaction == 'coffee'
+                                              ? Icons.coffee
+                                              : (post.userReaction == 'bookmark_nod'
+                                                  ? Icons.bookmark
+                                                  : Icons.favorite)),
+                                      size: 12,
+                                      color: post.userReaction != null ? AppColors.danger : AppColors.danger.withValues(alpha: 0.6),
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(
                                       '${post.savesCount}',

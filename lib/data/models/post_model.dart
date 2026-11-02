@@ -26,6 +26,7 @@ class PostModel {
   final DateTime createdAt;
   final bool isSaved;
   final Color? tint;
+  final String? userReaction;
 
   const PostModel({
     required this.id,
@@ -49,6 +50,7 @@ class PostModel {
     required this.createdAt,
     this.isSaved = false,
     this.tint,
+    this.userReaction,
   });
 
   bool get isFriendsOnly => audience == PostAudience.friends;
@@ -88,6 +90,8 @@ class PostModel {
     DateTime? createdAt,
     bool? isSaved,
     Color? tint,
+    String? userReaction,
+    bool clearUserReaction = false,
   }) {
     return PostModel(
       id: id ?? this.id,
@@ -111,6 +115,7 @@ class PostModel {
       createdAt: createdAt ?? this.createdAt,
       isSaved: isSaved ?? this.isSaved,
       tint: tint ?? this.tint,
+      userReaction: clearUserReaction ? null : (userReaction ?? this.userReaction),
     );
   }
 
@@ -148,6 +153,7 @@ class PostModel {
           ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
           : DateTime.now(),
       isSaved: json['is_saved'] as bool? ?? false,
+      userReaction: json['user_reaction'] as String?,
     );
   }
 
@@ -173,6 +179,7 @@ class PostModel {
       'is_quarantined': isQuarantined,
       'created_at': createdAt.toIso8601String(),
       'is_saved': isSaved,
+      'user_reaction': userReaction,
     };
   }
 }

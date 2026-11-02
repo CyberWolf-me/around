@@ -121,4 +121,46 @@ void main() {
       expect(collections.any((c) => c.id == 'col-night-1'), isFalse);
     });
   });
+
+  group('FriendPlansNotifier RSVP Tests', () {
+    late ProviderContainer container;
+    late FriendPlansNotifier plansNotifier;
+
+    setUp(() async {
+      await StorageService.clearAll();
+      container = ProviderContainer();
+      plansNotifier = container.read(friendPlansProvider.notifier);
+    });
+
+    tearDown(() {
+      container.dispose();
+    });
+
+    test('Initial plans contain seeded Tashkent friend plans', () {
+      final plans = container.read(friendPlansProvider);
+      expect(plans.isNotEmpty, isTrue);
+      expect(plans.any((p) => p.placeId == 'breadly'), isTrue);
+    });
+
+    test('rsvpToPlan updates RSVP status and toggles off when selected again (P8-04)', () async {
+      final plans = container.read(friendPlansProvider);
+      final targetPlan = plans.first;
+      expect(targetPlan.myRsvp, isNull);
+
+      // RSVP 'going'
+      await plansNotifier.rsvpToPlan(targetPlan.id, 'going');
+      final goingPlan = container.read(friendPlansProvider).firstWhere((p) => p.id == targetPlan.id);
+      expect(goingPlan.myRsvp, equals('going'));
+
+      // Toggle off by selecting 'going' again
+      await plansNotifier.rsvpToPlan(targetPlan.id, 'going');
+      final toggledOffPlan = container.read(friendPlansProvider).firstWhere((p) => p.id == targetPlan.id);
+      expect(toggledOffPlan.myRsvp, isNull);
+
+      // Switch to 'declined'
+      await plansNotifier.rsvpToPlan(targetPlan.id, 'declined');
+      final declinedPlan = container.read(friendPlansProvider).firstWhere((p) => p.id == targetPlan.id);
+      expect(declinedPlan.myRsvp, equals('declined'));
+    });
+  });
 }

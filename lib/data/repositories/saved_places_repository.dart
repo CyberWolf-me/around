@@ -227,24 +227,44 @@ class FriendPlansNotifier extends Notifier<List<FriendPlanModel>> {
 
   /// Updates the authenticated user's RSVP status (`going` or `declined`) on a shared plan (Phase 4.1).
   Future<void> rsvpToPlan(String planId, String rsvpStatus) async {
+    final previousState = state;
+    final plan = state.cast<FriendPlanModel?>().firstWhere((p) => p?.id == planId, orElse: () => null);
+    if (plan == null) return;
+
+    final isTogglingOff = plan.myRsvp == rsvpStatus;
+    final updatedRsvp = isTogglingOff ? null : rsvpStatus;
+
     state = [
       for (final p in state)
-        if (p.id == planId) p.copyWith(myRsvp: rsvpStatus) else p,
+        if (p.id == planId)
+          p.copyWith(myRsvp: updatedRsvp, clearMyRsvp: isTogglingOff)
+        else
+          p,
     ];
     await StorageService.persistPlans(state);
 
     if (!SupabaseService.isInitialized || !SupabaseService.isAuthenticated) return;
     try {
-      await SupabaseService.client
-          .from('friend_plan_participants')
-          .update({
-            'rsvp_status': rsvpStatus,
-            'responded_at': DateTime.now().toIso8601String(),
-          })
-          .eq('plan_id', planId)
-          .eq('user_id', SupabaseService.currentUser!.id);
+      if (isTogglingOff) {
+        await SupabaseService.client
+            .from('friend_plan_participants')
+            .delete()
+            .eq('plan_id', planId)
+            .eq('user_id', SupabaseService.currentUser!.id);
+      } else {
+        await SupabaseService.client
+            .from('friend_plan_participants')
+            .upsert({
+              'plan_id': planId,
+              'user_id': SupabaseService.currentUser!.id,
+              'rsvp_status': rsvpStatus,
+              'responded_at': DateTime.now().toIso8601String(),
+            });
+      }
     } catch (e) {
-      AppLogger.warn('FriendPlansNotifier', 'Supabase plan RSVP sync skipped', e);
+      AppLogger.warn('FriendPlansNotifier', 'Supabase plan RSVP sync failed, rolling back', e);
+      state = previousState;
+      await StorageService.persistPlans(previousState);
     }
   }
 

@@ -60,6 +60,7 @@ class FriendPlanModel {
     String? scheduleTime,
     String? note,
     String? myRsvp,
+    bool clearMyRsvp = false,
   }) {
     return FriendPlanModel(
       id: id ?? this.id,
@@ -68,7 +69,7 @@ class FriendPlanModel {
       attendeeInitials: attendeeInitials ?? this.attendeeInitials,
       scheduleTime: scheduleTime ?? this.scheduleTime,
       note: note ?? this.note,
-      myRsvp: myRsvp ?? this.myRsvp,
+      myRsvp: clearMyRsvp ? null : (myRsvp ?? this.myRsvp),
     );
   }
 

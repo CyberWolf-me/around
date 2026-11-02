@@ -141,19 +141,27 @@ class BentoCard extends ConsumerWidget {
                   GestureDetector(
                     onTap: () {
                       HapticService.selection();
-                      ref.read(postsRepositoryProvider.notifier).reactToPost(post.id, reaction: 'heart');
+                      ref.read(postsRepositoryProvider.notifier).reactToPost(post.id, reaction: post.userReaction ?? 'heart');
                     },
+                    onLongPress: () => _showReactionPicker(context, ref, post.id),
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.8),
+                        color: post.userReaction != null ? AppColors.orange.withValues(alpha: 0.18) : Colors.white.withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(999),
-                        border: Border.all(color: AppColors.ink.withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: post.userReaction != null ? AppColors.orange : AppColors.ink.withValues(alpha: 0.3),
+                          width: post.userReaction != null ? 1.5 : 1,
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.favorite, size: 11, color: AppColors.danger),
+                          Icon(
+                            _reactionIcon(post.userReaction),
+                            size: 11,
+                            color: _reactionColor(post.userReaction),
+                          ),
                           const SizedBox(width: 3),
                           Text(
                             '${post.savesCount}',
@@ -325,19 +333,27 @@ class BentoCard extends ConsumerWidget {
                       GestureDetector(
                         onTap: () {
                           HapticService.selection();
-                          ref.read(postsRepositoryProvider.notifier).reactToPost(post.id, reaction: 'heart');
+                          ref.read(postsRepositoryProvider.notifier).reactToPost(post.id, reaction: post.userReaction ?? 'heart');
                         },
+                        onLongPress: () => _showReactionPicker(context, ref, post.id),
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: AppColors.paper2,
+                            color: post.userReaction != null ? AppColors.orange.withValues(alpha: 0.18) : AppColors.paper2,
                             borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+                            border: Border.all(
+                              color: post.userReaction != null ? AppColors.orange : AppColors.ink.withValues(alpha: 0.2),
+                              width: post.userReaction != null ? 1.5 : 1,
+                            ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.favorite, size: 12, color: AppColors.danger),
+                              Icon(
+                                _reactionIcon(post.userReaction),
+                                size: 12,
+                                color: _reactionColor(post.userReaction),
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 '${post.savesCount}',
@@ -385,6 +401,100 @@ class BentoCard extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  IconData _reactionIcon(String? reaction) {
+    switch (reaction) {
+      case 'fire':
+        return Icons.local_fire_department;
+      case 'coffee':
+        return Icons.coffee;
+      case 'bookmark_nod':
+        return Icons.bookmark;
+      case 'heart':
+      default:
+        return Icons.favorite;
+    }
+  }
+
+  Color _reactionColor(String? reaction) {
+    switch (reaction) {
+      case 'fire':
+        return AppColors.orange;
+      case 'coffee':
+        return const Color(0xFF8D6E63);
+      case 'bookmark_nod':
+        return AppColors.ink;
+      case 'heart':
+      default:
+        return reaction != null ? AppColors.danger : AppColors.danger.withValues(alpha: 0.6);
+    }
+  }
+
+  void _showReactionPicker(BuildContext context, WidgetRef ref, String postId) {
+    HapticService.medium();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: const BoxDecoration(
+          color: AppColors.paper,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          border: Border(top: BorderSide(color: AppColors.ink, width: 2)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'React to Drop',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildReactionOption(ctx, ref, postId, 'heart', Icons.favorite, 'Love', AppColors.danger),
+                _buildReactionOption(ctx, ref, postId, 'fire', Icons.local_fire_department, 'Fire', AppColors.orange),
+                _buildReactionOption(ctx, ref, postId, 'coffee', Icons.coffee, 'Vibe', const Color(0xFF8D6E63)),
+                _buildReactionOption(ctx, ref, postId, 'bookmark_nod', Icons.bookmark, 'Saved', AppColors.ink),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReactionOption(
+    BuildContext ctx,
+    WidgetRef ref,
+    String postId,
+    String reaction,
+    IconData icon,
+    String label,
+    Color color,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        HapticService.selection();
+        Navigator.pop(ctx);
+        ref.read(postsRepositoryProvider.notifier).reactToPost(postId, reaction: reaction);
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CircleAvatar(
+            radius: 22,
+            backgroundColor: AppColors.paper2,
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.ink)),
+        ],
       ),
     );
   }
