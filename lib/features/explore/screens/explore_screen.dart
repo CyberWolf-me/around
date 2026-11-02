@@ -14,6 +14,7 @@ import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
+import '../../../core/services/atmosphere_service.dart';
 import '../widgets/category_chips.dart';
 import '../widgets/city_map_widget.dart';
 import '../widgets/venue_row_widget.dart';
@@ -31,19 +32,27 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   String _selectedCategory = 'All';
   String _searchQuery = '';
   String _selectedPlaceId = 'breadly';
+  bool _atmosphereActive = false;
+  late AtmosphereInfo _currentAtmosphere;
   late Future<List<PlaceModel>> _placesFuture;
 
   @override
   void initState() {
     super.initState();
+    _currentAtmosphere = AtmosphereService.getCurrentInfo();
     _refreshPlaces();
   }
 
   void _refreshPlaces() {
     _placesFuture = ref.read(placesRepositoryProvider).getNearbyPlaces(
-          category: _selectedCategory,
+          category: _atmosphereActive ? 'All' : _selectedCategory,
           searchQuery: _searchQuery,
-        );
+        ).then((places) {
+          if (_atmosphereActive) {
+            return AtmosphereService.filterPlaces(places, _currentAtmosphere.mode);
+          }
+          return places;
+        });
   }
 
   @override
@@ -196,13 +205,86 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                         ),
                       ),
                     ),
+                    // Atmosphere Rhythm Indicator & Quick Filter
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                        decoration: BoxDecoration(
+                          color: _atmosphereActive ? _currentAtmosphere.bgTint : AppColors.cardSurface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: _atmosphereActive ? _currentAtmosphere.accentColor : AppColors.borderHairline,
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              _currentAtmosphere.icon,
+                              size: 16,
+                              color: _atmosphereActive ? _currentAtmosphere.accentColor : AppColors.ink,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '${_currentAtmosphere.title} · ${_currentAtmosphere.tagline}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.instrumentSans(
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.ink,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            BouncingWidget(
+                              scaleFactor: 0.94,
+                              onTap: () {
+                                HapticService.selection();
+                                setState(() {
+                                  _atmosphereActive = !_atmosphereActive;
+                                  _refreshPlaces();
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: _atmosphereActive ? AppColors.ink : AppColors.paper2,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  _atmosphereActive ? 'Filtered' : 'Filter',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: _atmosphereActive ? Colors.white : AppColors.ink2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       child: CategoryChips(
                         selectedCategory: _selectedCategory,
+                        atmosphereLabel: _currentAtmosphere.title,
+                        isAtmosphereActive: _atmosphereActive,
+                        onToggleAtmosphere: () {
+                          HapticService.selection();
+                          setState(() {
+                            _atmosphereActive = !_atmosphereActive;
+                            _refreshPlaces();
+                          });
+                        },
                         onSelected: (cat) {
                           setState(() {
                             _selectedCategory = cat;
+                            _atmosphereActive = false;
                             _refreshPlaces();
                           });
                         },

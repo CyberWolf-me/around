@@ -892,7 +892,7 @@
       "description": "Create AtmosphereService that dynamically classifies Tashkent local time into urban rhythms (Morning Brew, Afternoon Focus, Golden Hour, Late Night Vinyl) and filters Explore venues accordingly.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P11-02"
       ],
@@ -921,7 +921,7 @@
       "description": "Implement persistent in-app localization engine supporting Uzbek, Russian, and English with dynamic locale switcher in Settings.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P11-03"
       ],
