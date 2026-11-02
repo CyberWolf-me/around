@@ -1706,7 +1706,7 @@
       "description": "NeighborhoodPulseBanner widget on MapScreen showing live district friend clusters and enabling quick zoom to active neighborhoods.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P17-01"
       ],
