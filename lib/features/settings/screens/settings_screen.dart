@@ -231,6 +231,85 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  Future<void> _confirmPurgeVisitHistory() async {
+    HapticService.heavy();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.paper,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: AppColors.borderSubtle, width: 1),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.shield_outlined, color: AppColors.orange, size: 22),
+            const SizedBox(width: 8),
+            Text(
+              'Purge Visit History?',
+              style: GoogleFonts.bricolageGrotesque(
+                fontWeight: FontWeight.w800,
+                fontSize: 18,
+                color: AppColors.ink,
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          'This will permanently zero out all your check-in drops, saved venue bookmarks, and sensitive visit logs across Supabase and in-memory vaults. This action is irreversible.',
+          style: TextStyle(fontSize: 13, color: AppColors.ink2, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel', style: TextStyle(color: AppColors.ink3)),
+          ),
+          BouncingWidget(
+            onTap: () => Navigator.pop(ctx, true),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.orange,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                'Purge History',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12.5),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      HapticService.medium();
+      if (SupabaseService.isAuthenticated) {
+        await SupabaseService.purgeVisitHistory();
+      }
+
+      // Zero out in-memory biometric sensitive memory vault
+      BiometricService.purgeSensitiveMemoryVault();
+
+      // Clear local saved places and drops
+      await ref.read(savedPlacesProvider.notifier).purgeAllSaved();
+      await ref.read(savedPlaceStatusesProvider.notifier).purgeAllStatuses();
+      await ref.read(friendPlansProvider.notifier).purgeAllPlans();
+      await ref.read(postsRepositoryProvider.notifier).purgeUserDrops();
+      await ref.read(currentProfileProvider.notifier).updatePrivacySettings(hideVisits: true);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Visit history securely purged from database and local vault.'),
+            backgroundColor: AppColors.ink,
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _confirmDeleteOrResetAccount() async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -718,6 +797,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   title: const Text('Export My Data (GDPR JSON)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
                   trailing: const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3),
                   onTap: _showExportDataDialog,
+                ),
+                const Divider(height: 1, color: AppColors.borderHairline, indent: 16, endIndent: 16),
+                ListTile(
+                  key: const Key('settings_tile_purge_history'),
+                  leading: const Icon(Icons.auto_delete_outlined, color: AppColors.orange, size: 20),
+                  title: const Text('Purge Visit History & Zero Check-Ins', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.orange)),
+                  trailing: const Icon(Icons.chevron_right, size: 18, color: AppColors.ink3),
+                  onTap: _confirmPurgeVisitHistory,
                 ),
                 const Divider(height: 1, color: AppColors.borderHairline, indent: 16, endIndent: 16),
                 ListTile(

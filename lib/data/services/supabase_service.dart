@@ -114,6 +114,21 @@ class SupabaseService {
     }
   }
 
+  /// Cryptographically purges all check-in drops, saved bookmarks, and visit logs (P13-04).
+  static Future<Map<String, dynamic>?> purgeVisitHistory() async {
+    if (!_isInitialized || currentUser == null) return null;
+    try {
+      final res = await client.rpc('purge_my_visit_history');
+      if (res is Map) {
+        return Map<String, dynamic>.from(res);
+      }
+      return {'status': 'purged'};
+    } catch (e) {
+      AppLogger.error('SupabaseService', 'RPC purge_my_visit_history failed', e);
+      return null;
+    }
+  }
+
   /// Validates file type & size (<= 5 MB), uploads to the private 'post-media' bucket,
   /// and returns both the internal `storagePath` (for RLS & orphan cleanup) and signed/public URL (SEC-14).
   static Future<UploadedMediaResult?> uploadDropMediaResult(String localFilePath) async {
