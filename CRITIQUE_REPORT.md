@@ -1,69 +1,77 @@
-# Around — Adversarial Product, UX & Growth Critique Report (Phase 11 Audit)
+# Around — Adversarial Product, UX & Growth Critique Report (Phase 13 Audit)
 
-**Audit Date**: November 2, 2026  
-**Auditor Personas**: Adversarial Product Critic, Senior UX Architect, Viral Growth Lead  
-**Target Milestone**: Phase 11 — Viral Growth, Taste Passports & Contextual Discovery  
-**Branch**: `feat/polsia-autonomous-loop-phase-11`
-
----
-
-## Executive Summary & Strategic Tension
-
-With Phase 9 (Real-Time Channels, 24h Venue Stories, Biometric Vault) and Phase 10 (Universal Deep Linking, Offline Outbox Exponential Retry Engine) verified and tagged (`v1.1.0-staging.1`), the product foundation is technically rock-solid:
-- **66/66 Flutter unit & widget tests** pass.
-- **16/16 Web Vitest tests** pass.
-- **0 compiler & analyzer warnings**.
-
-However, an adversarial product audit reveals 4 critical growth and UX barriers preventing Around from achieving organic network effects in Tashkent:
-
-1. **Zero External Virality / Shareable Social Artifacts**:
-   - Currently, a user who curates 20 amazing coffee spots in Mirabad has no single, high-aesthetic artifact to share to Instagram Stories or Telegram channels.
-   - Discovery is trapped inside the client instead of generating organic user-to-user referral loops.
-
-2. **High Friction in Mutual Friendship Onboarding**:
-   - The "Dual-layer privacy" model requires mutual consent before friends-only drops unlock.
-   - However, finding a friend currently requires knowing their exact username and navigating search. There is no instantaneous Invite Link or QR-code handshake.
-
-3. **Static Venue Discovery vs. Real-Time Tashkent Rhythms**:
-   - Venues are currently organized by static categories (`Specialty Roastery`, `Bakery`).
-   - But Tashkent's urban social life is strictly time-contextual: morning sourdough & quiet laptop booths (08:00–12:00), mid-day business espresso (12:00–17:00), and sunset courtyards/cocktail vinyl sets (18:00+). The app does not adapt to the clock.
-
-4. **Monolingual Friction in a Trilingual Metropolis**:
-   - Tashkent is culturally trilingual: Uzbek (`O'zbekcha`), Russian (`Русский`), and English (`English`).
-   - The UI is currently English-only, creating unnecessary cognitive friction for everyday local Tashkent residents.
+**Audit Date**: November 3, 2026  
+**Auditor Personas**: CTO & Autonomous Loop Orchestrator, Senior Spatial Engineer, Tashkent Growth Lead  
+**Target Milestone**: Phase 13 — City Taste Quests, Spatial Privacy Density & Telegram Mini App Bridge  
+**Branch**: `feat/phase-12-strava-for-places`  
 
 ---
 
-## Actionable Phase 11 Backlog Specifications
+## Executive Summary & Strategic Position
 
-### `P11-01`: Shareable Tashkent Taste Passport & Profile Card
-- **Domain**: `Engagement` / `Discovery`
-- **Core User Problem**: Users cannot show off their curated taste or favorite venues outside the app.
-- **Deliverables**:
-  - `TastePassportWidget`: An editorial, high-aesthetic digital passport card showcasing user's top recommended venues, district badges, and avatar.
-  - Deep link handler `around://passport/:username` with rich copyable summary.
-  - Interactive Preview & Share Modal on `ProfileScreen`.
+With Phase 12 fully delivered (10 milestones across Launch Readiness and Closed Beta Cohort Activation, tagged `v1.2.0-staging.1`):
+- **146 / 146 Flutter tests** passing with zero errors.
+- **21 / 21 Web Vitest tests** passing with zero errors.
+- **0 static analysis warnings** across all Dart & TypeScript code.
+- **50 curated Tashkent venues** with PostGIS coordinates across 5 central districts.
+- **Closed beta VIP code gate** (`TASH50`, `MIRAB1`, `YAKK02`, etc.) active.
+- **Telegram preview meta tags** and deep link routing bridge live.
 
-### `P11-02`: Mutual Friend Invite Links & QR Connection Engine
-- **Domain**: `Social Graph` / `Growth`
-- **Core User Problem**: Adding friends requires manual search and asynchronous approval.
-- **Deliverables**:
-  - `FriendInviteService`: Generates deterministic invite codes and signed URLs (`https://around.tashkent.app/invite/:code`).
-  - Auto-handshake: Opening an invite code immediately establishes or requests mutual friendship upon authentication.
-  - Quick QR/Invite sheet in Profile and Settings.
+### The Adversarial Growth Audit
 
-### `P11-03`: Contextual Time-of-Day Atmosphere Engine & Real-Time Filter
-- **Domain**: `Discovery` / `Places`
-- **Core User Problem**: Explore recommendations ignore the current time and mood of the city.
-- **Deliverables**:
-  - `AtmosphereService`: Evaluates live Tashkent local time (`TimeOfDayMode`: Morning Brew, Afternoon Focus, Evening Golden Hour, Late Night Vinyl).
-  - Dynamic atmosphere chip pills on `ExploreScreen` and `FeedScreen`.
-  - Filter places by live ambiance score and operational vibe.
+Now that our closed beta cohort (Tashkent 50) is entering the product, the primary operational threat shifts from *initial onboarding* to **habitual weekly retention & social proof**:
 
-### `P11-04`: Trilingual Tashkent Localization Engine (UZ / RU / EN)
-- **Domain**: `Platform` / `Identity`
-- **Core User Problem**: English-only UI alienates local Russian- and Uzbek-speaking residents.
+1. **Lack of Inherent "Strava-Like" Progress & Motivation**:
+   - In Strava, runners don't just log miles; they hunt Segments, build weekly streaks, and earn "Local Legend" status.
+   - In Around, visiting 3 artisan bakeries in Mirabad or tasting plov across Old City currently gives no progressive milestone feedback or collectible city badge.
+   - **Remedy**: Introduce curated **Tashkent Taste Quests** ("Mirabad Specialty Coffee Trail", "Old City Plov Connoisseur", "Evening Jazz & Wine Circuit") with unlockable badge flair displayed on Taste Passports and profiles.
+
+2. **Map Lacks Visual Aggregate Social Heat**:
+   - The map displays static venue pins, but gives no visceral sense of where friends or locals are clustering right now.
+   - However, showing exact real-time GPS locations violates our non-negotiable **dual-layer privacy invariant**.
+   - **Remedy**: Implement privacy-preserving **Venue Activity Heatmap & District Density Clusters** aggregating drop activity by district and venue without exposing precise user timestamps or raw coordinates.
+
+3. **Telegram Friction in Uzbekistan**:
+   - 90%+ of our target demographic in Tashkent lives in Telegram. When an invite link or passport link is opened on a mobile device, users prefer an immediate Telegram WebApp (TWA) overlay rather than breaking context to open external Safari/Chrome browsers.
+   - **Remedy**: Integrate Telegram WebApp (TWA) SDK hooks and viewport bridges into `src/` to provide an instant interactive preview within Telegram chats.
+
+4. **Cryptographic Privacy & GDPR Data Erasure Guarantee**:
+   - Trust is our core differentiator against massive directories like Yandex Maps. To back up our privacy promises, users must have an unambiguous, single-tap cryptographic visit history purge RPC (`purge_my_visit_history`) that immediately zeros out their sensitive places history in both database and device cache.
+
+---
+
+## Phase 13 Backlog Roadmap (`tasks.json`)
+
+### `P13-01`: Tashkent City Taste Quests & Local Legend Badges
+- **Domain**: `Gamification & Retention`
+- **Owner**: `Flutter & Web Product Engineer`
 - **Deliverables**:
-  - `LocaleService`: Persistent language selector (`en`, `ru`, `uz`) with Riverpod state.
-  - Tashkent localized dictionary for common navigation labels, category pills, kicker strings, and action buttons.
-  - In-app language switcher modal accessible from Settings.
+  - `QuestModel` & `QuestsRepository` managing curated city discovery trails (e.g., Mirabad Coffee Crawl, Old City Heritage Plov, Botanical Evening Stroll).
+  - Progress tracking engine based on saved places, drops, and verified visits.
+  - Interactive Quest Sheet and unlockable profile badge flair.
+  - Comprehensive unit and widget tests.
+
+### `P13-02`: Privacy-Preserving Venue Activity Heatmap & District Density Engine
+- **Domain**: `Spatial Data & Discovery`
+- **Owner**: `Backend & Security Engineer`
+- **Deliverables**:
+  - PostGIS aggregation function `get_district_activity_density` calculating anonymous drop counts per Tashkent district over sliding 7-day windows.
+  - Flutter map overlay displaying soft ambient heat rings around active neighborhoods without exposing individual user identities or raw coordinates.
+  - SQL authorization assertions and unit tests.
+
+### `P13-03`: Telegram WebApp (TWA) Mini App Bridge & Direct Invite Injection
+- **Domain**: `Social Graph & Distribution`
+- **Owner**: `Flutter & Web Product Engineer`
+- **Deliverables**:
+  - `src/services/telegramWebApp.ts` supporting Telegram WebApp initialization, theme synchronization (`tg.themeParams`), and viewport auto-expansion.
+  - Automatic cohort invite token detection from `Telegram.WebApp.initDataUnsafe.start_param`.
+  - Vitest test suite for TWA launch parameters.
+
+### `P13-04`: Cryptographic Visit History Purge RPC & Zero-Knowledge Self-Destruct
+- **Domain**: `Trust & Safety`
+- **Owner**: `Backend & Security Engineer`
+- **Deliverables**:
+  - Migration `00013_visit_history_purge.sql` with `SECURITY DEFINER` RPC `purge_my_visit_history()`.
+  - Atomic deletion of all user visit logs, reactions, and check-ins while preserving account integrity.
+  - UI action in `SettingsScreen` with double confirmation and haptic warning.
+  - pgTap and Dart unit tests.

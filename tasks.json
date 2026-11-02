@@ -1234,6 +1234,120 @@
         "flutter analyze --fatal-infos --fatal-warnings"
       ],
       "riskAssessment": "Low: Version bumping and tagging."
+    },
+    {
+      "id": "P13-01",
+      "title": "Tashkent City Taste Quests & Local Legend Badges",
+      "domain": "Gamification & Retention",
+      "description": "Implement curated city discovery trails (Mirabad Coffee Crawl, Old City Plov Connoisseur, Evening Lounge Circuit) with automated visit progress tracking and profile badge flair.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P0",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P12-10"
+      ],
+      "affectedPaths": [
+        "lib/data/models/quest_model.dart",
+        "lib/data/repositories/quests_repository.dart",
+        "lib/features/profile/widgets/taste_quests_card.dart",
+        "test/unit/quests_repository_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "QuestsRepository defines at least 4 curated Tashkent taste quests spanning specialty coffee, traditional dining, evening culture, and green promenades.",
+        "Tracks user progress based on saved places and drops matching quest target venues.",
+        "Grants badge flair and local legend status when all target venues of a quest are completed.",
+        "TasteQuestsCard renders quest progress bars and completed badges.",
+        "Unit tests verify progress calculation, badge unlocking, and deterministic sorting."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm test"
+      ],
+      "riskAssessment": "Low: Additive gamification domain."
+    },
+    {
+      "id": "P13-02",
+      "title": "Privacy-Preserving Venue Activity Heatmap & District Density Engine",
+      "domain": "Spatial Data & Discovery",
+      "description": "Build PostGIS aggregation RPC get_district_activity_density and Flutter map density rings visualizing live Tashkent social heat without exposing raw user GPS coordinates.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P13-01"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00013_district_activity_density.sql",
+        "lib/data/repositories/places_repository.dart",
+        "lib/features/places/widgets/district_density_overlay.dart",
+        "test/unit/district_density_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Migration creates get_district_activity_density RPC aggregating drop counts per district with spatial centroid points.",
+        "Dual-layer privacy enforced: aggregates anonymous counts only, never returns user identifiers or exact timestamps.",
+        "PlacesRepository exposes getDistrictActivityDensity method with local fallback.",
+        "Unit tests verify density calculations and privacy guarantees."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test"
+      ],
+      "riskAssessment": "Low: Non-destructive RPC function."
+    },
+    {
+      "id": "P13-03",
+      "title": "Telegram WebApp (TWA) Mini App Bridge & Direct Invite Injection",
+      "domain": "Social Graph & Distribution",
+      "description": "Add Telegram WebApp SDK bindings to web companion, automatically detecting start_param cohort invites and synchronizing Telegram theme params.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P13-02"
+      ],
+      "affectedPaths": [
+        "src/services/telegramWebApp.ts",
+        "src/router.tsx",
+        "src/__tests__/telegramWebApp.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Telegram WebApp SDK bridge extracts start_param invite tokens directly from window.Telegram.WebApp.initDataUnsafe.",
+        "Adapts app background and text colors to match user's Telegram theme.",
+        "Vitest test suite verifies start_param extraction and fallback behavior."
+      ],
+      "verificationCommands": [
+        "npm test",
+        "npm run lint"
+      ],
+      "riskAssessment": "Low: Web companion client-side integration only."
+    },
+    {
+      "id": "P13-04",
+      "title": "Cryptographic Visit History Purge RPC & Zero-Knowledge Self-Destruct",
+      "domain": "Trust & Safety",
+      "description": "Implement database-level purge_my_visit_history() RPC atomically zeroing out check-ins, sensitive visit history, and reaction logs with zero residual trace.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P13-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00014_visit_history_purge.sql",
+        "lib/features/settings/screens/settings_screen.dart",
+        "test/unit/visit_history_purge_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "PostgreSQL RPC purge_my_visit_history() securely deletes caller's visit history, check-ins, and saved entries bound to auth.uid().",
+        "Settings screen provides single-tap zeroization action with confirmation dialog and haptic feedback.",
+        "Unit tests verify deletion and memory vault purging."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test"
+      ],
+      "riskAssessment": "Medium: Destructive deletion strictly scoped to auth.uid()."
     }
   ],
   "loopConfig": {
