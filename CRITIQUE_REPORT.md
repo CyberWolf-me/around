@@ -438,3 +438,22 @@ With Phase 18 fully delivered (tagged `v1.8.0-staging.1`):
 - **Domain**: Resilience & Offline Experience
 - **Owner**: Core Engineering
 - **Deliverables**: `OfflineOutboxSyncBus` in `lib/core/services/offline_outbox_sync_bus.dart` listening to connectivity pulses and automatically flushing queued drops with localized status callbacks.
+
+
+---
+
+## Autonomous Product Audit & Replenishment — Phase 21 (November 3, 2026)
+
+### Strategic Evaluation: Milestone 2.0 Complete & Viral Social Density
+With Phase 20 successfully delivered and released as `v2.0.0-staging.1` (248 Flutter tests, 53 Web tests, zero static analysis warnings), Around has transitioned from basic place check-ins to an active social habit engine.
+
+However, to convert discovery into real-world social meetups and prevent streak churn, Phase 21 introduces 4 critical mechanisms:
+
+1. **Curator Mutual Coffee Match & Telegram Invite Sheet (`P21-01`)**:
+   - When curators discover high taste overlap on `UserProfileScreen`, provide an instant tactile action sheet to coordinate a coffee meetup at their shared top venue on Telegram (`t.me/<handle>` pre-filled deep link).
+2. **Explorer Streak Freeze Shield & Grace Period Engine (`P21-02`)**:
+   - Provide retention protection inspired by Strava/Duolingo: active curators who log ≥3 drops in a week bank an automatic "Streak Freeze Shield". When Sunday reflection expires with zero drops, the shield is consumed to protect the explorer's multi-week streak from resetting.
+3. **Web Companion Live Place Atmosphere Heatmap & Rhythm Tracker (`P21-03`)**:
+   - Port the 24-hour urban rhythm sparkline into the Web Companion (`PlaceRhythmHeatmap.tsx`) with peak atmosphere badges, hour selection, and direct mobile app deep links.
+4. **Curator Milestone & Trophy In-App Notification Dispatcher (`P21-04`)**:
+   - Reactive milestone notification dispatcher (`CuratorNotificationService`) issuing in-app notifications and haptic alerts when curators unlock achievements, level up streaks, or secure district crowns.

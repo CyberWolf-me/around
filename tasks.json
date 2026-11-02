@@ -2102,6 +2102,111 @@
         "flutter test test/unit/offline_outbox_sync_bus_test.dart"
       ],
       "riskAssessment": "Low: Outbox coordination service."
+    },
+    {
+      "id": "P21-01",
+      "title": "Curator Mutual Coffee Match & Telegram Invite Sheet",
+      "domain": "Social Graph & Engagement",
+      "description": "CuratorCoffeePingSheet on UserProfileScreen generating pre-filled Telegram direct invites based on shared top spots and taste compatibility score.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P0",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P20-04"
+      ],
+      "affectedPaths": [
+        "lib/features/profile/widgets/curator_coffee_ping_sheet.dart",
+        "lib/features/profile/screens/user_profile_screen.dart",
+        "test/widget/curator_coffee_ping_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders coffee invite bottom sheet with candidate curator, mutual match percentage, and shared venue chips.",
+        "Constructs localized Telegram deep link (t.me/<handle>) with pre-filled message mentioning shared spot.",
+        "Widget tests verify sheet presentation, copy generation, and URL launch delegation."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/curator_coffee_ping_test.dart"
+      ],
+      "riskAssessment": "Low: Additive profile interaction modal."
+    },
+    {
+      "id": "P21-02",
+      "title": "Explorer Streak Freeze Shield & Grace Period Engine",
+      "domain": "Gamification & Retention",
+      "description": "StreakFreezeService in lib/core/services/streak_freeze_service.dart banking freeze shields for high-activity weeks and protecting multi-week explorer streaks against missed deadlines.",
+      "ownerRole": "Core Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P21-01"
+      ],
+      "affectedPaths": [
+        "lib/core/services/streak_freeze_service.dart",
+        "test/unit/streak_freeze_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Banks freeze shield when weekly drops reach threshold (>=3 drops in calendar week).",
+        "Applies shield automatically when streak is at risk at week rollover, preserving streak counter.",
+        "Unit tests verify shield banking, consumption, cap limits, and streak status calculation."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/streak_freeze_test.dart"
+      ],
+      "riskAssessment": "Low: Core streak calculation service."
+    },
+    {
+      "id": "P21-03",
+      "title": "Web Companion Live Place Atmosphere Heatmap & Rhythm Tracker",
+      "domain": "Spatial Data & Discovery",
+      "description": "PlaceRhythmHeatmap.tsx in src/components/ rendering 24-hour atmosphere sparklines, peak hour tags, and mobile deep link CTA for web companion place pages.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P21-02"
+      ],
+      "affectedPaths": [
+        "src/components/PlaceRhythmHeatmap.tsx",
+        "src/__tests__/placeRhythmHeatmap.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders 24-hour atmosphere hourly distribution sparkline with interactive hour inspection.",
+        "Displays peak vibe tag (#MorningBrew, #WorkFriendly, #EveningBuzz) and active percentage.",
+        "Vitest test suite verifies hourly rendering, peak calculation, and fallback styling."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P21-04",
+      "title": "Curator Milestone & Trophy In-App Notification Dispatcher",
+      "domain": "Retention & Engagement",
+      "description": "CuratorNotificationService in lib/core/services/curator_notification_service.dart issuing in-app notifications and tactile alerts on achievement unlocks and streak milestones.",
+      "ownerRole": "Core Engineering & Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P21-03"
+      ],
+      "affectedPaths": [
+        "lib/core/services/curator_notification_service.dart",
+        "test/unit/curator_notification_service_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Detects unlocked trophies, streak increments, and district crown transitions.",
+        "Appends structured ActivityNotification into NotificationsRepository and triggers tactile vibration.",
+        "Unit tests verify deduplication, milestone evaluation, and notification delivery."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/curator_notification_service_test.dart"
+      ],
+      "riskAssessment": "Low: In-app notification dispatcher."
     }
   ],
   "loopConfig": {
