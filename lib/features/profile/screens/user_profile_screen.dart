@@ -9,6 +9,10 @@ import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/services/haptic_service.dart';
 import '../../../data/services/storage_service.dart';
 import '../../../data/services/supabase_service.dart';
+import '../../../core/services/curator_recommendation_engine.dart';
+import '../../../core/services/locale_service.dart';
+import '../../../data/repositories/saved_places_repository.dart';
+import '../widgets/curator_taste_overlap_card.dart';
 
 class UserProfileScreen extends ConsumerStatefulWidget {
   final String userId;
@@ -79,6 +83,36 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
           if (p.isFriendsOnly && !isAcceptedFriend) return false;
           return true;
         }).toList();
+
+        final currentProfile = ref.watch(currentProfileProvider);
+        final mySavedPlaces = ref.watch(savedPlacesProvider);
+        final myDrops = allPosts.where((p) => p.authorId == currentUserId && !p.isQuarantined).toList();
+        final currentLang = ref.watch(appLocaleProvider);
+
+        final myTasteProfile = CuratorTasteProfile(
+          userId: currentUserId,
+          username: currentProfile.username,
+          fullName: currentProfile.fullName,
+          neighborhood: currentProfile.neighborhood,
+          droppedPlaceIds: myDrops.map((d) => d.placeId).toSet(),
+          savedPlaceIds: mySavedPlaces.toSet(),
+          preferredTags: myDrops.expand((d) => d.tags).toSet(),
+          activeDistricts: {currentProfile.neighborhood},
+        );
+
+        final candidateTasteProfile = CuratorTasteProfile(
+          userId: member.id,
+          username: member.handle,
+          fullName: member.name,
+          neighborhood: member.neighborhood,
+          droppedPlaceIds: visibleUserDrops.map((d) => d.placeId).toSet(),
+          savedPlaceIds: const {},
+          preferredTags: visibleUserDrops.expand((d) => d.tags).toSet(),
+          activeDistricts: {member.neighborhood},
+        );
+
+        final recEngine = ref.watch(curatorRecommendationEngineProvider);
+        final tasteMatch = recEngine.evaluateOverlap(myTasteProfile, candidateTasteProfile);
 
         String buttonLabel;
         Color buttonBg;
@@ -385,7 +419,12 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 14),
+                    CuratorTasteOverlapCard(
+                      match: tasteMatch,
+                      languageCode: currentLang,
+                    ),
+                    const SizedBox(height: 20),
 
                     Text(
                       'Recent Drops',

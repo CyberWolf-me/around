@@ -2004,7 +2004,7 @@
       "description": "CuratorTasteOverlapCard on UserProfileScreen utilizing CuratorRecommendationEngine to compute and display live taste match score, shared favorite spots, and localized overlap highlights.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P0",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P19-04"
       ],
@@ -2031,7 +2031,7 @@
       "description": "WeeklyRetrospectiveModal on FeedScreen triggering during Sunday retrospective window or at-risk streak state, celebrating weekly milestones or offering immediate drop creation.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P20-01"
       ],
