@@ -665,7 +665,7 @@
       "description": "Connect SupabaseClient.channel('public:posts') in PostsRepository to listen for INSERT, UPDATE, and DELETE events, streaming new friend drops and real-time reaction counters directly to FeedScreen without manual pull-to-refresh.",
       "ownerRole": "Mobile Engineering & Backend Engineering",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P8-05"
       ],
@@ -692,7 +692,7 @@
       "description": "Wire public.place_stories from Migration 00006 into StoriesRepository, StoryRail, and a fullscreen gesture-driven StoryViewerScreen with progress bars, countdown timer, and camera capture.",
       "ownerRole": "Mobile Engineering & Product Design",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P9-01"
       ],

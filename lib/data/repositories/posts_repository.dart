@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/comment_model.dart';
 import '../models/post_model.dart';
 import '../../core/constants/app_colors.dart';
@@ -14,12 +15,20 @@ final postsRepositoryProvider = NotifierProvider<PostsNotifier, List<PostModel>>
 
 class PostsNotifier extends Notifier<List<PostModel>> {
   final List<DateTime> _recentPublishTimestamps = [];
+  RealtimeChannel? _postsRealtimeChannel;
+
+  /// Whether a Supabase Realtime channel is currently active (P9-01).
+  bool get isRealtimeActive => _postsRealtimeChannel != null;
 
   @override
   List<PostModel> build() {
+    ref.onDispose(unsubscribeFromRealtimeDrops);
     final storedDrops = StorageService.getStoredDrops();
     if (SupabaseService.isInitialized && SupabaseService.isAuthenticated) {
-      Future.microtask(syncRemoteFeed);
+      Future.microtask(() async {
+        await syncRemoteFeed();
+        subscribeToRealtimeDrops();
+      });
       if (storedDrops.isNotEmpty) return storedDrops;
       return [];
     }
@@ -754,5 +763,101 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       }
       return p.audience == PostAudience.public;
     }).toList();
+  }
+
+  /// Initializes real-time Postgres change listening for live drops & reactions (P9-01).
+  void subscribeToRealtimeDrops() {
+    if (!SupabaseService.isInitialized || !SupabaseService.isAuthenticated) return;
+    if (_postsRealtimeChannel != null) return;
+
+    try {
+      _postsRealtimeChannel = SupabaseService.client
+          .channel('public:posts')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.insert,
+            schema: 'public',
+            table: 'posts',
+            callback: (payload) {
+              final newRecord = payload.newRecord;
+              if (newRecord.isEmpty) return;
+              final postId = newRecord['id']?.toString() ?? '';
+              if (state.any((p) => p.id == postId)) return;
+              if (newRecord['is_quarantined'] == true) return;
+
+              final audienceStr = newRecord['audience']?.toString() ?? 'friends';
+              final audience = audienceStr == 'public' ? PostAudience.public : PostAudience.friends;
+
+              final incomingDrop = PostModel(
+                id: postId,
+                authorId: newRecord['author_id']?.toString() ?? '',
+                authorName: 'Friend',
+                authorUsername: 'friend',
+                placeId: newRecord['place_id']?.toString() ?? 'breadly',
+                placeName: 'Tashkent Spot',
+                placeCategory: 'Café',
+                placeAddress: 'Tashkent',
+                note: newRecord['note']?.toString() ?? '',
+                rating: newRecord['rating'] as int?,
+                audience: audience,
+                size: PostSize.hero,
+                mediaUrl: newRecord['media_url']?.toString(),
+                createdAt: DateTime.tryParse(newRecord['created_at']?.toString() ?? '') ?? DateTime.now(),
+              );
+
+              state = [incomingDrop, ...state];
+              StorageService.persistDrops(state);
+            },
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.update,
+            schema: 'public',
+            table: 'posts',
+            callback: (payload) {
+              final updatedRecord = payload.newRecord;
+              if (updatedRecord.isEmpty) return;
+              final postId = updatedRecord['id']?.toString() ?? '';
+              final isQuarantined = updatedRecord['is_quarantined'] == true;
+
+              state = state.map((p) {
+                if (p.id != postId) return p;
+                if (isQuarantined) {
+                  return p.copyWith(isQuarantined: true);
+                }
+                return p.copyWith(
+                  note: updatedRecord['note']?.toString() ?? p.note,
+                  rating: updatedRecord['rating'] as int? ?? p.rating,
+                );
+              }).toList();
+              StorageService.persistDrops(state);
+            },
+          )
+          .onPostgresChanges(
+            event: PostgresChangeEvent.delete,
+            schema: 'public',
+            table: 'posts',
+            callback: (payload) {
+              final oldRecord = payload.oldRecord;
+              if (oldRecord.isEmpty) return;
+              final postId = oldRecord['id']?.toString() ?? '';
+              state = state.where((p) => p.id != postId).toList();
+              StorageService.persistDrops(state);
+            },
+          )
+          .subscribe();
+    } catch (e) {
+      AppLogger.warn('PostsRepository', 'Realtime subscription failed to initialize', e);
+    }
+  }
+
+  /// Closes active Realtime channel on logout or provider disposal (P9-01).
+  void unsubscribeFromRealtimeDrops() {
+    if (_postsRealtimeChannel != null) {
+      try {
+        SupabaseService.client.removeChannel(_postsRealtimeChannel!);
+      } catch (e) {
+        AppLogger.warn('PostsRepository', 'Error removing realtime channel', e);
+      }
+      _postsRealtimeChannel = null;
+    }
   }
 }

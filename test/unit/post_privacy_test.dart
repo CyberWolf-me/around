@@ -292,5 +292,18 @@ void main() {
       expect(comments.isNotEmpty, isTrue);
       expect(comments.any((c) => c.body == 'Great cardamom bun recommendation!'), isTrue);
     });
+
+    test('subscribeToRealtimeDrops and unsubscribeFromRealtimeDrops manage lifecycle safely (P9-01)', () {
+      // In offline / unit test mode, Supabase is uninitialized
+      expect(notifier.isRealtimeActive, isFalse);
+
+      // Safe no-op without crashes when unauthenticated
+      notifier.subscribeToRealtimeDrops();
+      expect(notifier.isRealtimeActive, isFalse);
+
+      // Safe cleanup without crashes
+      notifier.unsubscribeFromRealtimeDrops();
+      expect(notifier.isRealtimeActive, isFalse);
+    });
   });
 }
