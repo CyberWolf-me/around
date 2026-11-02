@@ -2641,7 +2641,7 @@
       "description": "GroupCrawlSessionEngine in lib/core/services/group_crawl_session_engine.dart managing session codes, participant states, collective stop progress, and squad completion qualification.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P25-04"
       ],
