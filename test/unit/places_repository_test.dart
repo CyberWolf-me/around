@@ -31,18 +31,26 @@ void main() {
       expect(nonExistent, isNull);
     });
 
-    test('getNearbyPlaces returns all 14 canonical Tashkent venues without duplicate aliases', () async {
-      final places = await repository.getNearbyPlaces();
-      expect(places.length, equals(14));
+    test('getAllPlaces and getNearbyPlaces return all 50 canonical Tashkent venues without duplicate aliases', () async {
+      final allPlaces = repository.getAllPlaces();
+      expect(allPlaces.length, equals(50));
+      final uniqueAllIds = allPlaces.map((p) => p.id).toSet();
+      expect(uniqueAllIds.length, equals(50));
+
+      final places = await repository.getNearbyPlaces(limit: 60);
+      expect(places.length, equals(50));
       final uniqueIds = places.map((p) => p.id).toSet();
       expect(uniqueIds.length, equals(places.length));
 
-      // Verify newly added high-vibe venues (Sprint 1)
+      // Verify newly added high-vibe venues (Sprint 1 & Phase 12B)
       expect(repository.getPlaceById('sette'), isNotNull);
       expect(repository.getPlaceById('socials'), isNotNull);
       expect(repository.getPlaceById('afsona'), isNotNull);
       expect(repository.getPlaceById('caravan'), isNotNull);
       expect(repository.getPlaceById('teplo'), isNotNull);
+      expect(repository.getPlaceById('pie-republic'), isNotNull);
+      expect(repository.getPlaceById('besh-qozon-plov'), isNotNull);
+      expect(repository.getPlaceById('humo-arena-plaza'), isNotNull);
     });
 
     test('getNearbyPlaces filters by category accurately', () async {

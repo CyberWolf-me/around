@@ -1119,6 +1119,121 @@
         "flutter test"
       ],
       "riskAssessment": "Low: Non-blocking index creation."
+    },
+    {
+      "id": "P12-07",
+      "title": "50-Seed Curated Tashkent Venue Dataset Migration",
+      "domain": "Spatial Data & Curated Catalog",
+      "description": "Expand seed directory from 9 venues to 50 hand-vetted specialty cafes, bakeries, evening lounges, bookstores, and cultural hubs across Mirabad, Yakkasaray, Central, Yunusabad, and Shaykhontohur.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P0",
+      "status": "DONE",
+      "dependencies": [
+        "P12-06"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00012_curated_tashkent_venues.sql",
+        "lib/data/repositories/places_repository.dart",
+        "test/unit/places_curated_dataset_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Exactly 50 curated Tashkent places with valid UUIDs, unique slugs, PostGIS points (WGS84 4326), addresses, and atmosphere tags.",
+        "Distributed across all 5 major central districts: Mirabad, Yakkasaray, Central Tashkent, Yunusabad, and Shaykhontohur.",
+        "Idempotent INSERT INTO public.places ... ON CONFLICT (id) DO UPDATE.",
+        "PlacesRepository mirrors all 50 venues in fallback memory for offline/demo discovery.",
+        "Unit tests verify dataset integrity, non-null coordinates within Tashkent bounding box [41.20, 69.15] to [41.40, 69.40], and slug uniqueness."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm test"
+      ],
+      "riskAssessment": "Low: Non-destructive data migration with ON CONFLICT DO UPDATE."
+    },
+    {
+      "id": "P12-08",
+      "title": "Closed Beta Invite Code Access Gate & Cohort Activation",
+      "domain": "Growth & Access Control",
+      "description": "Implement closed beta gate requiring a 6-character cohort activation code (e.g. TASH50, MIRAB1) or valid mutual friend invite link before signup.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P12-07"
+      ],
+      "affectedPaths": [
+        "lib/core/services/beta_access_service.dart",
+        "lib/features/auth/screens/auth_screen.dart",
+        "test/unit/beta_access_service_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "BetaAccessService validates 6-character cohort codes (TASH50, MIRAB1, YAKK02, etc.) or active invite links.",
+        "Stores activation token in StorageService.",
+        "Auth screen presents VIP activation gate before new account registration.",
+        "Unit tests verify code validation, expiration, and error handling."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm test"
+      ],
+      "riskAssessment": "Low: Bypassable in dev/testing mode."
+    },
+    {
+      "id": "P12-09",
+      "title": "Telegram Web Companion Preview & Deep Link Bridge",
+      "domain": "Social Graph & Distribution",
+      "description": "Add OpenGraph social meta tags to index.html for rich Telegram chat previews and universal deep link bridge.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P12-08"
+      ],
+      "affectedPaths": [
+        "index.html",
+        "src/router.tsx",
+        "test/unit/deep_link_preview_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "index.html includes og:title, og:description, og:image, and telegram:channel meta tags.",
+        "Web companion router supports /invite/:code and /passport/:username routes.",
+        "Deep link preview test verifies meta tag formatting."
+      ],
+      "verificationCommands": [
+        "npm test",
+        "flutter test"
+      ],
+      "riskAssessment": "Low: HTML meta tags and web routing only."
+    },
+    {
+      "id": "P12-10",
+      "title": "Staging Release Verification & Version Tagging (v1.2.0-staging.1)",
+      "domain": "Release Engineering",
+      "description": "Execute full automated verification gate, tag v1.2.0-staging.1, and verify production release bundle readiness.",
+      "ownerRole": "QA & Release Lead",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P12-09"
+      ],
+      "affectedPaths": [
+        "COMPANY_PULSE.md",
+        "pubspec.yaml",
+        "package.json"
+      ],
+      "acceptanceCriteria": [
+        "All test suites pass with 0 failures.",
+        "Zero static analysis issues.",
+        "Git tag v1.2.0-staging.1 pushed to origin.",
+        "Release notes recorded in COMPANY_PULSE.md."
+      ],
+      "verificationCommands": [
+        "flutter test",
+        "npm test",
+        "flutter analyze --fatal-infos --fatal-warnings"
+      ],
+      "riskAssessment": "Low: Version bumping and tagging."
     }
   ],
   "loopConfig": {
