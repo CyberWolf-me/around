@@ -53,6 +53,14 @@ export interface TelegramMainButton {
   }) => TelegramMainButton;
 }
 
+export interface TelegramBackButton {
+  isVisible: boolean;
+  onClick: (callback: () => void) => TelegramBackButton;
+  offClick: (callback: () => void) => TelegramBackButton;
+  show: () => TelegramBackButton;
+  hide: () => TelegramBackButton;
+}
+
 export interface TelegramWebAppObject {
   initData?: string;
   initDataUnsafe?: {
@@ -80,6 +88,7 @@ export interface TelegramWebAppObject {
   sendData?: (data: string) => void;
   HapticFeedback?: TelegramHapticFeedback;
   MainButton?: TelegramMainButton;
+  BackButton?: TelegramBackButton;
 }
 
 declare global {
@@ -292,6 +301,79 @@ export function hideTelegramMainButton(): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+let activeBackButtonCallback: (() => void) | null = null;
+
+export function isTelegramBackButtonAvailable(): boolean {
+  const webApp = getTelegramWebApp();
+  return Boolean(webApp?.BackButton);
+}
+
+/**
+ * Shows the native Telegram BackButton and wires a click callback.
+ */
+export function showTelegramBackButton(onClick: () => void): boolean {
+  const webApp = getTelegramWebApp();
+  if (!webApp?.BackButton) return false;
+
+  try {
+    const bb = webApp.BackButton;
+
+    if (activeBackButtonCallback && typeof bb.offClick === 'function') {
+      bb.offClick(activeBackButtonCallback);
+    }
+
+    activeBackButtonCallback = () => {
+      triggerTelegramHaptic('selection');
+      onClick();
+    };
+
+    if (typeof bb.onClick === 'function') {
+      bb.onClick(activeBackButtonCallback);
+    }
+    if (typeof bb.show === 'function') {
+      bb.show();
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Hides and cleans up the native Telegram BackButton.
+ */
+export function hideTelegramBackButton(): boolean {
+  const webApp = getTelegramWebApp();
+  if (!webApp?.BackButton) return false;
+
+  try {
+    const bb = webApp.BackButton;
+    if (activeBackButtonCallback && typeof bb.offClick === 'function') {
+      bb.offClick(activeBackButtonCallback);
+      activeBackButtonCallback = null;
+    }
+    if (typeof bb.hide === 'function') {
+      bb.hide();
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Automatically updates Telegram native BackButton visibility based on route depth.
+ */
+export function syncTelegramNavigation(pathname: string, onNavigateBack: () => void): void {
+  const isRoot = !pathname || pathname === '/' || pathname === '';
+  if (isRoot) {
+    hideTelegramBackButton();
+  } else {
+    showTelegramBackButton(onNavigateBack);
   }
 }
 

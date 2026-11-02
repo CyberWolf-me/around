@@ -1599,12 +1599,13 @@
       "description": "Wire Telegram.WebApp.BackButton lifecycle and deep-linked place sharing into src/services/telegramWebApp.ts and src/router.tsx with Vitest test assertions.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P16-01"
       ],
       "affectedPaths": [
         "src/services/telegramWebApp.ts",
+        "src/router.tsx",
         "src/__tests__/telegramWebApp.test.ts"
       ],
       "acceptanceCriteria": [

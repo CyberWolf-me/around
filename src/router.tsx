@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AppProvider } from './context/AppContext';
 import { AppContent } from './App';
-import { initTelegramWebApp, parseTelegramStartParam } from './services/telegramWebApp';
+import { initTelegramWebApp, parseTelegramStartParam, syncTelegramNavigation } from './services/telegramWebApp';
 
 export type RouteType = 'home' | 'invite' | 'passport' | 'place';
 
@@ -111,6 +111,17 @@ export const WebCompanionRouter: React.FC = () => {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  useEffect(() => {
+    syncTelegramNavigation(route.path, () => {
+      if (typeof window !== 'undefined' && window.history.length > 1) {
+        window.history.back();
+      } else if (typeof window !== 'undefined') {
+        window.history.pushState({}, '', '/');
+        setRoute(parseRoute('/'));
+      }
+    });
+  }, [route.path]);
 
   return (
     <AppProvider>

@@ -11,6 +11,10 @@ import {
   isTelegramMainButtonAvailable,
   setTelegramMainButton,
   hideTelegramMainButton,
+  isTelegramBackButtonAvailable,
+  showTelegramBackButton,
+  hideTelegramBackButton,
+  syncTelegramNavigation,
 } from '../services/telegramWebApp';
 import { resolveInitialRoute } from '../router';
 
@@ -332,5 +336,72 @@ describe('P13-03: Telegram WebApp (TWA) Mini App Bridge & Direct Invite Injectio
     expect(offClickMock).toHaveBeenCalled();
     expect(hideMock).toHaveBeenCalled();
     expect(disableMock).toHaveBeenCalled();
+  });
+
+  it('controls Telegram native BackButton lifecycle and syncs with route depth', () => {
+    expect(isTelegramBackButtonAvailable()).toBe(false);
+    expect(showTelegramBackButton(vi.fn())).toBe(false);
+    expect(hideTelegramBackButton()).toBe(false);
+
+    let backClickHandler: (() => void) | null = null;
+    const showMock = vi.fn();
+    const hideMock = vi.fn();
+    const onClickMock = vi.fn((cb) => {
+      backClickHandler = cb;
+    });
+    const offClickMock = vi.fn();
+
+    mockWindow.Telegram = {
+      WebApp: {
+        ready: vi.fn(),
+        expand: vi.fn(),
+        close: vi.fn(),
+        BackButton: {
+          show: showMock,
+          hide: hideMock,
+          onClick: onClickMock,
+          offClick: offClickMock,
+        },
+      },
+    };
+
+    expect(isTelegramBackButtonAvailable()).toBe(true);
+
+    const onBack = vi.fn();
+    const shown = showTelegramBackButton(onBack);
+    expect(shown).toBe(true);
+    expect(showMock).toHaveBeenCalled();
+    expect(onClickMock).toHaveBeenCalled();
+
+    // Trigger back click
+    expect(backClickHandler).not.toBeNull();
+    backClickHandler!();
+    expect(onBack).toHaveBeenCalled();
+
+    // Hide BackButton
+    const hidden = hideTelegramBackButton();
+    expect(hidden).toBe(true);
+    expect(hideMock).toHaveBeenCalled();
+    expect(offClickMock).toHaveBeenCalled();
+
+    // Route sync tests
+    showMock.mockClear();
+    hideMock.mockClear();
+
+    // Root should hide BackButton
+    syncTelegramNavigation('/', onBack);
+    expect(hideMock).toHaveBeenCalled();
+    expect(showMock).not.toHaveBeenCalled();
+
+    // Sub-route should show BackButton
+    showMock.mockClear();
+    hideMock.mockClear();
+    syncTelegramNavigation('/places/breadly', onBack);
+    expect(showMock).toHaveBeenCalled();
+
+    // Sub-route passport should show BackButton
+    showMock.mockClear();
+    syncTelegramNavigation('/u/aziz/passport', onBack);
+    expect(showMock).toHaveBeenCalled();
   });
 });
