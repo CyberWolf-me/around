@@ -2503,15 +2503,15 @@
       "id": "P24-04",
       "title": "Supabase SQL Schema & District Leaderboard RPC Migration",
       "domain": "Backend & Security",
-      "description": "00013_curator_levels_and_district_leaderboard.sql adding curator_xp, curator_tier, and get_curator_leaderboard RPC with PostGIS spatial ranking.",
+      "description": "00015_curator_levels_and_district_leaderboard.sql adding curator_xp, curator_tier, and get_curator_leaderboard RPC with PostGIS spatial ranking.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P24-03"
       ],
       "affectedPaths": [
-        "supabase/migrations/00013_curator_levels_and_district_leaderboard.sql",
+        "supabase/migrations/00015_curator_levels_and_district_leaderboard.sql",
         "test/unit/curator_leaderboard_rpc_test.dart"
       ],
       "acceptanceCriteria": [
