@@ -2775,7 +2775,7 @@
       "description": "CuratorPostcardCard in lib/features/explore/widgets/curator_postcard_card.dart rendering the aesthetic paper receipt with perforated borders, seal stamp, and Telegram share actions.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P27-01"
       ],
