@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/services/biometric_service.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
@@ -365,6 +366,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             child: Column(
               children: [
+                SwitchListTile(
+                  title: const Text('Require Biometrics on Resume', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  subtitle: const Text('Prompt for biometric lock if app is backgrounded for >60s.', style: TextStyle(fontSize: 10.5)),
+                  value: ref.watch(biometricLockEnabledProvider),
+                  activeThumbColor: AppColors.orange,
+                  onChanged: (val) {
+                    HapticService.light();
+                    ref.read(biometricLockEnabledProvider.notifier).setEnabled(val);
+                  },
+                ),
+                const Divider(height: 1, indent: 14, endIndent: 14),
                 SwitchListTile(
                   title: const Text('Keep my visits private', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   subtitle: const Text('Places you visit are never shown as a chronological timeline.', style: TextStyle(fontSize: 10.5)),

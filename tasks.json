@@ -719,14 +719,17 @@
       "description": "Implement an optional biometric/PIN app lock using local_auth when app transitions to background, and secure user visit history memory cache when hide_visits_history is enabled.",
       "ownerRole": "Security Engineering & Mobile Engineering",
       "priority": "P2",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P9-02"
       ],
       "affectedPaths": [
         "lib/core/services/biometric_service.dart",
+        "lib/core/widgets/app_lock_gate.dart",
         "lib/features/settings/screens/settings_screen.dart",
-        "test/unit/post_privacy_test.dart"
+        "lib/data/services/storage_service.dart",
+        "lib/main.dart",
+        "test/unit/biometric_lock_test.dart"
       ],
       "acceptanceCriteria": [
         "Users can toggle 'Require Biometrics on Resume' in Settings.",

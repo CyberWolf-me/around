@@ -24,4 +24,10 @@ class HapticService {
       HapticFeedback.selectionClick();
     } catch (_) {}
   }
+
+  static void success() {
+    try {
+      HapticFeedback.mediumImpact();
+    } catch (_) {}
+  }
 }

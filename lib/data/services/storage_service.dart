@@ -22,9 +22,11 @@ class StorageService {
   static const _authUserEmailKey = 'around_auth_user_email_v1';
   static const _guestModeKey = 'around_guest_mode_v1';
   static const _notificationsKey = 'around_notifications_v1';
+  static const _biometricLockKey = 'around_biometric_lock_v1';
 
   static SharedPreferences? _prefs;
   static final Map<String, Object> _memoryFallback = {};
+  static final Map<String, DateTime> _sensitiveVisitVault = {};
 
   static Future<void> init() async {
     try {
@@ -290,8 +292,35 @@ class StorageService {
     await _prefs?.setString(_notificationsKey, encoded);
   }
 
+  // Biometric / App Lock preference
+  static bool isBiometricLockEnabled() {
+    return _prefs?.getBool(_biometricLockKey) ?? (_memoryFallback[_biometricLockKey] as bool? ?? false);
+  }
+
+  static Future<void> setBiometricLockEnabled(bool value) async {
+    _memoryFallback[_biometricLockKey] = value;
+    await _prefs?.setBool(_biometricLockKey, value);
+  }
+
+  // Sensitive Visit History Memory Vault
+  static void recordSensitiveVisit(String placeId, DateTime timestamp) {
+    _sensitiveVisitVault[placeId] = timestamp;
+  }
+
+  static Map<String, DateTime> getSensitiveVisitVault({bool hideVisitsHistory = false, bool isLocked = false}) {
+    if (hideVisitsHistory || isLocked) {
+      return const {};
+    }
+    return Map<String, DateTime>.unmodifiable(_sensitiveVisitVault);
+  }
+
+  static void purgeSensitiveMemoryVault() {
+    _sensitiveVisitVault.clear();
+  }
+
   static Future<void> clearAll() async {
     _memoryFallback.clear();
+    _sensitiveVisitVault.clear();
     await _prefs?.clear();
   }
 }
