@@ -237,3 +237,61 @@ With Phase 15 fully delivered (Weekend Rhythm UI, Multi-Axis Taste Radar, Telegr
 - **Domain**: Social Graph & Engagement
 - **Owner**: Mobile Engineering
 - **Deliverables**: `FriendPresenceEngine` computing recency and neighborhood activity indicators for friend cards without raw GPS leakage.
+
+---
+
+# Around — Adversarial Product, UX & Growth Critique Report (Phase 17 Audit)
+
+**Audit Date**: November 3, 2026  
+**Auditor Personas**: CTO & Autonomous Loop Orchestrator, Growth & Retention Lead, Senior Product Engineer  
+**Target Milestone**: Phase 17 — Ambient Presence Rail, Neighborhood Map Pulse, Web Share & Explorer Streaks  
+**Branch**: `feat/phase-12-strava-for-places`  
+
+## Executive Summary & Strategic Position
+
+With Phase 16 fully delivered (tagged `v1.6.0-staging.1`):
+- **204 / 204 Flutter tests** passing with zero errors.
+- **32 / 32 Web Vitest tests** passing with zero errors.
+- **0 static analysis warnings** across all Dart & TypeScript code.
+
+### The Adversarial Growth Audit
+
+1. **Ambient Presence Is Computed but Unsurfaced in Mobile Feed**:
+   - `FriendPresenceEngine` (`P16-04`) calculates ambient recency and neighborhood presence badges without GPS leakage, but the mobile Feed screen lacks a visual horizontal avatar rail showing friends active today in Mirabad or Yunusabad.
+   - **Remedy**: Build `FriendPresenceRail` with pulse indicators and district chips at the top of `FeedScreen`.
+
+2. **Map Lacks Real-Time Neighborhood Social Heat**:
+   - Curators opening the Map screen need to know at a glance which Tashkent district is buzzing with activity tonight.
+   - **Remedy**: Create `NeighborhoodPulseBanner` integrating `FriendPresenceEngine.getNeighborhoodFriendCounts` to display aggregate friend counts per district and allow 1-tap district filtering.
+
+3. **Web Companion Needs 1-Tap Telegram Social Share**:
+   - When a friend receives a link to a place or taste passport on Telegram, they open `src/`. The web companion must offer a native Telegram share card with pre-formatted invite text for forwarding to friends and group chats.
+   - **Remedy**: Implement `PassportShareModal` and native Telegram share URL builder in the web companion.
+
+4. **Retention Engine: Weekly Explorer Streak**:
+   - Strava's weekly mileage streak is the ultimate retention driver. For Around in Tashkent, curators should build consecutive weekly discovery streaks by logging ≥1 drop or visit each week.
+   - **Remedy**: Implement `ExplorerStreakEngine` computing consecutive active weeks, longest streak, and awarding streak badges ("🔥 3-Week Explorer").
+
+---
+
+## Phase 17 Backlog Roadmap (`tasks.json`)
+
+### `P17-01`: Friend Presence Rail & Ambient Social Avatar Ring
+- **Domain**: Social Graph & Engagement
+- **Owner**: Mobile Engineering
+- **Deliverables**: `FriendPresenceRail` widget for `FeedScreen` displaying active friends, online pulse rings, and neighborhood badges.
+
+### `P17-02`: Neighborhood Social Pulse Map Banner & District Heat Filter
+- **Domain**: Places Catalog & Intelligence
+- **Owner**: Mobile Engineering
+- **Deliverables**: `NeighborhoodPulseBanner` on the map screen showing live district friend clusters and enabling quick zoom to active neighborhoods.
+
+### `P17-03`: Web Companion Telegram Direct Share & Passport Link Generator
+- **Domain**: Social Graph & Distribution
+- **Owner**: Web Companion Engineer
+- **Deliverables**: `PassportShareModal` in `src/components/PassportShareModal.tsx` with native Telegram share URL builder and Vitest test assertions.
+
+### `P17-04`: Weekly Discovery Streak & Sunday Retrospective Engine
+- **Domain**: Gamification & Retention
+- **Owner**: Core Engineering
+- **Deliverables**: `ExplorerStreakEngine` in `lib/core/services/explorer_streak_engine.dart` computing weekly active streaks and badge awards with unit tests.

@@ -1670,6 +1670,114 @@
         "flutter test test/unit/friend_presence_test.dart"
       ],
       "riskAssessment": "Low: Non-sensitive status aggregation."
+    },
+    {
+      "id": "P17-01",
+      "title": "Friend Presence Rail & Ambient Social Avatar Ring",
+      "domain": "Social Graph & Engagement",
+      "description": "FriendPresenceRail widget in FeedScreen displaying active friends with pulse indicators, district chips, and bottom sheet profile preview.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P16-04"
+      ],
+      "affectedPaths": [
+        "lib/features/feed/widgets/friend_presence_rail.dart",
+        "lib/features/feed/screens/feed_screen.dart",
+        "test/widget/friend_presence_rail_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders horizontal avatar rail showing friends active within the last 24 hours.",
+        "Displays animated green pulse ring on avatars with justNow online status.",
+        "Shows localized district chip badge below avatar.",
+        "Widget tests verify presence rendering and empty states."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/friend_presence_rail_test.dart"
+      ],
+      "riskAssessment": "Low: Additive feed header widget."
+    },
+    {
+      "id": "P17-02",
+      "title": "Neighborhood Social Pulse Map Banner & District Heat Filter",
+      "domain": "Places Catalog & Intelligence",
+      "description": "NeighborhoodPulseBanner widget on MapScreen showing live district friend clusters and enabling quick zoom to active neighborhoods.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P17-01"
+      ],
+      "affectedPaths": [
+        "lib/features/places/widgets/neighborhood_pulse_banner.dart",
+        "test/widget/neighborhood_pulse_banner_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Computes aggregate friend activity counts per district via FriendPresenceEngine.",
+        "Displays high-aesthetic banner highlighting most active district tonight.",
+        "Tapping a district chip notifies camera to center on that neighborhood.",
+        "Widget tests verify count calculations and tap callbacks."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/neighborhood_pulse_banner_test.dart"
+      ],
+      "riskAssessment": "Low: Map overlay component."
+    },
+    {
+      "id": "P17-03",
+      "title": "Web Companion Telegram Direct Share & Passport Link Generator",
+      "domain": "Social Graph & Distribution",
+      "description": "PassportShareModal in src/components/PassportShareModal.tsx with native Telegram share URL builder and Vitest test assertions.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P17-02"
+      ],
+      "affectedPaths": [
+        "src/components/PassportShareModal.tsx",
+        "src/__tests__/passportShare.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Generates direct tg://msg_url and t.me/share links with preformatted invitation copy.",
+        "Renders passport stats preview modal with 1-tap copy and share buttons.",
+        "Vitest test suite validates URL generation and clipboard operations."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion modal component."
+    },
+    {
+      "id": "P17-04",
+      "title": "Weekly Discovery Streak & Sunday Retrospective Engine",
+      "domain": "Gamification & Retention",
+      "description": "ExplorerStreakEngine in lib/core/services/explorer_streak_engine.dart computing weekly active streaks and badge awards with unit tests.",
+      "ownerRole": "Core Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P17-03"
+      ],
+      "affectedPaths": [
+        "lib/core/services/explorer_streak_engine.dart",
+        "test/unit/explorer_streak_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Calculates consecutive weekly streaks (Monday-Sunday cycles) with qualifying drops.",
+        "Determines if streak is currently active or at risk.",
+        "Awards milestone badges (e.g. 2-Week, 4-Week, 8-Week Explorer).",
+        "Unit tests verify streak increments, resets, and edge cases."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/explorer_streak_test.dart"
+      ],
+      "riskAssessment": "Low: In-memory calculation engine."
     }
   ],
   "loopConfig": {
