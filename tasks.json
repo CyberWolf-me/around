@@ -741,6 +741,88 @@
         "flutter test"
       ],
       "riskAssessment": "Low: Local hardware capability with graceful fallback when biometric hardware is unconfigured."
+    },
+    {
+      "id": "P10-01",
+      "title": "Deep Linking & Universal Routing for Venues & Drops",
+      "domain": "Discovery",
+      "description": "Configure deep link URI parsing for places and drops (around://places/:id, around://drops/:id) in go_router and add native share action sheet helpers to copy canonical links.",
+      "ownerRole": "Mobile Engineering & Product Design",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P9-03"
+      ],
+      "affectedPaths": [
+        "lib/core/routing/app_router.dart",
+        "lib/features/places/screens/place_detail_screen.dart",
+        "test/unit/places_repository_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Deep link URIs with custom scheme or web domain route to matching PlaceDetailScreen or drop viewer.",
+        "Share button in PlaceDetail copies canonical link to system clipboard with user toast.",
+        "Unit tests verify slug resolution and deep link URI mapping."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test"
+      ],
+      "riskAssessment": "Low: Extends existing go_router declarative routes without breaking state."
+    },
+    {
+      "id": "P10-02",
+      "title": "Offline Outbox Auto-Sync & Exponential Retry Engine",
+      "domain": "Experiences",
+      "description": "Harden OutboxService with background network change listeners, exponential backoff, maximum retry capping, and idempotent UUID dispatch.",
+      "ownerRole": "Platform Engineering & Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P10-01"
+      ],
+      "affectedPaths": [
+        "lib/data/services/outbox_service.dart",
+        "test/unit/post_privacy_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Failed drop actions enqueue in persistent outbox with unique idempotency keys.",
+        "Network reconnect triggers drainOutbox() with exponential backoff on transient errors.",
+        "Unit tests verify outbox retry bounds and idempotency."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test"
+      ],
+      "riskAssessment": "Low: Outbox operates alongside existing repository providers."
+    },
+    {
+      "id": "P10-03",
+      "title": "Staging Release v1.1.0 Verification & Release Tagging",
+      "domain": "Platform",
+      "description": "Execute comprehensive multi-suite verification across Flutter and React, generate release documentation, and ship release tag v1.1.0-staging.1.",
+      "ownerRole": "QA Engineer & CTO / Orchestrator",
+      "priority": "P0",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P10-02"
+      ],
+      "affectedPaths": [
+        "COMPANY_PULSE.md",
+        "ROADMAP.md",
+        "tasks.json"
+      ],
+      "acceptanceCriteria": [
+        "All unit, widget, and lint tests pass with zero warnings.",
+        "Release notes for v1.1.0 recorded in ROADMAP.md and COMPANY_PULSE.md.",
+        "Git release tag created and pushed to origin."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm run lint",
+        "npm test"
+      ],
+      "riskAssessment": "Low: Verification and staging release gating."
     }
   ],
   "loopConfig": {
