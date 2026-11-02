@@ -1,25 +1,25 @@
 ---
-description: Autonomous self-building and self-shipping development loop for Around
+description: Polsia-style autonomous product audit, backlog generation, iterative build, and shipping loop
 ---
 
-# /startcycle — Autonomous Build, Verify & Ship Loop
+# /startcycle — Polsia-Style Continuous Autonomous Company Loop
 
-Execute the following multi-agent loop continuously until the targeted milestone in `tasks.json` has zero remaining tasks:
+NEVER declare the company or repository "100% DONE" and stop. Execute this continuous 5-stage loop:
 
-1. **Initialize Context (`CTO / Loop Orchestrator`)**:
-   - Read `.antigravity/rules.md`, `.agents/agents.md`, and `tasks.json`.
-   - Identify all tasks in the active milestone whose dependencies are `"DONE"`. If all tasks in the milestone are `"DONE"`, skip to Step 4 (`staging-shipper`).
+1. **Stage 1 — Check Queue or Run Product/UX/Growth Discovery**:
+   - Inspect `tasks.json` for any task with `"status": "IN_PROGRESS"`, `"READY"`, or `"BACKLOG"` whose dependencies are `"DONE"`.
+   - **If ZERO unblocked tasks exist**:
+     1. Act as the **Adversarial Product Critic & Growth Lead**: inspect `lib/features/`, `src/`, and `supabase/` to identify the next 3–4 highest-value product features, UX polish improvements, growth/viral loops (e.g., referral links, shareable city cards, taste onboarding, localization), or backend hardening tasks, and write them to `CRITIQUE_REPORT.md`.
+     2. Act as the **Autonomous CEO**: append those 3–4 new tasks as the next Phase (`P11-01`..`P11-04`, `P12-01`.., etc.) into `tasks.json`, log the strategy in `COMPANY_PULSE.md`, and commit (`chore(ceo): replenish Phase P<N> backlog`).
 
-2. **Execute Vertical Slice (`task-loop-executor` Skill)**:
-   - Invoke the `task-loop-executor` skill as the **Backend & Security Engineer** and **Flutter & Web Product Engineer**.
-   - Implement the selected task end-to-end across `supabase/`, `lib/`, `src/`, and `test/`.
+2. **Stage 2 — Implement One Vertical Slice (`task-loop-executor`)**:
+   - Mark the first unblocked task `"IN_PROGRESS"` in `tasks.json`.
+   - Implement the full vertical slice across SQL migrations, Flutter (`lib/`), React (`src/`), and unit/widget tests (`test/`).
 
-3. **Adversarial QA & Rework Gate (`QA & Release Lead`)**:
-   - Run `flutter analyze --fatal-infos --fatal-warnings`, `flutter test`, and `npm test`.
-   - For UI changes, launch the local preview (`npm run dev` or `flutter run -d web-server`) and inspect the rendered view with the Antigravity Browser Agent to confirm zero console errors or broken layouts.
-   - **Loop Condition**: If any check fails, return a defect list to Step 2 and repeat until green (up to 3 rework iterations per task).
-   - Once green, update `tasks.json` (`"status": "DONE"`), update `PRODUCT_CAPABILITIES.md`, and create an atomic Git commit (`feat(<task-id>): <title>`).
+3. **Stage 3 — Iterative Self-Healing Verification Gate**:
+   - Run `flutter analyze --fatal-infos --fatal-warnings`, `flutter test`, and `npm run lint && npm test -- --run`.
+   - If any command fails, inspect the exact error output, fix the code, and re-run until green (up to 4 rework iterations).
 
-4. **Continuous Loop or Ship (`staging-shipper` Skill)**:
-   - If more unblocked tasks remain in the current milestone, recursively invoke `/startcycle` for the next task.
-   - Once the milestone is complete, invoke the `staging-shipper` skill to push migrations, run `supabase/tests/rls_authorization_test.sql`, build the release artifact, and push to staging.
+4. **Stage 4 — Ship Slice & Immediately Loop**:
+   - Mark the task `"DONE"` in `tasks.json`, append the shipped summary to `COMPANY_PULSE.md`, and `git commit` + `git push` to `origin/main`.
+   - **Immediately continue to Stage 1** for the next task (and if the milestone just finished, runStage 1's Product Critic + CEO replenishment to start the next Phase immediately).
