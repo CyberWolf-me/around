@@ -30,6 +30,24 @@ class DeepLinkService {
     return '$customScheme://drops/$cleanId';
   }
 
+  /// Builds a canonical deep link URI for a user's Tashkent Taste Passport.
+  static String buildPassportUri(String username, {bool web = true}) {
+    final clean = Uri.encodeComponent(username.trim().replaceAll('@', ''));
+    if (web) {
+      return 'https://$canonicalWebDomain/passport/$clean';
+    }
+    return '$customScheme://passport/$clean';
+  }
+
+  /// Builds a canonical deep link URI for a friend invite link.
+  static String buildInviteUri(String inviteCode, {bool web = true}) {
+    final clean = Uri.encodeComponent(inviteCode.trim());
+    if (web) {
+      return 'https://$canonicalWebDomain/invite/$clean';
+    }
+    return '$customScheme://invite/$clean';
+  }
+
   /// Resolves an incoming URI (custom scheme or universal link) into an internal app route.
   static String? resolveRouteFromUri(Uri uri) {
     try {
@@ -48,11 +66,23 @@ class DeepLinkService {
           return id.isNotEmpty ? '/drops/$id' : '/feed';
         }
 
+        if (host == 'passport') {
+          final id = pathSegments.isNotEmpty ? pathSegments.first : '';
+          return id.isNotEmpty ? '/passport/$id' : '/profile';
+        }
+
+        if (host == 'invite') {
+          final id = pathSegments.isNotEmpty ? pathSegments.first : '';
+          return id.isNotEmpty ? '/invite/$id' : '/feed';
+        }
+
         if (pathSegments.isNotEmpty) {
           final section = pathSegments.first.toLowerCase();
           final id = pathSegments.length > 1 ? pathSegments[1] : '';
           if (section == 'places' && id.isNotEmpty) return '/places/$id';
           if (section == 'drops' && id.isNotEmpty) return '/drops/$id';
+          if (section == 'passport' && id.isNotEmpty) return '/passport/$id';
+          if (section == 'invite' && id.isNotEmpty) return '/invite/$id';
         }
       }
 
@@ -66,7 +96,9 @@ class DeepLinkService {
             final id = segments.length > 1 ? segments[1] : '';
             if (section == 'places' && id.isNotEmpty) return '/places/$id';
             if (section == 'drops' && id.isNotEmpty) return '/drops/$id';
-            if (section == 'feed' || section == 'explore' || section == 'saved' || section == 'settings') {
+            if (section == 'passport' && id.isNotEmpty) return '/passport/$id';
+            if (section == 'invite' && id.isNotEmpty) return '/invite/$id';
+            if (section == 'feed' || section == 'explore' || section == 'saved' || section == 'settings' || section == 'profile') {
               return '/$section';
             }
           }
@@ -88,6 +120,20 @@ class DeepLinkService {
   /// Copies a drop share link to system clipboard.
   static Future<String> copyDropShareLink(String dropId) async {
     final link = buildDropUri(dropId, web: true);
+    await Clipboard.setData(ClipboardData(text: link));
+    return link;
+  }
+
+  /// Copies a taste passport link to system clipboard.
+  static Future<String> copyPassportShareLink(String username) async {
+    final link = buildPassportUri(username, web: true);
+    await Clipboard.setData(ClipboardData(text: link));
+    return link;
+  }
+
+  /// Copies a friend invite link to system clipboard.
+  static Future<String> copyInviteShareLink(String inviteCode) async {
+    final link = buildInviteUri(inviteCode, web: true);
     await Clipboard.setData(ClipboardData(text: link));
     return link;
   }

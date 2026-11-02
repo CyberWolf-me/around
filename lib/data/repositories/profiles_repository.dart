@@ -120,8 +120,9 @@ const List<CommunityMember> kTashkentCommunityMembers = [
 ];
 
 CommunityMember? getCommunityMemberById(String id) {
+  final clean = id.trim().toLowerCase().replaceAll('@', '');
   for (final m in kTashkentCommunityMembers) {
-    if (m.id == id) return m;
+    if (m.id.toLowerCase() == clean || m.handle.toLowerCase() == clean) return m;
   }
   return null;
 }

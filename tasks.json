@@ -832,7 +832,7 @@
       "description": "Build an editorial, high-aesthetic shareable Taste Passport widget showcasing a user's curated top venues, district badges, and bio, with copyable link and deep link routing.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P0",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P10-03"
       ],

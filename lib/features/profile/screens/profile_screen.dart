@@ -10,6 +10,10 @@ import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
 import '../../../data/services/supabase_service.dart';
+import '../../../core/services/deep_link_service.dart';
+import '../../../data/models/place_model.dart';
+import '../../../data/repositories/places_repository.dart';
+import '../widgets/taste_passport_card.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -142,6 +146,13 @@ class ProfileScreen extends ConsumerWidget {
     final posts = ref.watch(postsRepositoryProvider);
     final followedFriends = ref.watch(followedFriendsProvider);
     final savedPlaces = ref.watch(savedPlacesProvider);
+    final placesRepo = ref.watch(placesRepositoryProvider);
+    final allPlaces = placesRepo.getAllPlaces();
+    final topPlaces = savedPlaces
+        .map((id) => allPlaces.where((p) => p.id == PlacesRepository.resolveCanonicalId(id)).firstOrNull)
+        .whereType<PlaceModel>()
+        .take(3)
+        .toList();
 
     final currentUserId = SupabaseService.currentUser?.id ?? profile.id;
     final myDrops = posts.where((p) => p.authorId == currentUserId || p.authorId == profile.id || p.authorId == 'you').toList();
@@ -422,6 +433,19 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ],
             ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Tashkent Taste Passport & Official Curator Badge
+          TastePassportCard(
+            profile: profile,
+            topPlaces: topPlaces,
+            totalDrops: myDrops.length,
+            totalSaved: savedPlaces.length,
+            onShare: () {
+              DeepLinkService.copyPassportShareLink(profile.username);
+            },
           ),
 
           const SizedBox(height: 24),
