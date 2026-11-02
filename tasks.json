@@ -2427,7 +2427,7 @@
       "description": "PersonalCoverageEngine in lib/core/services/personal_coverage_engine.dart calculating personal exploration percentage across Tashkent districts based on visited places.",
       "ownerRole": "Core Engineering & Spatial Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P23-04"
       ],
@@ -2454,7 +2454,7 @@
       "description": "DistrictCoverageCard in lib/features/explore/widgets/district_coverage_card.dart rendering district coverage progress bars and discovery recommendations.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P24-01"
       ],
