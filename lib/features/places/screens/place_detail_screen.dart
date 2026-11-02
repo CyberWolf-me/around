@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/services/deep_link_service.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/models/post_model.dart';
@@ -33,8 +34,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
 
   Future<void> _copyShareLink(PlaceModel place) async {
     HapticService.light();
-    final link = 'https://around.app/places/${place.slug}';
-    await Clipboard.setData(ClipboardData(text: link));
+    final link = await DeepLinkService.copyPlaceShareLink(place.slug);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

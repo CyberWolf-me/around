@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
+import '../../data/repositories/posts_repository.dart';
 import '../../data/services/haptic_service.dart';
 import '../../features/feed/screens/feed_screen.dart';
 import '../../features/feed/screens/notifications_screen.dart';
@@ -107,6 +109,29 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) {
         final placeId = state.pathParameters['id'] ?? '';
         return PlaceDetailScreen(placeId: placeId);
+      },
+    ),
+    GoRoute(
+      path: '/drops/:id',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) {
+        final dropId = state.pathParameters['id'] ?? '';
+        return Consumer(
+          builder: (context, ref, _) {
+            final posts = ref.watch(postsRepositoryProvider);
+            final drop = posts.where((p) => p.id == dropId).firstOrNull;
+            if (drop != null) {
+              return PlaceDetailScreen(placeId: drop.placeId);
+            }
+            return Scaffold(
+              backgroundColor: AppColors.paper,
+              appBar: AppBar(leading: const BackButton()),
+              body: Center(
+                child: Text('Drop not found or expired', style: GoogleFonts.bricolageGrotesque(fontSize: 16)),
+              ),
+            );
+          },
+        );
       },
     ),
     GoRoute(

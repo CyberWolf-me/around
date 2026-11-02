@@ -749,14 +749,15 @@
       "description": "Configure deep link URI parsing for places and drops (around://places/:id, around://drops/:id) in go_router and add native share action sheet helpers to copy canonical links.",
       "ownerRole": "Mobile Engineering & Product Design",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P9-03"
       ],
       "affectedPaths": [
         "lib/core/routing/app_router.dart",
+        "lib/core/services/deep_link_service.dart",
         "lib/features/places/screens/place_detail_screen.dart",
-        "test/unit/places_repository_test.dart"
+        "test/unit/deep_link_test.dart"
       ],
       "acceptanceCriteria": [
         "Deep link URIs with custom scheme or web domain route to matching PlaceDetailScreen or drop viewer.",
@@ -776,7 +777,7 @@
       "description": "Harden OutboxService with background network change listeners, exponential backoff, maximum retry capping, and idempotent UUID dispatch.",
       "ownerRole": "Platform Engineering & Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P10-01"
       ],
