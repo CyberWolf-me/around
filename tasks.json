@@ -2561,7 +2561,7 @@
       "description": "CuratedRouteCard and RouteStopTimelineWidget in lib/features/explore/widgets/curated_route_card.dart rendering step-by-step stop timelines with transit badges.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P25-01"
       ],
