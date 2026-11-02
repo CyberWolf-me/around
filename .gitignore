@@ -39,6 +39,7 @@ dist-ssr/
 
 # Environment & local archives
 .env
+coverage/
 around-fixes/
 around-fixed.zip
 supabase/.temp/
