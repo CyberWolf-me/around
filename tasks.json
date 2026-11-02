@@ -1213,7 +1213,7 @@
       "description": "Execute full automated verification gate, tag v1.2.0-staging.1, and verify production release bundle readiness.",
       "ownerRole": "QA & Release Lead",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P12-09"
       ],
