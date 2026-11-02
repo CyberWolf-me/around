@@ -1733,7 +1733,7 @@
       "description": "PassportShareModal in src/components/PassportShareModal.tsx with native Telegram share URL builder and Vitest test assertions.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P17-02"
       ],
