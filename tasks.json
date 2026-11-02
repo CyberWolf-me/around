@@ -2163,7 +2163,7 @@
       "description": "PlaceRhythmHeatmap.tsx in src/components/ rendering 24-hour atmosphere sparklines, peak hour tags, and mobile deep link CTA for web companion place pages.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P21-02"
       ],
@@ -2189,7 +2189,7 @@
       "description": "CuratorNotificationService in lib/core/services/curator_notification_service.dart issuing in-app notifications and tactile alerts on achievement unlocks and streak milestones.",
       "ownerRole": "Core Engineering & Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P21-03"
       ],
