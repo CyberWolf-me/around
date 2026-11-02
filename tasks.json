@@ -2614,7 +2614,7 @@
       "description": "00016_curated_routes_and_crawl_completions.sql adding curated_routes and route_completions tables with complete_curated_route RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P25-03"
       ],
