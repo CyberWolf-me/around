@@ -1242,7 +1242,7 @@
       "description": "Implement curated city discovery trails (Mirabad Coffee Crawl, Old City Plov Connoisseur, Evening Lounge Circuit) with automated visit progress tracking and profile badge flair.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P0",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P12-10"
       ],
@@ -1273,7 +1273,7 @@
       "description": "Build PostGIS aggregation RPC get_district_activity_density and Flutter map density rings visualizing live Tashkent social heat without exposing raw user GPS coordinates.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P13-01"
       ],

@@ -15,7 +15,9 @@ import '../../../core/services/friend_invite_service.dart';
 import '../../../core/services/telegram_share_service.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/repositories/places_repository.dart';
+import '../../../data/repositories/quests_repository.dart';
 import '../widgets/taste_passport_card.dart';
+import '../widgets/taste_quests_card.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -447,6 +449,17 @@ class ProfileScreen extends ConsumerWidget {
             totalSaved: savedPlaces.length,
             onShare: () {
               DeepLinkService.copyPassportShareLink(profile.username);
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Tashkent Taste Quests & Local Legend Badges (P13-01)
+          TasteQuestsCard(
+            quests: ref.watch(questsRepositoryProvider).getQuests(),
+            visitedPlaceIds: {
+              ...savedPlaces,
+              ...myDrops.map((d) => d.placeId),
             },
           ),
 
