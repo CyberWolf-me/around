@@ -1462,7 +1462,7 @@
       "description": "Tactile WeeklyDigestBanner mounted at head of FeedScreen during weekend windows (Fri 16:00 – Sun 23:59), opening coordination sheet with top district stats and instant Telegram invite generator.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P14-04"
       ],
@@ -1490,7 +1490,7 @@
       "description": "Build TasteRadarWidget in TastePassportScreen rendering category distribution, diversity ratio, and calculated explorer archetype (Specialty Connoisseur, Old City Nomad, etc.).",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P15-01"
       ],
