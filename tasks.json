@@ -2721,7 +2721,7 @@
       "description": "00017_group_crawl_sessions_and_live_beacons.sql adding group_crawl_sessions and group_crawl_participants tables with join_or_update_group_crawl RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P26-03"
       ],
