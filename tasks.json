@@ -2668,7 +2668,7 @@
       "description": "GroupCrawlRadarHUD in lib/features/explore/widgets/group_crawl_radar_hud.dart displaying friend avatars placed along the route stops, collective completion percentage, and join modal.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P26-01"
       ],
