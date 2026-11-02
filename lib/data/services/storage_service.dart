@@ -78,6 +78,21 @@ class StorageService {
     await _prefs?.remove(_guestModeKey);
   }
 
+  // Generic key-value helpers for services & outbox
+  static String? getString(String key) {
+    return _prefs?.getString(key) ?? (_memoryFallback[key] as String?);
+  }
+
+  static Future<void> setString(String key, String value) async {
+    _memoryFallback[key] = value;
+    await _prefs?.setString(key, value);
+  }
+
+  static Future<void> removeString(String key) async {
+    _memoryFallback.remove(key);
+    await _prefs?.remove(key);
+  }
+
   // Saved places IDs
   static List<String>? getSavedPlaceIds() {
     return _prefs?.getStringList(_savedPlacesKey) ?? (_memoryFallback[_savedPlacesKey] as List<String>?);

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
+import '../../../data/services/outbox_service.dart';
 import '../widgets/bento_card.dart';
 import '../widgets/story_rail.dart';
 import '../widgets/caught_up_widget.dart';
@@ -19,6 +20,7 @@ class FeedScreen extends ConsumerWidget {
     final followedFriends = ref.watch(followedFriendsProvider);
     final blockedUsers = ref.watch(blockedUsersProvider);
     final userProfile = ref.watch(currentProfileProvider);
+    final outboxCount = ref.watch(outboxCountProvider);
 
     final visibleDrops = postsNotifier.getFriendsDrops(
       followedFriends,
@@ -93,6 +95,43 @@ class FeedScreen extends ConsumerWidget {
               child: StoryRailWrapper(),
             ),
           ),
+          if (outboxCount > 0)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                child: GestureDetector(
+                  onTap: () async {
+                    final synced = await OutboxService.drainOutbox(ref);
+                    if (context.mounted && synced > 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('✓ Synced $synced offline drops to Around!')),
+                      );
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.butter,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.ink, width: 1.5),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.cloud_upload_outlined, size: 16, color: AppColors.ink),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '$outboxCount drop${outboxCount > 1 ? 's' : ''} saved offline · Tap to sync now',
+                            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.ink),
+                          ),
+                        ),
+                        const Icon(Icons.refresh, size: 14, color: AppColors.ink),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           if (visibleDrops.isEmpty)
             SliverToBoxAdapter(
               child: Container(

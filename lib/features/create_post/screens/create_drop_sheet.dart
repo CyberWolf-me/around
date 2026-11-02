@@ -12,6 +12,7 @@ import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/services/haptic_service.dart';
+import '../../../data/services/outbox_service.dart';
 
 class CreateDropSheet extends ConsumerStatefulWidget {
   final String? presetPlaceId;
@@ -149,6 +150,36 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
         );
 
     if (failure != null) {
+      final msg = failure.message.toLowerCase();
+      if (failure.code == 'NETWORK_ERROR' || msg.contains('network') || msg.contains('offline') || msg.contains('failed host lookup') || msg.contains('client is offline')) {
+        await OutboxService.queueDrop(
+          PendingDrop(
+            id: 'draft_${DateTime.now().millisecondsSinceEpoch}',
+            placeId: _selectedPlaceId,
+            placeName: place?.name ?? 'Tashkent Spot',
+            placeCategory: place?.category ?? 'Café',
+            placeAddress: place?.streetAddress ?? 'Tashkent, Uzbekistan',
+            localPhotoPath: _selectedPhoto,
+            note: effectiveNote,
+            rating: _rating,
+            tags: _selectedTags,
+            audience: _audience.name,
+            createdAt: DateTime.now(),
+          ),
+        );
+        ref.read(outboxCountProvider.notifier).refresh();
+        HapticService.heavy();
+        if (mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✓ Saved to offline outbox. Will sync automatically when connected.'),
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
+        return;
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(failure.message)),

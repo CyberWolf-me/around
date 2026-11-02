@@ -1,9 +1,12 @@
 // ignore_for_file: avoid_print
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
   test('Two-User Live Staging Smoke Test (Step C)', () async {
     // 1. Resolve environment configuration from .env or Platform environment
     final env = <String, String>{};

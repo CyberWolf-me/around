@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
+import '../../../data/models/collection_model.dart';
 import '../../../data/models/place_model.dart';
+import '../../../data/repositories/collections_repository.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
@@ -49,6 +51,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     final savedStatuses = ref.watch(savedPlaceStatusesProvider);
     final followedFriends = ref.watch(followedFriendsProvider);
     final allDrops = ref.watch(postsRepositoryProvider);
+    final collections = ref.watch(collectionsRepositoryProvider);
 
     // Compute explainable recommendations
     final friendPlaceIds = allDrops
@@ -127,7 +130,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
         ],
       ),
       body: _viewMode == 2
-          ? _buildRecommendationsView(recommendations, savedPlaces)
+          ? _buildRecommendationsView(recommendations, savedPlaces, collections, placesRepo)
           : FutureBuilder<List<PlaceModel>>(
               future: _placesFuture,
               builder: (context, snapshot) {
@@ -326,8 +329,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     );
   }
 
-  Widget _buildRecommendationsView(List<RecommendedPlaceResult> recs, List<String> savedPlaces) {
-    if (recs.isEmpty) {
+  Widget _buildRecommendationsView(
+    List<RecommendedPlaceResult> recs,
+    List<String> savedPlaces,
+    List<CollectionModel> collections,
+    PlacesRepository placesRepo,
+  ) {
+    if (recs.isEmpty && collections.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -364,138 +372,395 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
       );
     }
 
-    return ListView.separated(
+    return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      itemCount: recs.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (context, index) {
-        final item = recs[index];
-        final place = item.place;
-        final isSaved = savedPlaces.contains(place.id);
-
-        return GestureDetector(
-          onTap: () {
-            HapticService.light();
-            context.push('/places/${place.id}');
-          },
-          child: Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.paper,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.ink, width: 2),
-              boxShadow: const [AppColors.shadowSm],
+      children: [
+        if (collections.isNotEmpty) ...[
+          Row(
+            children: [
+              const Icon(Icons.auto_stories, size: 16, color: AppColors.orange),
+              const SizedBox(width: 6),
+              Text(
+                'Curated Tastemaker Guides',
+                style: GoogleFonts.bricolageGrotesque(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.ink,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.paper2,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: AppColors.ink.withValues(alpha: 0.2)),
+                ),
+                child: Text(
+                  '${collections.length} Guides',
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.ink2),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 3),
+          const Text(
+            'Shortlists curated by Tashkent locals, creators & friends',
+            style: TextStyle(fontSize: 11, color: AppColors.ink3),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 135,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: collections.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              itemBuilder: (context, index) {
+                final col = collections[index];
+                return GestureDetector(
+                  onTap: () {
+                    HapticService.selection();
+                    _showCollectionBottomSheet(context, col, placesRepo);
+                  },
+                  child: Container(
+                    width: 220,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.paper,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: AppColors.ink, width: 1.8),
+                      boxShadow: const [AppColors.shadowSm],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.orange.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                col.audience.toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.orange,
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            Row(
+                              children: [
+                                const Icon(Icons.place_outlined, size: 12, color: AppColors.ink3),
+                                const SizedBox(width: 2),
+                                Text(
+                                  '${col.placeIds.length}',
+                                  style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: AppColors.ink2),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          col.title,
+                          style: GoogleFonts.bricolageGrotesque(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13.5,
+                            color: AppColors.ink,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Expanded(
+                          child: Text(
+                            col.description,
+                            style: const TextStyle(fontSize: 10.5, color: AppColors.ink3),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          ),
+          const SizedBox(height: 18),
+        ],
+        Row(
+          children: [
+            const Icon(Icons.auto_awesome, size: 16, color: AppColors.orange),
+            const SizedBox(width: 6),
+            Text(
+              'Personalized Venues',
+              style: GoogleFonts.bricolageGrotesque(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: AppColors.ink,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        ...recs.map((item) {
+          final place = item.place;
+          final isSaved = savedPlaces.contains(place.id);
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: GestureDetector(
+              onTap: () {
+                HapticService.light();
+                context.push('/places/${place.id}');
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.paper,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.ink, width: 2),
+                  boxShadow: const [AppColors.shadowSm],
+                ),
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.ink, width: 1.5),
-                      ),
-                      clipBehavior: Clip.antiAlias,
-                      child: AppImage(path: place.heroImageUrl, fit: BoxFit.cover),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.ink, width: 1.5),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: AppImage(path: place.heroImageUrl, fit: BoxFit.cover),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: Text(
-                                  place.name,
-                                  style: GoogleFonts.bricolageGrotesque(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 15,
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      place.name,
+                                      style: GoogleFonts.bricolageGrotesque(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 15,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
+                                  Text(place.priceTier, style: Theme.of(context).textTheme.labelSmall),
+                                ],
                               ),
-                              Text(place.priceTier, style: Theme.of(context).textTheme.labelSmall),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${place.category} · ${place.district}',
+                                style: const TextStyle(fontSize: 11, color: AppColors.ink2),
+                              ),
+                              const SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  const Icon(Icons.star, size: 13, color: AppColors.orange),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    '${place.ratingAvg}',
+                                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.directions_walk, size: 13, color: AppColors.ink3),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    place.walkDistanceLabel,
+                                    style: const TextStyle(fontSize: 10.5, color: AppColors.ink3),
+                                  ),
+                                  const Spacer(),
+                                  IconButton(
+                                    constraints: const BoxConstraints(),
+                                    padding: EdgeInsets.zero,
+                                    icon: Icon(
+                                      isSaved ? Icons.bookmark : Icons.bookmark_border,
+                                      size: 19,
+                                      color: isSaved ? AppColors.orange : AppColors.ink3,
+                                    ),
+                                    onPressed: () {
+                                      HapticService.medium();
+                                      ref.read(savedPlacesProvider.notifier).toggleSave(place.id);
+                                    },
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '${place.category} · ${place.district}',
-                            style: const TextStyle(fontSize: 11, color: AppColors.ink2),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Icon(Icons.star, size: 13, color: AppColors.orange),
-                              const SizedBox(width: 3),
-                              Text(
-                                '${place.ratingAvg}',
-                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.butter.withValues(alpha: 0.35),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.ink.withValues(alpha: 0.15)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.auto_awesome, size: 13, color: AppColors.orange),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              item.explanation,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.ink,
                               ),
-                              const SizedBox(width: 8),
-                              const Icon(Icons.directions_walk, size: 13, color: AppColors.ink3),
-                              const SizedBox(width: 2),
-                              Text(
-                                place.walkDistanceLabel,
-                                style: const TextStyle(fontSize: 10.5, color: AppColors.ink3),
-                              ),
-                              const Spacer(),
-                              IconButton(
-                                constraints: const BoxConstraints(),
-                                padding: EdgeInsets.zero,
-                                icon: Icon(
-                                  isSaved ? Icons.bookmark : Icons.bookmark_border,
-                                  size: 19,
-                                  color: isSaved ? AppColors.orange : AppColors.ink3,
-                                ),
-                                onPressed: () {
-                                  HapticService.medium();
-                                  ref.read(savedPlacesProvider.notifier).toggleSave(place.id);
-                                },
-                              ),
-                            ],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.butter.withValues(alpha: 0.35),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.ink.withValues(alpha: 0.15)),
+              ),
+            ),
+          );
+        }),
+        const SizedBox(height: 40),
+      ],
+    );
+  }
+
+  void _showCollectionBottomSheet(
+    BuildContext context,
+    CollectionModel collection,
+    PlacesRepository placesRepo,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.paper,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      isScrollControlled: true,
+      builder: (ctx) {
+        final places = collection.placeIds
+            .map((id) => placesRepo.getPlaceById(id))
+            .whereType<PlaceModel>()
+            .toList();
+
+        return DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          minChildSize: 0.4,
+          maxChildSize: 0.85,
+          expand: false,
+          builder: (_, scrollController) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: ListView(
+                controller: scrollController,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 14),
+                      decoration: BoxDecoration(
+                        color: AppColors.ink3.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
                   ),
-                  child: Row(
+                  Row(
                     children: [
-                      const Icon(Icons.auto_awesome, size: 13, color: AppColors.orange),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          item.explanation,
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.ink,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.orange.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: AppColors.orange.withValues(alpha: 0.4)),
                         ),
+                        child: Text(
+                          collection.audience.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.orange,
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 20),
+                        onPressed: () => Navigator.of(ctx).pop(),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-          ),
+                  const SizedBox(height: 6),
+                  Text(
+                    collection.title,
+                    style: GoogleFonts.bricolageGrotesque(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                  if (collection.description.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      collection.description,
+                      style: const TextStyle(fontSize: 13, color: AppColors.ink2),
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+                  Text(
+                    'Places in this guide (${places.length})',
+                    style: GoogleFonts.bricolageGrotesque(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  if (places.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(
+                        child: Text(
+                          'No places loaded for this collection.',
+                          style: TextStyle(fontSize: 12, color: AppColors.ink3),
+                        ),
+                      ),
+                    )
+                  else
+                    ...places.map((place) => Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: VenueRowWidget(
+                            place: place,
+                            onTap: () {
+                              Navigator.of(ctx).pop();
+                              context.push('/places/${place.id}');
+                            },
+                          ),
+                        )),
+                ],
+              ),
+            );
+          },
         );
       },
     );

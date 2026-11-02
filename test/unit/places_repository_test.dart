@@ -31,11 +31,18 @@ void main() {
       expect(nonExistent, isNull);
     });
 
-    test('getNearbyPlaces returns all 9 canonical Tashkent venues without duplicate aliases', () async {
+    test('getNearbyPlaces returns all 14 canonical Tashkent venues without duplicate aliases', () async {
       final places = await repository.getNearbyPlaces();
-      expect(places.length, equals(9));
+      expect(places.length, equals(14));
       final uniqueIds = places.map((p) => p.id).toSet();
       expect(uniqueIds.length, equals(places.length));
+
+      // Verify newly added high-vibe venues (Sprint 1)
+      expect(repository.getPlaceById('sette'), isNotNull);
+      expect(repository.getPlaceById('socials'), isNotNull);
+      expect(repository.getPlaceById('afsona'), isNotNull);
+      expect(repository.getPlaceById('caravan'), isNotNull);
+      expect(repository.getPlaceById('teplo'), isNotNull);
     });
 
     test('getNearbyPlaces filters by category accurately', () async {

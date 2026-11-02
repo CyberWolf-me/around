@@ -244,6 +244,121 @@ class PlacesRepository {
       tags: ['street artists', 'souvenirs', 'night stroll', 'bustling'],
       photos: ['assets/storefront.jpg', 'assets/street.jpg', 'assets/ramen-bowl.jpg'],
     ),
+    const PlaceModel(
+      id: 'sette',
+      canonicalUuid: '11111111-1111-4111-8111-111111111110',
+      slug: 'sette-restaurant-terrace',
+      name: 'Sette Restaurant & Terrace',
+      category: 'Italian Cuisine · Rooftop Terrace',
+      streetAddress: '1 Navoi Avenue (Hyatt Regency)',
+      district: 'Mirabad',
+      city: 'Tashkent',
+      latitude: 41.3168,
+      longitude: 69.2785,
+      distanceMeters: 720,
+      walkTimeMinutes: 9,
+      priceTier: r'$$$$',
+      hours: '12:00 PM – 11:30 PM',
+      statusLine: 'Open today · Sunset rooftop seating',
+      description: 'Panoramic 7th-floor rooftop views over Amir Timur Square. Wood-fired Neapolitan pizza, handmade tagliolini with truffles, and an extensive European wine collection.',
+      heroImageUrl: 'assets/wine-wide.jpg',
+      ratingAvg: 4.8,
+      ratingCount: 340,
+      tags: ['rooftop', 'panoramic view', 'sunset', 'wine bar', 'wood-fired pizza', 'dinner', 'terrace'],
+      photos: ['assets/wine-wide.jpg', 'assets/wine-tall.jpg', 'assets/storefront.jpg'],
+    ),
+    const PlaceModel(
+      id: 'socials',
+      canonicalUuid: '11111111-1111-4111-8111-111111111111',
+      slug: 'socials-cafe-bar',
+      name: 'Socials Café & Bar',
+      category: 'All-Day Brunch · Specialty Coffee',
+      streetAddress: '34 Taras Shevchenko Street',
+      district: 'Mirabad',
+      city: 'Tashkent',
+      latitude: 41.3005,
+      longitude: 69.2742,
+      distanceMeters: 510,
+      walkTimeMinutes: 7,
+      priceTier: r'$$',
+      hours: '8:00 AM – 11:00 PM',
+      statusLine: 'Open · All-day sourdough toast',
+      description: 'High-energy neighborhood hub on Shevchenko. Fluffy ricotta hotcakes, smashed avocado toast on artisan sourdough, and expertly pulled flat whites.',
+      heroImageUrl: 'assets/cafe-light.jpg',
+      ratingAvg: 4.7,
+      ratingCount: 280,
+      tags: ['brunch', 'ricotta hotcakes', 'specialty coffee', 'shevchenko', 'terrace', 'coffee', 'breakfast'],
+      photos: ['assets/cafe-light.jpg', 'assets/window-girl.jpg', 'assets/cafe-bw.jpg'],
+    ),
+    const PlaceModel(
+      id: 'afsona',
+      canonicalUuid: '11111111-1111-4111-8111-111111111112',
+      slug: 'afsona-contemporary-uzbek',
+      name: 'Afsona Contemporary Uzbek',
+      category: 'Modern Uzbek Cuisine · Wine Bar',
+      streetAddress: '30 Taras Shevchenko Street',
+      district: 'Mirabad',
+      city: 'Tashkent',
+      latitude: 41.3021,
+      longitude: 69.2760,
+      distanceMeters: 480,
+      walkTimeMinutes: 6,
+      priceTier: r'$$$',
+      hours: '12:00 PM – 11:00 PM',
+      statusLine: 'Open · Contemporary dining',
+      description: 'Refined contemporary interpretation of traditional Uzbek gastronomy. Slow-braised lamb shank with quince, vegetarian pumpkin manti, and regional Samarkand wines.',
+      heroImageUrl: 'assets/ramen-bowl.jpg',
+      ratingAvg: 4.8,
+      ratingCount: 410,
+      tags: ['modern uzbek', 'shevchenko', 'lamb shank', 'wine bar', 'date spot', 'dinner'],
+      photos: ['assets/ramen-bowl.jpg', 'assets/street.jpg', 'assets/wine-tall.jpg'],
+    ),
+    const PlaceModel(
+      id: 'caravan',
+      canonicalUuid: '11111111-1111-4111-8111-111111111113',
+      slug: 'caravan-art-restaurant',
+      name: 'Caravan Art Café & Restaurant',
+      category: 'Traditional Uzbek · Art Courtyard',
+      streetAddress: '22 Abdulla Qahhor Street',
+      district: 'Yakkasaray',
+      city: 'Tashkent',
+      latitude: 41.2910,
+      longitude: 69.2625,
+      distanceMeters: 920,
+      walkTimeMinutes: 12,
+      priceTier: r'$$$',
+      hours: '11:00 AM – 11:00 PM',
+      statusLine: 'Open · Courtyard fountain active',
+      description: 'Tashkent’s first art restaurant set within a traditional Uzbek residential courtyard. Handwoven Suzani tapestries, antique ceramics, and slow-cooked tandoor dishes.',
+      heroImageUrl: 'assets/storefront.jpg',
+      ratingAvg: 4.7,
+      ratingCount: 520,
+      tags: ['art cafe', 'courtyard', 'traditional', 'dutar music', 'suzani', 'dinner'],
+      photos: ['assets/storefront.jpg', 'assets/street.jpg', 'assets/records-crates.jpg'],
+    ),
+    const PlaceModel(
+      id: 'teplo',
+      canonicalUuid: '11111111-1111-4111-8111-111111111114',
+      slug: 'teplo-bakery-kitchen',
+      name: 'Teplo Bakery & Kitchen',
+      category: 'Artisan Bakery · Breakfast',
+      streetAddress: '42 Sadyk Azimov Street',
+      district: 'Mirabad',
+      city: 'Tashkent',
+      latitude: 41.3082,
+      longitude: 69.2845,
+      distanceMeters: 650,
+      walkTimeMinutes: 8,
+      priceTier: r'$$',
+      hours: '8:00 AM – 10:00 PM',
+      statusLine: 'Fresh baguettes and brioche ready',
+      description: 'Cozy neighborhood bakery famous for crusty baguettes, almond croissants, shakshuka, and specialty coffee. Warm Scandi-Uzbek oak interior.',
+      heroImageUrl: 'assets/breadly.jpg',
+      ratingAvg: 4.8,
+      ratingCount: 295,
+      tags: ['bakery', 'croissants', 'shakshuka', 'breakfast', 'coffee', 'specialty coffee'],
+      photos: ['assets/breadly.jpg', 'assets/cafe-light.jpg', 'assets/window-girl.jpg'],
+    ),
   ];
 
   static String resolveCanonicalId(String id) {
@@ -365,11 +480,30 @@ class PlacesRepository {
       final friendMatch = acceptedFriendPlaceIds.contains(p.id) ? 1 : 0;
       final primaryCat = p.category.split(' · ').first.toLowerCase();
       final catAffinity = savedCategories.contains(primaryCat) ? 1.5 : 0.0;
-      final score = (friendMatch * 3.0) + catAffinity + (p.ratingAvg * 0.5);
+
+      // Time-of-day contextual affinity (Sprint 4.1)
+      final currentHour = DateTime.now().hour;
+      final isMorning = currentHour >= 7 && currentHour < 12;
+      final isEvening = currentHour >= 18 && currentHour < 24;
+
+      double timeContextBoost = 0.0;
+      String? timeReason;
+
+      if (isMorning && p.tags.any((t) => ['coffee', 'bakery', 'breakfast', 'v60', 'matcha'].contains(t.toLowerCase()))) {
+        timeContextBoost = 1.5;
+        timeReason = 'Perfect morning coffee & bakes in ${p.district}';
+      } else if (isEvening && p.tags.any((t) => ['dinner', 'cocktails', 'wine bar', 'craft cocktails', 'vinyl', 'late night', 'rooftop'].contains(t.toLowerCase()))) {
+        timeContextBoost = 1.5;
+        timeReason = 'Great evening dinner & cocktail vibe in ${p.district}';
+      }
+
+      final score = (friendMatch * 3.0) + catAffinity + timeContextBoost + (p.ratingAvg * 0.5);
 
       final String reason;
       if (friendMatch > 0) {
         reason = 'Recommended by your accepted friends in ${p.district}';
+      } else if (timeReason != null) {
+        reason = timeReason;
       } else if (catAffinity > 0) {
         reason = 'Matches your saved ${p.category.split(' · ').first} spots';
       } else {
