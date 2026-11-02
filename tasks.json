@@ -1778,6 +1778,113 @@
         "flutter test test/unit/explorer_streak_test.dart"
       ],
       "riskAssessment": "Low: In-memory calculation engine."
+    },
+    {
+      "id": "P18-01",
+      "title": "Profile Streak Progress Card & Milestone Flame Flair",
+      "domain": "Gamification & Retention",
+      "description": "StreakProgressCard widget on ProfileScreen displaying consecutive week flame counter, progress toward next badge, and days remaining.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P17-04"
+      ],
+      "affectedPaths": [
+        "lib/features/profile/widgets/streak_progress_card.dart",
+        "lib/features/profile/screens/profile_screen.dart",
+        "test/widget/streak_progress_card_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders flame badge with current consecutive week streak count.",
+        "Displays progress bar toward next milestone tier (2, 4, 8, 12 weeks).",
+        "Shows urgent warning when streak is at risk with remaining days countdown.",
+        "Widget tests verify rendering across all streak states."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/streak_progress_card_test.dart"
+      ],
+      "riskAssessment": "Low: Profile presentation widget."
+    },
+    {
+      "id": "P18-02",
+      "title": "Sunday Evening Social Digest & Retrospective Trigger Engine",
+      "domain": "Social Graph & Engagement",
+      "description": "SundayRetrospectiveService generating localized weekly discovery digests and at-risk streak alerts with unit tests.",
+      "ownerRole": "Core Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P18-01"
+      ],
+      "affectedPaths": [
+        "lib/core/services/sunday_retrospective_service.dart",
+        "test/unit/sunday_retrospective_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Detects Sunday evening retrospective window (18:00-21:00 Tashkent time).",
+        "Generates customized retrospective cards for curators with active drops vs at-risk streaks.",
+        "Trilingual copy across Uzbek, Russian, and English.",
+        "Unit tests verify window detection and message generation."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/sunday_retrospective_test.dart"
+      ],
+      "riskAssessment": "Low: Local notification & alert engine."
+    },
+    {
+      "id": "P18-03",
+      "title": "Web Companion Audio-Tactile Sound Effects Synthesizer",
+      "domain": "Social Graph & Distribution",
+      "description": "Web Audio API sound generator in src/services/soundEffects.ts with volume controls, haptic sync, and Vitest test assertions.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P18-02"
+      ],
+      "affectedPaths": [
+        "src/services/soundEffects.ts",
+        "src/__tests__/soundEffects.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Synthesizes subtle pops, clicks, and success chimes without external audio files.",
+        "Syncs with Telegram WebApp haptic triggers.",
+        "Vitest test suite validates synthetic audio initialization and fallback."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web Audio API synthesis."
+    },
+    {
+      "id": "P18-04",
+      "title": "District Crown Rivalry & Usurpation Notification Engine",
+      "domain": "Gamification & Reputation",
+      "description": "CrownRivalryEngine in lib/core/services/crown_rivalry_engine.dart detecting district leader changes and generating friendly rivalry notifications.",
+      "ownerRole": "Backend & Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P18-03"
+      ],
+      "affectedPaths": [
+        "lib/core/services/crown_rivalry_engine.dart",
+        "test/unit/crown_rivalry_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Tracks district leader transitions when a new drop dethrones an existing Local Legend.",
+        "Generates localized rivalry alerts ('Kamila just claimed the Mirabad crown with 5 drops!').",
+        "Unit tests verify leader transition detection and notification payload formatting."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/crown_rivalry_test.dart"
+      ],
+      "riskAssessment": "Low: Local rivalry calculation."
     }
   ],
   "loopConfig": {

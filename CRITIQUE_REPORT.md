@@ -295,3 +295,62 @@ With Phase 16 fully delivered (tagged `v1.6.0-staging.1`):
 - **Domain**: Gamification & Retention
 - **Owner**: Core Engineering
 - **Deliverables**: `ExplorerStreakEngine` in `lib/core/services/explorer_streak_engine.dart` computing weekly active streaks and badge awards with unit tests.
+
+
+---
+
+# Around — Adversarial Product, UX & Growth Critique Report (Phase 18 Audit)
+
+**Audit Date**: November 3, 2026  
+**Auditor Personas**: CTO & Autonomous Loop Orchestrator, Growth & Retention Lead, Senior Product Engineer  
+**Target Milestone**: Phase 18 — Streak Profile Flair, Sunday Retrospectives, Web Micro-Sounds & Crown Rivalry  
+**Branch**: `feat/phase-12-strava-for-places`  
+
+## Executive Summary & Strategic Position
+
+With Phase 17 fully delivered (tagged `v1.7.0-staging.1`):
+- **213 / 213 Flutter tests** passing with zero errors.
+- **36 / 36 Web Vitest tests** passing with zero errors.
+- **0 static analysis warnings** across all Dart & TypeScript code.
+
+### The Adversarial Growth Audit
+
+1. **Explorer Streak Is Computed but Unsurfaced in Profile Screen**:
+   - `ExplorerStreakEngine` (`P17-04`) computes consecutive discovery weeks and milestone badges, but the user profile and taste passport don't visually show the flame counter (`🔥 4-Week Explorer`) or countdown days remaining before streak expiration.
+   - **Remedy**: Create `StreakProgressCard` in `lib/features/profile/widgets/streak_progress_card.dart` and embed on `ProfileScreen`.
+
+2. **Missing Sunday Evening Retrospective Loop**:
+   - Sunday evening (18:00–21:00 Tashkent time) is the optimal window to celebrate weekly discoveries or warn curators whose streak is at risk.
+   - **Remedy**: Build `SundayRetrospectiveService` in `lib/core/services/sunday_retrospective_service.dart` generating retrospective alerts and notifications.
+
+3. **Telegram Mini App Companion Lacks Audio-Tactile Micro-Feedback**:
+   - The web companion in `src/` has haptics, but lacks subtle audio feedback on button taps, story views, and bookmark clicks, dampening the sensory experience.
+   - **Remedy**: Implement `soundEffects.ts` Web Audio API synthesizer in `src/services/soundEffects.ts` with Vitest test assertions.
+
+4. **Friendly Competition: Crown Usurpation & Rivalry Engine**:
+   - The ultimate motivation in Strava is defending your Local Legend crown against friends.
+   - **Remedy**: Build `CrownRivalryEngine` in `lib/core/services/crown_rivalry_engine.dart` detecting when a friend takes the lead in a Tashkent district and alerting the previous crown holder.
+
+---
+
+## Phase 18 Backlog Roadmap (`tasks.json`)
+
+### `P18-01`: Profile Streak Progress Card & Milestone Flame Flair
+- **Domain**: Gamification & Retention
+- **Owner**: Mobile Engineering
+- **Deliverables**: `StreakProgressCard` widget on `ProfileScreen` displaying consecutive week flame counter, progress toward next badge, and days remaining.
+
+### `P18-02`: Sunday Evening Social Digest & Retrospective Trigger Engine
+- **Domain**: Social Graph & Engagement
+- **Owner**: Core Engineering
+- **Deliverables**: `SundayRetrospectiveService` generating localized weekly discovery digests and at-risk streak alerts with unit tests.
+
+### `P18-03`: Web Companion Audio-Tactile Sound Effects Synthesizer
+- **Domain**: Social Graph & Distribution
+- **Owner**: Web Companion Engineer
+- **Deliverables**: Web Audio API sound generator in `src/services/soundEffects.ts` with volume controls, haptic sync, and Vitest test assertions.
+
+### `P18-04`: District Crown Rivalry & Usurpation Notification Engine
+- **Domain**: Gamification & Reputation
+- **Owner**: Backend & Mobile Engineering
+- **Deliverables**: `CrownRivalryEngine` in `lib/core/services/crown_rivalry_engine.dart` detecting district leader changes and generating friendly rivalry notifications.
