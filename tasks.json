@@ -2269,7 +2269,7 @@
       "description": "MetroStationFilter.tsx in src/components/ providing metro station filter chips (Oybek, Kosmonavtlar, Chorsu, etc.) with audio-tactile feedback and responsive web layout.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P22-02"
       ],
@@ -2296,7 +2296,7 @@
       "description": "DropVerificationService in lib/core/services/drop_verification_service.dart computing cryptographic verification hashes and rendering Verified Visit seal on genuine on-device drops.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P22-03"
       ],
