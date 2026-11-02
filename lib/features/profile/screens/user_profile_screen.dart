@@ -13,6 +13,7 @@ import '../../../core/services/curator_recommendation_engine.dart';
 import '../../../core/services/locale_service.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../widgets/curator_taste_overlap_card.dart';
+import '../widgets/curator_coffee_ping_sheet.dart';
 
 class UserProfileScreen extends ConsumerStatefulWidget {
   final String userId;
@@ -423,6 +424,14 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                     CuratorTasteOverlapCard(
                       match: tasteMatch,
                       languageCode: currentLang,
+                      onTap: () {
+                        CuratorCoffeePingSheet.show(
+                          context: context,
+                          member: member,
+                          match: tasteMatch,
+                          languageCode: currentLang,
+                        );
+                      },
                     ),
                     const SizedBox(height: 20),
 

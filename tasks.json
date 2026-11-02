@@ -2110,7 +2110,7 @@
       "description": "CuratorCoffeePingSheet on UserProfileScreen generating pre-filled Telegram direct invites based on shared top spots and taste compatibility score.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P0",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P20-04"
       ],
@@ -2137,7 +2137,7 @@
       "description": "StreakFreezeService in lib/core/services/streak_freeze_service.dart banking freeze shields for high-activity weeks and protecting multi-week explorer streaks against missed deadlines.",
       "ownerRole": "Core Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P21-01"
       ],
