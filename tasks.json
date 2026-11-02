@@ -2349,7 +2349,7 @@
       "description": "CuratorLevelBadgeWidget in lib/features/profile/widgets/curator_level_badge_widget.dart rendering tier badge, animated XP bar, and next-tier unlock criteria.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P23-01"
       ],
@@ -2375,7 +2375,7 @@
       "description": "CuratorLevelBadge.tsx in src/components/ displaying curator tier badges, XP meters, and sound effects on web companion profile surfaces.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P23-02"
       ],
