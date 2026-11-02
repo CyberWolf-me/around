@@ -11,6 +11,7 @@ import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
 import '../../../data/services/supabase_service.dart';
 import '../../../core/services/deep_link_service.dart';
+import '../../../core/services/friend_invite_service.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../widgets/taste_passport_card.dart';
@@ -594,6 +595,7 @@ class ProfileScreen extends ConsumerWidget {
         builder: (ctx, dialogRef, __) {
           final relations = dialogRef.watch(friendshipStatusesProvider);
           final relationNotifier = dialogRef.read(friendshipStatusesProvider.notifier);
+          final currentProfile = dialogRef.watch(currentProfileProvider);
 
           return AlertDialog(
             backgroundColor: AppColors.paper,
@@ -628,7 +630,85 @@ class ProfileScreen extends ConsumerWidget {
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: kTashkentCommunityMembers.map((member) {
+                  children: [
+                    // Quick Invite Link Card
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 14),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.butter,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.ink, width: 1.2),
+                        boxShadow: const [AppColors.shadowTactile],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.qr_code_2, size: 20, color: AppColors.ink),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Invite Friends via Link',
+                                  style: GoogleFonts.bricolageGrotesque(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: AppColors.ink,
+                                  ),
+                                ),
+                                const Text(
+                                  'Connect instantly with 1 tap',
+                                  style: TextStyle(fontSize: 11, color: AppColors.ink2),
+                                ),
+                              ],
+                            ),
+                          ),
+                          BouncingWidget(
+                            onTap: () async {
+                              HapticService.selection();
+                              final link = await FriendInviteService.copyInviteLink(
+                                inviterId: currentProfile.id,
+                                username: currentProfile.username,
+                                fullName: currentProfile.fullName,
+                                neighborhood: currentProfile.neighborhood,
+                              );
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('✓ Invite link copied: $link'),
+                                    backgroundColor: AppColors.ink,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.ink,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                'Copy Link',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ...kTashkentCommunityMembers.map((member) {
                     final rel = relations[member.id] ?? FriendshipRelation.none;
                     String label;
                     Color btnBg;
@@ -730,9 +810,10 @@ class ProfileScreen extends ConsumerWidget {
                         ],
                       ),
                     );
-                  }).toList(),
-                ),
+                  }),
+                ],
               ),
+            ),
             ),
             actions: [
               TextButton(

@@ -862,7 +862,7 @@
       "description": "Implement FriendInviteService generating signed invite URLs and QR payload strings, with automatic mutual friend connection intent resolution on deep link navigation.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P0",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P11-01"
       ],
@@ -892,7 +892,7 @@
       "description": "Create AtmosphereService that dynamically classifies Tashkent local time into urban rhythms (Morning Brew, Afternoon Focus, Golden Hour, Late Night Vinyl) and filters Explore venues accordingly.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P11-02"
       ],
