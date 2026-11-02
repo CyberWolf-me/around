@@ -6,6 +6,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../core/widgets/bookmark_button.dart';
 import '../../../core/widgets/bouncing_widget.dart';
+import '../../../core/widgets/empty_state_widget.dart';
 import '../../../data/models/collection_model.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/repositories/collections_repository.dart';
@@ -779,27 +780,9 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
               ),
             const SizedBox(height: 14),
             if (filteredSavedVenues.isEmpty)
-              Container(
-                padding: const EdgeInsets.all(36),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: AppColors.cardSurface,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.borderSubtle),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'No places in "$_activeFilter".',
-                      style: GoogleFonts.bricolageGrotesque(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () => context.go('/explore'),
-                      child: const Text('Discover Venues'),
-                    ),
-                  ],
-                ),
+              EmptyStateWidget.savedEmpty(
+                filterName: _activeFilter,
+                onDiscoverVenues: () => context.go('/explore'),
               )
             else
               ...filteredSavedVenues.map((PlaceModel place) {

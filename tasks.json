@@ -1072,7 +1072,7 @@
       "description": "Build reusable EmptyStateWidget and wire into FeedScreen and SavedScreen with clear social and discovery CTAs.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P12-04"
       ],
@@ -1102,7 +1102,7 @@
       "description": "Add composite indexes for high-throughput query patterns across posts, saved_places, friendships, and stories.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P12-01"
       ],
