@@ -1786,7 +1786,7 @@
       "description": "StreakProgressCard widget on ProfileScreen displaying consecutive week flame counter, progress toward next badge, and days remaining.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P17-04"
       ],

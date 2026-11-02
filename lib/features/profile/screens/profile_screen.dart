@@ -19,6 +19,7 @@ import '../../../data/repositories/quests_repository.dart';
 import '../widgets/taste_passport_card.dart';
 import '../widgets/taste_quests_card.dart';
 import '../widgets/district_leaderboard_sheet.dart';
+import '../widgets/streak_progress_card.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -476,6 +477,13 @@ class ProfileScreen extends ConsumerWidget {
               ...savedPlaces,
               ...myDrops.map((d) => d.placeId),
             },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Weekly Discovery Streak Card (P18-01)
+          StreakProgressCard(
+            userId: profile.id,
           ),
 
           const SizedBox(height: 24),
