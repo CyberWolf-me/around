@@ -497,3 +497,23 @@ To further deepen the Strava/Duolingo gaming loop and reward persistent explorer
    - `CuratorLevelBadge.tsx` displaying the curator's tier badge and level details with audio-tactile click feedback.
 4. **Offline Cache Telemetry & Subway Sync Diagnostics (`P23-04`)**:
    - Diagnostics service monitoring offline cache hit performance, underground subway commute connectivity loss, and post-reconnection sync latency.
+
+
+---
+
+## Autonomous Product Audit & Replenishment — Phase 24 (November 3, 2026)
+
+### Strategic Evaluation: Milestone 2.3 Complete & Personal City Exploration Heatmaps
+With Phase 23 delivered and tagged as `v2.3.0-staging.1` (302 Flutter tests, 74 Web tests, zero static analysis warnings), Around has established the 4-tier Curator XP progression system.
+
+To take the "Strava for Places" metaphor to its ultimate expression in Tashkent, Phase 24 establishes Personal City Coverage:
+
+1. **Curator City District Coverage Engine (`P24-01`)**:
+   - Calculates the curator's personal exploration coverage across Tashkent's 5 key districts (Mirabad, Central Tashkent, Yakkasaray, Old City, Yunusabad) based on verified drops and saved places.
+   - Generates completion percentages, district badges, and recommends the next unvisited gem in under-explored districts.
+2. **Interactive District Coverage Card & Exploration Overlay Widget (`P24-02`)**:
+   - `DistrictCoverageCard` in `lib/features/explore/widgets/district_coverage_card.dart` mounted on `ExploreScreen` and `TastePassportScreen` displaying animated district progress bars and tactile district filter taps.
+3. **Web Companion Personal City Coverage Meter (`P24-03`)**:
+   - `DistrictCoverageMeter.tsx` in `src/components/` rendering responsive district progress rings and Web Audio tactile haptics.
+4. **Supabase SQL Schema & District Leaderboard RPC Migration (`P24-04`)**:
+   - `00013_curator_levels_and_district_leaderboard.sql` adding `curator_xp`, `curator_tier`, and `curator_level` to `profiles`, alongside idempotent RPC `get_curator_leaderboard` with PostGIS RLS authorization assertions.

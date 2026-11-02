@@ -2419,6 +2419,112 @@
         "flutter test test/unit/subway_sync_diagnostics_test.dart"
       ],
       "riskAssessment": "Low: Local performance diagnostics."
+    },
+    {
+      "id": "P24-01",
+      "title": "Curator City District Coverage Engine",
+      "domain": "Spatial Data & Discovery",
+      "description": "PersonalCoverageEngine in lib/core/services/personal_coverage_engine.dart calculating personal exploration percentage across Tashkent districts based on visited places.",
+      "ownerRole": "Core Engineering & Spatial Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P23-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/personal_coverage_engine.dart",
+        "test/unit/personal_coverage_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Calculates coverage percentage for 5 Tashkent districts (Mirabad, Central Tashkent, Yakkasaray, Old City, Yunusabad).",
+        "Computes overall metropolitan exploration score and identifies least-explored district.",
+        "Recommends unvisited venue from lowest-coverage district.",
+        "Unit tests verify coverage percentages, boundary clamping, and recommendation logic."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/personal_coverage_test.dart"
+      ],
+      "riskAssessment": "Low: Mathematical aggregation logic."
+    },
+    {
+      "id": "P24-02",
+      "title": "Interactive District Coverage Card & Exploration Overlay Widget",
+      "domain": "Spatial Data & Discovery",
+      "description": "DistrictCoverageCard in lib/features/explore/widgets/district_coverage_card.dart rendering district coverage progress bars and discovery recommendations.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P24-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/district_coverage_card.dart",
+        "test/widget/district_coverage_card_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders district progress bars with animated percentages.",
+        "Displays unvisited place recommendation card with one-tap navigate action.",
+        "Widget tests verify district progress rendering, empty states, and interaction callbacks."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/district_coverage_card_test.dart"
+      ],
+      "riskAssessment": "Low: UI presentation widget."
+    },
+    {
+      "id": "P24-03",
+      "title": "Web Companion Personal City Coverage Meter",
+      "domain": "Spatial Data & Discovery",
+      "description": "DistrictCoverageMeter.tsx in src/components/ rendering responsive district progress meters with audio-tactile haptic feedback.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P24-02"
+      ],
+      "affectedPaths": [
+        "src/components/DistrictCoverageMeter.tsx",
+        "src/__tests__/districtCoverageMeter.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders responsive district coverage bars in web companion.",
+        "Triggers sound effects on district chip tap.",
+        "Vitest test suite verifies coverage math, district filtering, and localization."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P24-04",
+      "title": "Supabase SQL Schema & District Leaderboard RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00013_curator_levels_and_district_leaderboard.sql adding curator_xp, curator_tier, and get_curator_leaderboard RPC with PostGIS spatial ranking.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P24-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00013_curator_levels_and_district_leaderboard.sql",
+        "test/unit/curator_leaderboard_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Adds curator_xp, curator_tier, curator_level columns to profiles table.",
+        "Creates idempotent get_curator_leaderboard RPC returning ranked curators per district or city-wide.",
+        "Enforces RLS policies and auth.uid() caller invariants.",
+        "Unit test validates SQL syntax and RPC signature."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/curator_leaderboard_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
