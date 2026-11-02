@@ -124,6 +124,15 @@ class StorageService {
     await _prefs?.setString(key, value);
   }
 
+  static int getInt(String key, [int fallback = 0]) {
+    return _prefs?.getInt(key) ?? (_memoryFallback[key] as int? ?? fallback);
+  }
+
+  static Future<void> setInt(String key, int value) async {
+    _memoryFallback[key] = value;
+    await _prefs?.setInt(key, value);
+  }
+
   static Future<void> removeString(String key) async {
     _memoryFallback.remove(key);
     await _prefs?.remove(key);

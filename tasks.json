@@ -2137,7 +2137,7 @@
       "description": "StreakFreezeService in lib/core/services/streak_freeze_service.dart banking freeze shields for high-activity weeks and protecting multi-week explorer streaks against missed deadlines.",
       "ownerRole": "Core Engineering",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P21-01"
       ],
@@ -2163,7 +2163,7 @@
       "description": "PlaceRhythmHeatmap.tsx in src/components/ rendering 24-hour atmosphere sparklines, peak hour tags, and mobile deep link CTA for web companion place pages.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P21-02"
       ],
