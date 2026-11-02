@@ -552,7 +552,7 @@
       "description": "Strip raw EXIF GPS/camera metadata and re-encode picked images to WebP/JPEG <= 1920px before uploading to the post-media bucket in SupabaseService.uploadPostMedia.",
       "ownerRole": "Mobile Engineering & Security Engineering",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P2-03"
       ],

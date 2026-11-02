@@ -1,5 +1,8 @@
+import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:around_app/core/services/app_logger.dart';
+import 'package:around_app/core/services/exif_sanitizer.dart';
 import 'package:around_app/data/models/post_model.dart';
 import 'package:around_app/data/repositories/posts_repository.dart';
 import 'package:around_app/data/repositories/profiles_repository.dart';
@@ -198,6 +201,48 @@ void main() {
       // In offline / unauthenticated test environment, gracefully returns 0 without crashing or duplicating state
       expect(addedCount, equals(0));
       expect(notifier.hasMoreRemoteDrops, isTrue);
+    });
+
+    test('ExifSanitizer strips APP1 EXIF GPS metadata from JPEG byte payloads (P8-02)', () {
+      // Construct synthetic JPEG with SOI (0xFFD8) + APP1 EXIF (0xFFE1) with GPS payload + SOS (0xFFDA)
+      final fakeGpsPayload = [
+        0xFF, 0xD8, // SOI
+        0xFF, 0xE1, // APP1 marker (EXIF/GPS)
+        0x00, 0x08, // length: 8 bytes (including length bytes)
+        0x45, 0x78, 0x69, 0x66, 0x00, 0x00, // "Exif\0\0"
+        0xFF, 0xDA, // SOS (Start of Scan)
+        0x00, 0x02,
+        0xAA, 0xBB, // entropy-coded image data
+        0xFF, 0xD9, // EOI (End of Image)
+      ];
+
+      final rawBytes = Uint8List.fromList(fakeGpsPayload);
+      expect(ExifSanitizer.hasExifGps(rawBytes), isTrue);
+
+      final sanitized = ExifSanitizer.stripExif(rawBytes);
+      expect(ExifSanitizer.hasExifGps(sanitized), isFalse);
+
+      // Verify sanitized bytes still have valid SOI and SOS markers
+      expect(sanitized[0], equals(0xFF));
+      expect(sanitized[1], equals(0xD8));
+      expect(sanitized.contains(0xE1), isFalse);
+    });
+
+    test('AppLogger.validateImagePath enforces 5 MB limit and MIME format restrictions (P8-02)', () {
+      // 1. Valid JPEG under 5 MB
+      final valid = AppLogger.validateImagePath('sample.jpg', byteLength: 2 * 1024 * 1024);
+      expect(valid, isNull);
+
+      // 2. Reject image > 5 MB
+      final tooLarge = AppLogger.validateImagePath('heavy.jpg', byteLength: 6 * 1024 * 1024);
+      expect(tooLarge, isNotNull);
+      expect(tooLarge!.code, equals('IMAGE_TOO_LARGE'));
+      expect(tooLarge.message, contains('5 MB maximum'));
+
+      // 3. Reject unsupported executable or file extension
+      final invalidType = AppLogger.validateImagePath('malicious.exe', byteLength: 1024);
+      expect(invalidType, isNotNull);
+      expect(invalidType!.code, equals('INVALID_IMAGE_TYPE'));
     });
   });
 }

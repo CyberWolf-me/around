@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/app_logger.dart';
+import '../../../core/services/exif_sanitizer.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/models/post_model.dart';
@@ -80,13 +81,15 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
     try {
       final XFile? file = await _picker.pickImage(
         source: source,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 78,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        imageQuality: 82,
+        requestFullMetadata: false,
       );
       if (file != null) {
-        final bytes = await file.readAsBytes();
-        final err = AppLogger.validateImagePath(file.path, byteLength: bytes.length);
+        final rawBytes = await file.readAsBytes();
+        final sanitizedBytes = ExifSanitizer.stripExif(rawBytes);
+        final err = AppLogger.validateImagePath(file.path, byteLength: sanitizedBytes.length);
         if (err != null) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -96,7 +99,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
           return;
         }
         // Persist as a base64 data URI so OS temporary cache purges never break local drops
-        final persistentDataUri = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+        final persistentDataUri = 'data:image/jpeg;base64,${base64Encode(sanitizedBytes)}';
         setState(() {
           _selectedPhoto = persistentDataUri;
         });

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/services/app_logger.dart';
+import '../../core/services/exif_sanitizer.dart';
 
 class UploadedMediaResult {
   final String storagePath;
@@ -117,14 +118,15 @@ class SupabaseService {
       if (localFilePath.startsWith('data:image/')) {
         final commaIdx = localFilePath.indexOf(',');
         if (commaIdx == -1) return null;
-        final bytes = base64Decode(localFilePath.substring(commaIdx + 1));
-        final validationError = AppLogger.validateImagePath(localFilePath, byteLength: bytes.length);
+        final rawBytes = base64Decode(localFilePath.substring(commaIdx + 1));
+        final sanitizedBytes = ExifSanitizer.stripExif(rawBytes);
+        final validationError = AppLogger.validateImagePath(localFilePath, byteLength: sanitizedBytes.length);
         if (validationError != null) throw validationError;
 
         final storagePath = '${currentUser!.id}/drop_${DateTime.now().millisecondsSinceEpoch}.jpg';
         await client.storage.from('post-media').uploadBinary(
               storagePath,
-              bytes,
+              sanitizedBytes,
               fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: false),
             );
         final signedUrl = await client.storage.from('post-media').createSignedUrl(storagePath, 60 * 60 * 24 * 365);
@@ -137,8 +139,9 @@ class SupabaseService {
 
       final file = File(localFilePath);
       if (!await file.exists()) return null;
-      final byteLength = await file.length();
-      final validationError = AppLogger.validateImagePath(localFilePath, byteLength: byteLength);
+      final rawBytes = await file.readAsBytes();
+      final sanitizedBytes = ExifSanitizer.stripExif(rawBytes);
+      final validationError = AppLogger.validateImagePath(localFilePath, byteLength: sanitizedBytes.length);
       if (validationError != null) {
         AppLogger.warn('SupabaseService', validationError.message);
         throw validationError;
@@ -150,9 +153,9 @@ class SupabaseService {
           : (ext == 'webp' ? 'image/webp' : 'image/jpeg');
       final storagePath = '${currentUser!.id}/drop_${DateTime.now().millisecondsSinceEpoch}.$ext';
 
-      await client.storage.from('post-media').upload(
+      await client.storage.from('post-media').uploadBinary(
             storagePath,
-            file,
+            sanitizedBytes,
             fileOptions: FileOptions(contentType: contentType, upsert: false),
           );
       final signedUrl = await client.storage.from('post-media').createSignedUrl(storagePath, 60 * 60 * 24 * 365);
@@ -162,6 +165,9 @@ class SupabaseService {
       return null;
     }
   }
+
+  /// Alias for uploadDropMedia (P8-02 / Experience Domain).
+  static Future<String?> uploadPostMedia(String localFilePath) => uploadDropMedia(localFilePath);
 
   /// Backward-compatible wrapper returning the uploaded media URL.
   static Future<String?> uploadDropMedia(String localFilePath) async {
