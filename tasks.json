@@ -1841,7 +1841,7 @@
       "description": "Web Audio API sound generator in src/services/soundEffects.ts with volume controls, haptic sync, and Vitest test assertions.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P18-02"
       ],
