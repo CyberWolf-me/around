@@ -2525,6 +2525,114 @@
         "flutter test test/unit/curator_leaderboard_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P25-01",
+      "title": "Curated City Walking Crawls & Route Itinerary Engine",
+      "domain": "Spatial Data & Discovery",
+      "description": "CuratedRouteEngine in lib/core/services/curated_route_engine.dart computing route distance, walking minutes, metro connectors, and stop completion state.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P24-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/curated_route_engine.dart",
+        "test/unit/curated_route_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Defines CuratedRoute and RouteStop models with coordinates, estimated walking duration, and metro connectors.",
+        "Includes at least 3 curated Tashkent routes: Mirabad Specialty Coffee Crawl, Old City Plov Trail, and Central Cultural Walk.",
+        "Calculates distance between sequential stops and total walking minutes.",
+        "Computes stop completion progress and route finisher qualification based on visited places.",
+        "Unit test validates route aggregation, metric calculations, and localizations."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/curated_route_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart spatial and route calculation service."
+    },
+    {
+      "id": "P25-02",
+      "title": "Interactive Multi-Stop Route Map & Itinerary Card Widget",
+      "domain": "Spatial Data & Discovery",
+      "description": "CuratedRouteCard and RouteStopTimelineWidget in lib/features/explore/widgets/curated_route_card.dart rendering step-by-step stop timelines with transit badges.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P25-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/curated_route_card.dart",
+        "test/widget/curated_route_card_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders route title, district badge, total walking time, and stop count.",
+        "Displays expandable ordered stop timeline with metro connector chips.",
+        "Provides start route action and stop selection callback.",
+        "Widget test verifies step rendering, progress indicators, and interaction callbacks."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/curated_route_card_test.dart"
+      ],
+      "riskAssessment": "Low: UI presentation widget."
+    },
+    {
+      "id": "P25-03",
+      "title": "Web Companion Interactive Itinerary Preview & Stop Navigator",
+      "domain": "Spatial Data & Discovery",
+      "description": "CuratedRouteNavigator.tsx in src/components/ rendering interactive multi-stop route timelines with audio-tactile haptic feedback.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P25-02"
+      ],
+      "affectedPaths": [
+        "src/components/CuratedRouteNavigator.tsx",
+        "src/__tests__/curatedRouteNavigator.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders responsive route timeline with stop distance indicators.",
+        "Triggers Web Audio tactile feedback on stop selection.",
+        "Vitest test suite verifies route calculations, stop filtering, and localization."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P25-04",
+      "title": "Supabase SQL Schema & Shared Route Completion RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00016_curated_routes_and_crawl_completions.sql adding curated_routes and route_completions tables with complete_curated_route RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P25-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00016_curated_routes_and_crawl_completions.sql",
+        "test/unit/curated_routes_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates curated_routes and route_completions tables with PostGIS foreign keys.",
+        "Creates idempotent complete_curated_route RPC that validates stop check-ins and awards 150 curator XP.",
+        "Enforces RLS policies and auth.uid() caller invariants.",
+        "Unit test validates SQL syntax and RPC signature."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/curated_routes_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {

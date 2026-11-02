@@ -517,3 +517,33 @@ To take the "Strava for Places" metaphor to its ultimate expression in Tashkent,
    - `DistrictCoverageMeter.tsx` in `src/components/` rendering responsive district progress rings and Web Audio tactile haptics.
 4. **Supabase SQL Schema & District Leaderboard RPC Migration (`P24-04`)**:
    - `00013_curator_levels_and_district_leaderboard.sql` adding `curator_xp`, `curator_tier`, and `curator_level` to `profiles`, alongside idempotent RPC `get_curator_leaderboard` with PostGIS RLS authorization assertions.
+
+
+---
+
+## Autonomous Product Audit & Replenishment — Phase 25 (November 3, 2026)
+
+### Strategic Evaluation: Milestone 2.4 Complete & Curated Multi-Stop City Crawls
+With Phase 24 delivered and tagged as `v2.4.0-staging.1` (317 Flutter tests, 80 Web tests, zero static analysis warnings), Around has established the 5-district personal coverage system and Supabase curator leaderboard migration.
+
+### The Adversarial Growth Audit for Phase 25:
+In Tashkent, people don't explore venues in isolation. Social life revolves around curated multi-stop itineraries:
+- "The Mirabad Specialty Coffee Crawl" (Breadly -> Socials -> Ekler)
+- "The Chorsu Heritage Food Trail" (Chorsu Bread Bakers -> Lamb Skewers Alley -> Samarkand Darvoza)
+- "Central Tashkent Cultural & Evening Promenade" (Amir Temur Square -> TIMS Roastery -> Afsona)
+
+Currently, users have to assemble these stops manually. In Strava, athletes follow segments and courses. In Around, curators should be able to create, share, and follow **Curated Multi-Stop Crawls & Walking Routes** with:
+1. Ordered venue waypoints, estimated walking time, and nearest Tashkent Metro station connectors.
+2. Step-by-step progress tracking that verifies each stop via check-ins and awards a "Route Finisher" XP bonus.
+3. Interactive route timeline visualization in both the Flutter app and React web companion.
+4. Supabase SQL migration creating `curated_routes` and `route_completions` tables with an atomic completion RPC.
+
+### Phase 25 Work Breakdown:
+1. **Curated City Walking Crawls & Route Itinerary Engine (`P25-01`)**:
+   - `CuratedRouteEngine` in `lib/core/services/curated_route_engine.dart` computing route distance, walking minutes, metro connectors, and stop completion state.
+2. **Interactive Multi-Stop Route Map & Itinerary Card Widget (`P25-02`)**:
+   - `CuratedRouteCard` and `RouteStopTimelineWidget` in `lib/features/explore/widgets/curated_route_card.dart` rendering step-by-step stop timelines with transit badges.
+3. **Web Companion Interactive Itinerary Preview & Stop Navigator (`P25-03`)**:
+   - `CuratedRouteNavigator.tsx` in `src/components/` rendering interactive multi-stop route timelines with audio-tactile haptic feedback.
+4. **Supabase SQL Schema & Shared Route Completion RPC Migration (`P25-04`)**:
+   - `00016_curated_routes_and_crawl_completions.sql` adding `curated_routes` and `route_completions` tables, with idempotent RPC `complete_curated_route` rewarding 150 curator XP upon verifying all stops.
