@@ -777,13 +777,13 @@
       "description": "Harden OutboxService with background network change listeners, exponential backoff, maximum retry capping, and idempotent UUID dispatch.",
       "ownerRole": "Platform Engineering & Mobile Engineering",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P10-01"
       ],
       "affectedPaths": [
         "lib/data/services/outbox_service.dart",
-        "test/unit/post_privacy_test.dart"
+        "test/unit/outbox_service_test.dart"
       ],
       "acceptanceCriteria": [
         "Failed drop actions enqueue in persistent outbox with unique idempotency keys.",
@@ -803,7 +803,7 @@
       "description": "Execute comprehensive multi-suite verification across Flutter and React, generate release documentation, and ship release tag v1.1.0-staging.1.",
       "ownerRole": "QA Engineer & CTO / Orchestrator",
       "priority": "P0",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P10-02"
       ],
