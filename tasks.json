@@ -2322,7 +2322,7 @@
       "description": "CuratorProgressionEngine in lib/core/services/curator_progression_engine.dart calculating XP from verified drops, multi-week streaks, and district crown holding to derive tier levels.",
       "ownerRole": "Core Engineering",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P22-04"
       ],
@@ -2349,7 +2349,7 @@
       "description": "CuratorLevelBadgeWidget in lib/features/profile/widgets/curator_level_badge_widget.dart rendering tier badge, animated XP bar, and next-tier unlock criteria.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P23-01"
       ],
