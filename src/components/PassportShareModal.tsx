@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { buildPassportUrl } from '../router';
-import { triggerTelegramHaptic, getTelegramWebApp } from '../services/telegramWebApp';
+import { getTelegramWebApp } from '../services/telegramWebApp';
+import { playSoundWithHaptic } from '../services/soundEffects';
 
 export interface PassportShareOptions {
   username: string;
@@ -75,7 +76,7 @@ export const PassportShareModal: React.FC<PassportShareModalProps> = ({
   });
 
   const handleCopyLink = async () => {
-    triggerTelegramHaptic('selection');
+    playSoundWithHaptic('success', 'selection');
     try {
       if (typeof navigator !== 'undefined' && navigator.clipboard) {
         await navigator.clipboard.writeText(passportUrl);
@@ -88,7 +89,7 @@ export const PassportShareModal: React.FC<PassportShareModalProps> = ({
   };
 
   const handleShareTelegram = () => {
-    triggerTelegramHaptic('medium');
+    playSoundWithHaptic('pop', 'medium');
     const webApp = getTelegramWebApp();
 
     if (webApp && typeof (webApp as any).openTelegramLink === 'function') {
@@ -107,6 +108,11 @@ export const PassportShareModal: React.FC<PassportShareModalProps> = ({
     }
   };
 
+  const handleClose = () => {
+    playSoundWithHaptic('click', 'light');
+    onClose();
+  };
+
   const initials = fullName
     .split(' ')
     .map((n) => n[0])
@@ -118,7 +124,7 @@ export const PassportShareModal: React.FC<PassportShareModalProps> = ({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
       data-testid="passport-share-modal-backdrop"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         className="w-full max-w-sm rounded-3xl bg-[#FAF7F2] p-6 shadow-2xl border border-[#161412]/10"
@@ -137,7 +143,7 @@ export const PassportShareModal: React.FC<PassportShareModalProps> = ({
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="w-8 h-8 rounded-full bg-[#F3ECE0] flex items-center justify-center text-[#5A544C] hover:text-[#161412]"
             aria-label="Close modal"
           >

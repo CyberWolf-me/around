@@ -1,6 +1,7 @@
 import React from 'react';
 import { COLORS } from '../../data/mockData';
 import { ICON_PATHS } from './Icon';
+import { playSoundWithHaptic } from '../../services/soundEffects';
 
 export interface StarRatingProps {
   rating: number;
@@ -17,6 +18,13 @@ export const StarRating: React.FC<StarRatingProps> = ({
   interactive = false,
   onChange,
 }) => {
+  const handleStarClick = (starIndex: number) => {
+    if (interactive && onChange) {
+      playSoundWithHaptic('select', 'selection');
+      onChange(starIndex);
+    }
+  };
+
   return (
     <span
       style={{
@@ -34,7 +42,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
             key={starIndex}
             type="button"
             disabled={!interactive}
-            onClick={() => interactive && onChange && onChange(starIndex)}
+            onClick={() => handleStarClick(starIndex)}
             style={{
               padding: 0,
               background: 'none',
