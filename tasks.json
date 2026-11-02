@@ -2695,7 +2695,7 @@
       "description": "GroupCrawlRoomViewer.tsx in src/components/ rendering real-time group crawl participants, stop badges, and Web Audio tactile feedback.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P26-02"
       ],
