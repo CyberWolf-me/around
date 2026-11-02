@@ -14,6 +14,7 @@ import '../widgets/bento_card.dart';
 import '../widgets/story_rail.dart';
 import '../widgets/caught_up_widget.dart';
 import '../widgets/weekly_digest_banner.dart';
+import '../widgets/friend_presence_rail.dart';
 
 class FeedScreen extends ConsumerWidget {
   const FeedScreen({super.key});
@@ -161,6 +162,9 @@ class FeedScreen extends ConsumerWidget {
             ),
             const SliverToBoxAdapter(
               child: WeeklyDigestBanner(),
+            ),
+            const SliverToBoxAdapter(
+              child: FriendPresenceRail(),
             ),
             if (outboxCount > 0)
               SliverToBoxAdapter(

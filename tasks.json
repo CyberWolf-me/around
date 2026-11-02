@@ -1678,7 +1678,7 @@
       "description": "FriendPresenceRail widget in FeedScreen displaying active friends with pulse indicators, district chips, and bottom sheet profile preview.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P16-04"
       ],
