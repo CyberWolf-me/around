@@ -579,13 +579,14 @@
       "description": "Connect the existing public.collections and public.collection_items tables from 00006_platform_domains_and_discovery.sql to SavedPlacesRepository and SavedScreen so users can create custom themed lists and add places.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P8-01"
       ],
       "affectedPaths": [
-        "lib/data/repositories/saved_places_repository.dart",
+        "lib/data/repositories/collections_repository.dart",
         "lib/features/saved_places/screens/saved_screen.dart",
+        "lib/features/places/screens/place_detail_screen.dart",
         "test/unit/saved_places_test.dart"
       ],
       "acceptanceCriteria": [
@@ -606,7 +607,7 @@
       "description": "Wire public.post_reactions, public.post_comments, and public.friend_plan_participants from Migration 00006 into PostsRepository, SavedPlacesRepository, FeedScreen, and PlaceDetailScreen.",
       "ownerRole": "Mobile Engineering & Backend Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P8-03"
       ],

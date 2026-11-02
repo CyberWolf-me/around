@@ -7,6 +7,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/models/post_model.dart';
+import '../../../data/repositories/collections_repository.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
@@ -41,6 +42,91 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
         ),
       );
     }
+  }
+
+  void _showAddToCollectionSheet(String placeId) {
+    HapticService.light();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.paper,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final collections = ref.watch(collectionsRepositoryProvider);
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.ink3.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.collections_bookmark_outlined, size: 18, color: AppColors.orange),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Save to Collection',
+                    style: GoogleFonts.bricolageGrotesque(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              if (collections.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: Center(
+                    child: Text('No collections created yet. Go to Saved tab to create one.'),
+                  ),
+                )
+              else
+                ...collections.map((col) {
+                  final inCol = col.placeIds.contains(placeId);
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(
+                      inCol ? Icons.check_circle : Icons.radio_button_unchecked,
+                      color: inCol ? AppColors.orange : AppColors.ink3,
+                    ),
+                    title: Text(col.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5)),
+                    subtitle: Text('${col.placeIds.length} spots · ${col.audience}', style: const TextStyle(fontSize: 11)),
+                    onTap: () {
+                      HapticService.selection();
+                      if (inCol) {
+                        ref.read(collectionsRepositoryProvider.notifier).removePlaceFromCollection(col.id, placeId);
+                      } else {
+                        ref.read(collectionsRepositoryProvider.notifier).addPlaceToCollection(col.id, placeId);
+                      }
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(inCol ? 'Removed from ${col.title}' : 'Added to ${col.title}'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                  );
+                }),
+              const SizedBox(height: 10),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _showDirectionsDialog(PlaceModel place) {
@@ -256,6 +342,11 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                     ),
                   );
                 },
+              ),
+              IconButton(
+                icon: const Icon(Icons.playlist_add, color: AppColors.ink),
+                tooltip: 'Add to Collection',
+                onPressed: () => _showAddToCollectionSheet(place.id),
               ),
               IconButton(
                 icon: const Icon(Icons.share, color: AppColors.ink),

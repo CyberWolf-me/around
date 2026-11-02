@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:around_app/data/repositories/saved_places_repository.dart';
+import 'package:around_app/data/repositories/collections_repository.dart';
 import 'package:around_app/data/services/storage_service.dart';
 
 void main() {
@@ -51,6 +52,73 @@ void main() {
       expect(notifier.isSaved('steam'), isTrue);
       notifier.remove('steam');
       expect(notifier.isSaved('steam'), isFalse);
+    });
+  });
+
+  group('CollectionsNotifier Tests', () {
+    late ProviderContainer container;
+    late CollectionsNotifier notifier;
+
+    setUp(() async {
+      await StorageService.clearAll();
+      container = ProviderContainer();
+      notifier = container.read(collectionsRepositoryProvider.notifier);
+    });
+
+    tearDown(() {
+      container.dispose();
+    });
+
+    test('Initial state loads default Tashkent collections', () {
+      final collections = container.read(collectionsRepositoryProvider);
+      expect(collections.isNotEmpty, isTrue);
+      expect(collections.any((c) => c.id == 'col-coffee-1'), isTrue);
+      expect(collections.any((c) => c.id == 'col-night-1'), isTrue);
+    });
+
+    test('createCollection creates and prepends a new custom collection', () async {
+      final initialCount = container.read(collectionsRepositoryProvider).length;
+      final created = await notifier.createCollection(
+        title: 'Best Matcha Spots',
+        description: 'Ceremonial grade matcha spots in Tashkent',
+        audience: 'public',
+      );
+
+      final updated = container.read(collectionsRepositoryProvider);
+      expect(updated.length, equals(initialCount + 1));
+      expect(updated.first.id, equals(created.id));
+      expect(updated.first.title, equals('Best Matcha Spots'));
+      expect(updated.first.description, equals('Ceremonial grade matcha spots in Tashkent'));
+      expect(updated.first.audience, equals('public'));
+      expect(updated.first.placeIds, isEmpty);
+    });
+
+    test('addPlaceToCollection adds canonical place ID to collection', () async {
+      await notifier.addPlaceToCollection('col-night-1', 'breadly');
+      final collections = container.read(collectionsRepositoryProvider);
+      final col = collections.firstWhere((c) => c.id == 'col-night-1');
+      expect(col.placeIds.contains('breadly'), isTrue);
+
+      // Verify idempotency (cannot add duplicate place ID)
+      await notifier.addPlaceToCollection('col-night-1', 'breadly');
+      final colAfterDuplicate = container.read(collectionsRepositoryProvider).firstWhere((c) => c.id == 'col-night-1');
+      expect(colAfterDuplicate.placeIds.where((id) => id == 'breadly').length, equals(1));
+    });
+
+    test('removePlaceFromCollection removes place ID from collection', () async {
+      await notifier.removePlaceFromCollection('col-coffee-1', 'breadly');
+      final collections = container.read(collectionsRepositoryProvider);
+      final col = collections.firstWhere((c) => c.id == 'col-coffee-1');
+      expect(col.placeIds.contains('breadly'), isFalse);
+      expect(col.placeIds.contains('bnb'), isTrue);
+    });
+
+    test('deleteCollection removes collection from state', () async {
+      final initialCount = container.read(collectionsRepositoryProvider).length;
+      await notifier.deleteCollection('col-night-1');
+      final collections = container.read(collectionsRepositoryProvider);
+      expect(collections.length, equals(initialCount - 1));
+      expect(collections.any((c) => c.id == 'col-night-1'), isFalse);
     });
   });
 }

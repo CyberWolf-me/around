@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
+import '../../../data/models/collection_model.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/repositories/collections_repository.dart';
 import '../../../data/repositories/places_repository.dart';
@@ -154,6 +155,290 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
     );
   }
 
+  void _showAddPlaceToCollectionDialog(CollectionModel collection, List<PlaceModel> allSavedVenues) {
+    final available = allSavedVenues.where((p) => !collection.placeIds.contains(p.id)).toList();
+    if (available.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('All your saved places are already in this collection.')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.paper,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: AppColors.ink, width: 2),
+        ),
+        title: Text('Add to "${collection.title}"', style: GoogleFonts.bricolageGrotesque(fontWeight: FontWeight.w800, fontSize: 16)),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.separated(
+            shrinkWrap: true,
+            itemCount: available.length,
+            separatorBuilder: (_, __) => const Divider(height: 1),
+            itemBuilder: (ctx, idx) {
+              final place = available[idx];
+              return ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: SizedBox(width: 36, height: 36, child: AppImage(path: place.heroImageUrl, fit: BoxFit.cover)),
+                ),
+                title: Text(place.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                subtitle: Text(place.district, style: const TextStyle(fontSize: 11)),
+                trailing: const Icon(Icons.add_circle_outline, size: 20, color: AppColors.orange),
+                onTap: () {
+                  HapticService.selection();
+                  ref.read(collectionsRepositoryProvider.notifier).addPlaceToCollection(collection.id, place.id);
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Added ${place.name} to ${collection.title}')),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCollectionsView(
+    List<CollectionModel> collections,
+    PlacesRepository placesRepo,
+    List<PlaceModel> allSavedVenues,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Custom Collections',
+                  style: GoogleFonts.bricolageGrotesque(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.ink,
+                  ),
+                ),
+                const Text(
+                  'Themed shortlists & collaborative guides',
+                  style: TextStyle(fontSize: 11, color: AppColors.ink3),
+                ),
+              ],
+            ),
+            ElevatedButton.icon(
+              onPressed: _showCreateCollectionDialog,
+              icon: const Icon(Icons.add, size: 14),
+              label: const Text('New List', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.ink,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        if (collections.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(32),
+            alignment: Alignment.center,
+            child: Column(
+              children: [
+                const Icon(Icons.collections_bookmark_outlined, size: 36, color: AppColors.ink3),
+                const SizedBox(height: 12),
+                const Text(
+                  'No collections created yet.',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Organize your favorite Tashkent spots into custom lists.',
+                  style: TextStyle(fontSize: 12, color: AppColors.ink3),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _showCreateCollectionDialog,
+                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
+                  child: const Text('Create Collection'),
+                ),
+              ],
+            ),
+          )
+        else
+          ...collections.map((col) {
+            final places = col.placeIds
+                .map((id) => placesRepo.getPlaceById(id))
+                .whereType<PlaceModel>()
+                .toList();
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 14),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.paper,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.ink, width: 2),
+                boxShadow: const [AppColors.shadowSm],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: col.audience == 'public'
+                              ? AppColors.ink
+                              : (col.audience == 'friends' ? AppColors.orange : AppColors.paper2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          col.audience.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: col.audience == 'private' ? AppColors.ink : Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      if (col.isCollaborative)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.mint,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(color: AppColors.ink, width: 1),
+                          ),
+                          child: const Text(
+                            'COLLABORATIVE',
+                            style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.bold, color: AppColors.ink),
+                          ),
+                        ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.ink3),
+                        constraints: const BoxConstraints(),
+                        padding: EdgeInsets.zero,
+                        onPressed: () {
+                          HapticService.medium();
+                          ref.read(collectionsRepositoryProvider.notifier).deleteCollection(col.id);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    col.title,
+                    style: GoogleFonts.bricolageGrotesque(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                  if (col.description.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      col.description,
+                      style: const TextStyle(fontSize: 11.5, color: AppColors.ink2),
+                    ),
+                  ],
+                  const SizedBox(height: 10),
+                  if (places.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Text(
+                        'No places added yet.',
+                        style: TextStyle(fontSize: 11, color: AppColors.ink3, fontStyle: FontStyle.italic),
+                      ),
+                    )
+                  else
+                    ...places.map((place) => Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppColors.paper2,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: AppColors.ink.withValues(alpha: 0.15)),
+                            ),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: SizedBox(
+                                    width: 40,
+                                    height: 40,
+                                    child: AppImage(path: place.heroImageUrl, fit: BoxFit.cover),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => context.push('/places/${place.id}'),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          place.name,
+                                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          '${place.category} · ${place.district}',
+                                          style: const TextStyle(fontSize: 10, color: AppColors.ink2),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close, size: 14, color: AppColors.ink3),
+                                  constraints: const BoxConstraints(),
+                                  padding: const EdgeInsets.all(4),
+                                  onPressed: () {
+                                    HapticService.selection();
+                                    ref.read(collectionsRepositoryProvider.notifier).removePlaceFromCollection(col.id, place.id);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        )),
+                  const SizedBox(height: 6),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () => _showAddPlaceToCollectionDialog(col, allSavedVenues),
+                      icon: const Icon(Icons.add, size: 13, color: AppColors.ink),
+                      label: const Text('+ Add Saved Place', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.ink)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        const SizedBox(height: 60),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final savedPlaces = ref.watch(savedPlacesProvider);
@@ -196,7 +481,9 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '${filteredSavedVenues.length} places',
+                  _activeFilter == 'Collections'
+                      ? '${collections.length} lists'
+                      : '${filteredSavedVenues.length} places',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -226,11 +513,11 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         children: [
           Row(
-            children: ['All', 'Want to go', 'Been'].map((filter) {
+            children: ['All', 'Want to go', 'Been', 'Collections'].map((filter) {
               final isSel = _activeFilter == filter;
               return Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
                   child: GestureDetector(
                     onTap: () {
                       HapticService.selection();
@@ -247,7 +534,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                       child: Text(
                         filter,
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 10.5,
                           fontWeight: FontWeight.bold,
                           color: isSel ? AppColors.paper : AppColors.ink,
                         ),
@@ -259,6 +546,9 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
             }).toList(),
           ),
           const SizedBox(height: 14),
+          if (_activeFilter == 'Collections')
+            _buildCollectionsView(collections, placesRepo, allSavedVenues)
+          else ...[
           if (friendPlans.isNotEmpty)
             Container(
               padding: const EdgeInsets.all(12),
@@ -654,6 +944,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                 ),
               );
             }),
+          ],
           const SizedBox(height: 70),
         ],
       ),
