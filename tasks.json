@@ -1102,7 +1102,7 @@
       "description": "Add composite indexes for high-throughput query patterns across posts, saved_places, friendships, and stories.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P12-01"
       ],
