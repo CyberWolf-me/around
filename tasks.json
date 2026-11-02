@@ -2314,6 +2314,111 @@
         "flutter test test/unit/drop_verification_test.dart"
       ],
       "riskAssessment": "Low: Cryptographic hashing and verification logic."
+    },
+    {
+      "id": "P23-01",
+      "title": "Curator Badging & Level Progression Engine",
+      "domain": "Gamification & Retention",
+      "description": "CuratorProgressionEngine in lib/core/services/curator_progression_engine.dart calculating XP from verified drops, multi-week streaks, and district crown holding to derive tier levels.",
+      "ownerRole": "Core Engineering",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P22-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/curator_progression_engine.dart",
+        "test/unit/curator_progression_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Computes XP score based on drops (+50 XP), streak weeks (+100 XP/week), and crowns (+250 XP).",
+        "Maps XP to tiers: Neighborhood Scout (1), District Curator (2), City Pioneer (3), Tashkent Legend (4).",
+        "Provides progress fraction and remaining XP to next tier.",
+        "Unit tests verify XP calculation, tier mapping, and localization."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/curator_progression_test.dart"
+      ],
+      "riskAssessment": "Low: Mathematical XP progression engine."
+    },
+    {
+      "id": "P23-02",
+      "title": "Interactive Curator Level Badge & XP Progress Bar Widget",
+      "domain": "Gamification & Retention",
+      "description": "CuratorLevelBadgeWidget in lib/features/profile/widgets/curator_level_badge_widget.dart rendering tier badge, animated XP bar, and next-tier unlock criteria.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P23-01"
+      ],
+      "affectedPaths": [
+        "lib/features/profile/widgets/curator_level_badge_widget.dart",
+        "test/widget/curator_level_badge_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Displays current curator tier badge, title, and current level.",
+        "Renders animated XP progress bar with remaining points to next tier.",
+        "Widget tests verify rendering for all 4 tiers and boundary states."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/curator_level_badge_test.dart"
+      ],
+      "riskAssessment": "Low: UI widget."
+    },
+    {
+      "id": "P23-03",
+      "title": "Web Companion Curator Level & Tier Showcase Component",
+      "domain": "Social Graph & Distribution",
+      "description": "CuratorLevelBadge.tsx in src/components/ displaying curator tier badges, XP meters, and sound effects on web companion profile surfaces.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P23-02"
+      ],
+      "affectedPaths": [
+        "src/components/CuratorLevelBadge.tsx",
+        "src/__tests__/curatorLevelBadge.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders curator tier badge and XP bar in web companion.",
+        "Triggers sound effects on badge interaction.",
+        "Vitest test suite verifies tier styling, XP math, and localization."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P23-04",
+      "title": "Offline Cache Telemetry & Subway Sync Diagnostics",
+      "domain": "Platform & Performance",
+      "description": "SubwaySyncDiagnosticsService in lib/core/services/subway_sync_diagnostics_service.dart tracking cache hit rates and offline duration metrics during metro commutes.",
+      "ownerRole": "Core Engineering & Backend Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P23-03"
+      ],
+      "affectedPaths": [
+        "lib/core/services/subway_sync_diagnostics_service.dart",
+        "test/unit/subway_sync_diagnostics_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Records cache hits, cache misses, and underground offline durations.",
+        "Calculates cache efficiency ratio and sync recovery latency.",
+        "Unit tests verify event tracking, metric bounds, and storage persistence."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/subway_sync_diagnostics_test.dart"
+      ],
+      "riskAssessment": "Low: Local performance diagnostics."
     }
   ],
   "loopConfig": {
