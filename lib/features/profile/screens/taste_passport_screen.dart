@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/deep_link_service.dart';
+import '../../../core/services/locale_service.dart';
 import '../../../data/models/place_model.dart';
 import '../../../data/models/profile_model.dart';
 import '../../../data/repositories/places_repository.dart';
@@ -10,6 +11,7 @@ import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../widgets/taste_passport_card.dart';
+import '../widgets/taste_radar_widget.dart';
 
 /// Screen displaying a user's shareable Tashkent Taste Passport.
 /// Can be opened directly or via deep link: around://passport/:username
@@ -34,6 +36,7 @@ class _TastePassportScreenState extends ConsumerState<TastePassportScreen> {
   @override
   Widget build(BuildContext context) {
     final currentProfile = ref.watch(currentProfileProvider);
+    final currentLang = ref.watch(appLocaleProvider);
     final isMe = widget.username == 'you' ||
         widget.username.toLowerCase() == currentProfile.username.toLowerCase() ||
         widget.username == currentProfile.id;
@@ -89,7 +92,12 @@ class _TastePassportScreenState extends ConsumerState<TastePassportScreen> {
                 totalDrops: myDrops.length,
                 totalSaved: savedIds.length,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 14),
+              TasteRadarWidget(
+                places: topPlaces,
+                languageCode: currentLang,
+              ),
+              const SizedBox(height: 14),
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
@@ -236,6 +244,11 @@ class _TastePassportScreenState extends ConsumerState<TastePassportScreen> {
                   topPlaces: topPlaces,
                   totalDrops: member.dropsCount,
                   totalSaved: topPlaces.length,
+                ),
+                const SizedBox(height: 14),
+                TasteRadarWidget(
+                  places: topPlaces,
+                  languageCode: currentLang,
                 ),
               ],
             ),
