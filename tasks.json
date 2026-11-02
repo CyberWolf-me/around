@@ -1921,7 +1921,7 @@
       "description": "VenueRhythmSparkline widget on PlaceDetailScreen displaying 24h activity curve, friend drop density, and peak hours based on real drop timestamps.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P19-01"
       ],
@@ -1949,7 +1949,7 @@
       "description": "Connect playSoundWithHaptic into AudienceBadge, StarRating, and PassportShareModal with Vitest assertions.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P19-02"
       ],

@@ -21,6 +21,7 @@ import '../../../data/services/storage_service.dart';
 import '../../../data/services/supabase_service.dart';
 import '../../create_post/screens/create_drop_sheet.dart';
 import '../../feed/widgets/comments_sheet.dart';
+import '../widgets/venue_rhythm_sparkline.dart';
 
 class PlaceDetailScreen extends ConsumerStatefulWidget {
   final String placeId;
@@ -672,6 +673,15 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                     ),
                   ),
                 ).toList(),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: VenueRhythmSparkline(
+                place: place,
+                drops: [...friendDrops, ...publicDrops],
               ),
             ),
           ),
