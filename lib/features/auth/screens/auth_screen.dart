@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/services/beta_access_service.dart';
 import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
@@ -27,6 +28,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   final TextEditingController _usernameCtrl = TextEditingController();
   final TextEditingController _fullNameCtrl = TextEditingController();
   final TextEditingController _neighborhoodCtrl = TextEditingController(text: 'Mirabad');
+  final TextEditingController _betaCodeCtrl = TextEditingController();
 
   @override
   void dispose() {
@@ -35,6 +37,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     _usernameCtrl.dispose();
     _fullNameCtrl.dispose();
     _neighborhoodCtrl.dispose();
+    _betaCodeCtrl.dispose();
     super.dispose();
   }
 
@@ -61,6 +64,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       if (fullName.isEmpty) {
         setState(() => _errorMessage = 'Please enter your full name.');
         return;
+      }
+      if (!BetaAccessService.hasAccess()) {
+        final code = _betaCodeCtrl.text.trim();
+        final betaResult = await BetaAccessService.activateWithCode(code);
+        if (!betaResult.isValid) {
+          setState(() => _errorMessage = betaResult.error ?? 'Invalid beta invite code.');
+          return;
+        }
       }
     }
 
@@ -210,6 +221,40 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     ),
                   ),
                 if (_isSignUp) ...[
+                  if (BetaAccessService.hasAccess())
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.orangeSubtle,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.orange.withValues(alpha: 0.4)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.verified, size: 16, color: AppColors.orange),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'VIP Cohort: ${BetaAccessService.getActiveCohort() ?? 'Founding Member'}',
+                              style: GoogleFonts.instrumentSans(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.ink),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else ...[
+                    TextField(
+                      controller: _betaCodeCtrl,
+                      textCapitalization: TextCapitalization.characters,
+                      decoration: const InputDecoration(
+                        labelText: 'Beta Invite Code (e.g. TASH50) *',
+                        hintText: '6-character VIP code or friend link',
+                        prefixIcon: Icon(Icons.vpn_key_outlined, size: 18),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   TextField(
                     controller: _fullNameCtrl,
                     decoration: const InputDecoration(labelText: 'Full Name *', hintText: 'e.g. Kamila Rahimova'),

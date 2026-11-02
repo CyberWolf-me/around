@@ -25,6 +25,8 @@ class StorageService {
   static const _biometricLockKey = 'around_biometric_lock_v1';
   static const _appLanguageKey = 'around_app_language_v1';
   static const _userNeighborhoodKey = 'around_user_neighborhood_v1';
+  static const _betaAccessKey = 'around_beta_access_v1';
+  static const _betaCohortKey = 'around_beta_cohort_v1';
 
   static SharedPreferences? _prefs;
   static final Map<String, Object> _memoryFallback = {};
@@ -56,6 +58,25 @@ class StorageService {
   static Future<void> setGuestMode(bool value) async {
     _memoryFallback[_guestModeKey] = value;
     await _prefs?.setBool(_guestModeKey, value);
+  }
+
+  // Closed Beta access and cohort activation
+  static bool hasBetaAccess() {
+    return _prefs?.getBool(_betaAccessKey) ?? (_memoryFallback[_betaAccessKey] as bool? ?? false);
+  }
+
+  static Future<void> setBetaAccess(bool value) async {
+    _memoryFallback[_betaAccessKey] = value;
+    await _prefs?.setBool(_betaAccessKey, value);
+  }
+
+  static String? getBetaCohort() {
+    return _prefs?.getString(_betaCohortKey) ?? (_memoryFallback[_betaCohortKey] as String?);
+  }
+
+  static Future<void> setBetaCohort(String cohort) async {
+    _memoryFallback[_betaCohortKey] = cohort;
+    await _prefs?.setString(_betaCohortKey, cohort);
   }
 
   // User neighborhood selection

@@ -1157,7 +1157,7 @@
       "description": "Implement closed beta gate requiring a 6-character cohort activation code (e.g. TASH50, MIRAB1) or valid mutual friend invite link before signup.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P12-07"
       ],
@@ -1186,7 +1186,7 @@
       "description": "Add OpenGraph social meta tags to index.html for rich Telegram chat previews and universal deep link bridge.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P12-08"
       ],
