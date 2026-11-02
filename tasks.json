@@ -1436,7 +1436,7 @@
       "description": "Implement WeeklyDigestEngine computing weekly district drop volumes, peak atmosphere hours, and inviting friends to weekend meetups.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P14-03"
       ],
