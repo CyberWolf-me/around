@@ -921,7 +921,7 @@
       "description": "Implement persistent in-app localization engine supporting Uzbek, Russian, and English with dynamic locale switcher in Settings.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P11-03"
       ],

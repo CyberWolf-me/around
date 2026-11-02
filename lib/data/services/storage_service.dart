@@ -23,6 +23,7 @@ class StorageService {
   static const _guestModeKey = 'around_guest_mode_v1';
   static const _notificationsKey = 'around_notifications_v1';
   static const _biometricLockKey = 'around_biometric_lock_v1';
+  static const _appLanguageKey = 'around_app_language_v1';
 
   static SharedPreferences? _prefs;
   static final Map<String, Object> _memoryFallback = {};
@@ -316,6 +317,16 @@ class StorageService {
 
   static void purgeSensitiveMemoryVault() {
     _sensitiveVisitVault.clear();
+  }
+
+  // Trilingual App Language Preference
+  static String getAppLanguage() {
+    return _prefs?.getString(_appLanguageKey) ?? (_memoryFallback[_appLanguageKey] as String? ?? 'en');
+  }
+
+  static Future<void> setAppLanguage(String langCode) async {
+    _memoryFallback[_appLanguageKey] = langCode;
+    await _prefs?.setString(_appLanguageKey, langCode);
   }
 
   static Future<void> clearAll() async {

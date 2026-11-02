@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/services/biometric_service.dart';
+import '../../../core/services/locale_service.dart';
 import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/repositories/posts_repository.dart';
 import '../../../data/repositories/profiles_repository.dart';
@@ -530,6 +531,80 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           const SizedBox(height: 22),
 
+          // Section: Language & Localization
+          const _SectionTitle(title: 'LANGUAGE & LOCALIZATION'),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.cardSurface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: AppColors.borderSubtle, width: 1),
+              boxShadow: const [AppColors.shadowCard],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: AppLanguage.values.map((lang) {
+                    final currentLang = ref.watch(appLocaleProvider);
+                    final isSelected = currentLang == lang.code;
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: BouncingWidget(
+                          scaleFactor: 0.94,
+                          onTap: () {
+                            HapticService.selection();
+                            ref.read(appLocaleProvider.notifier).setLocale(lang.code);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: isSelected ? AppColors.orange : AppColors.paper2,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected ? AppColors.ink : AppColors.borderHairline,
+                                width: isSelected ? 1.5 : 1.0,
+                              ),
+                              boxShadow: isSelected ? const [AppColors.shadowTactile] : null,
+                            ),
+                            alignment: Alignment.center,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(lang.flag, style: const TextStyle(fontSize: 16)),
+                                const SizedBox(height: 4),
+                                Text(
+                                  lang.displayName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                                    color: isSelected ? Colors.white : AppColors.ink,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Switch between Uzbek, Russian, and English for curated venue descriptions and community drops.',
+                  style: TextStyle(fontSize: 11.5, color: AppColors.ink2, height: 1.3),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 22),
+
           // Section: Account & Session
           const _SectionTitle(title: 'ACCOUNT & SESSION'),
           Container(
@@ -578,9 +653,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       children: [
                         const Icon(Icons.login, size: 16, color: Colors.white),
                         const SizedBox(width: 8),
-                        Text(
-                          authEmail != null ? 'Switch Account' : 'Sign In / Create Account',
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                        Flexible(
+                          child: Text(
+                            authEmail != null ? 'Switch Account' : 'Sign In / Create Account',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
                         ),
                       ],
                     ),
