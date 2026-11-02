@@ -2748,7 +2748,7 @@
       "description": "CuratorPostcardEngine in lib/core/services/curator_postcard_engine.dart computing postcard metadata, aesthetic theme palettes, stamp text, and receipt formatting.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P26-04"
       ],
