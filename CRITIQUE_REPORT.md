@@ -413,3 +413,28 @@ With Phase 18 fully delivered (tagged `v1.8.0-staging.1`):
 - **Domain**: Social Graph & Engagement
 - **Owner**: Core Engineering
 - **Deliverables**: `CuratorRecommendationEngine` in `lib/core/services/curator_recommendation_engine.dart` computing taste similarity and mutual neighborhood overlap.
+
+
+---
+
+## Phase 20 Sprint Audit — Taste Compatibility UI, Sunday Retrospective Dialog, Web Leaderboard & Outbox Sync Bus
+
+### `P20-01`: User Profile Taste Compatibility Card & Mutual Match Widget
+- **Domain**: Social Graph & Engagement
+- **Owner**: Flutter & Web Product Engineer
+- **Deliverables**: `CuratorTasteOverlapCard` on `UserProfileScreen` utilizing `CuratorRecommendationEngine` to compute and display live taste match score (e.g. "86% Taste Match"), shared favorite spots, and localized overlap highlights.
+
+### `P20-02`: Sunday Retrospective Celebration Modal & Streak Rescue CTA
+- **Domain**: Gamification & Retention
+- **Owner**: Flutter & Web Product Engineer
+- **Deliverables**: `WeeklyRetrospectiveModal` on `FeedScreen` triggering during the Sunday retrospective window (or streak at-risk period), celebrating weekly milestones or presenting an urgent "Save Streak with a Drop" action.
+
+### `P20-03`: Web Companion District Crown Leaderboard & Local Legend Showcase
+- **Domain**: Social Graph & Distribution
+- **Owner**: Web Companion Engineer
+- **Deliverables**: `CuratorLeaderboard.tsx` in `src/components/` rendering district crown holders, streak rankings, and direct passport link previews with Vitest tests.
+
+### `P20-04`: Reactive Offline Outbox Sync Bus & Network Reconnection Flush
+- **Domain**: Resilience & Offline Experience
+- **Owner**: Core Engineering
+- **Deliverables**: `OfflineOutboxSyncBus` in `lib/core/services/offline_outbox_sync_bus.dart` listening to connectivity pulses and automatically flushing queued drops with localized status callbacks.

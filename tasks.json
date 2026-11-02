@@ -1996,6 +1996,112 @@
         "flutter test test/unit/curator_recommendation_test.dart"
       ],
       "riskAssessment": "Low: In-memory taste compatibility algorithm."
+    },
+    {
+      "id": "P20-01",
+      "title": "User Profile Taste Compatibility Card & Mutual Match Widget",
+      "domain": "Social Graph & Engagement",
+      "description": "CuratorTasteOverlapCard on UserProfileScreen utilizing CuratorRecommendationEngine to compute and display live taste match score, shared favorite spots, and localized overlap highlights.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P0",
+      "status": "READY",
+      "dependencies": [
+        "P19-04"
+      ],
+      "affectedPaths": [
+        "lib/features/profile/widgets/curator_taste_overlap_card.dart",
+        "lib/features/profile/screens/user_profile_screen.dart",
+        "test/widget/curator_taste_overlap_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Displays compatibility score badge (e.g. '86% Taste Match') with flame/mint accent.",
+        "Lists shared favorite spots and localized highlight in active app language.",
+        "Widget tests verify rendering for high overlap, low overlap, and disjoint profiles."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/curator_taste_overlap_test.dart"
+      ],
+      "riskAssessment": "Low: User profile presentation widget."
+    },
+    {
+      "id": "P20-02",
+      "title": "Sunday Retrospective Celebration Modal & Streak Rescue CTA",
+      "domain": "Gamification & Retention",
+      "description": "WeeklyRetrospectiveModal on FeedScreen triggering during Sunday retrospective window or at-risk streak state, celebrating weekly milestones or offering immediate drop creation.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P20-01"
+      ],
+      "affectedPaths": [
+        "lib/features/feed/widgets/weekly_retrospective_modal.dart",
+        "lib/features/feed/screens/feed_screen.dart",
+        "test/widget/weekly_retrospective_modal_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Modal renders retrospective summary card when triggered.",
+        "Displays 'Secured' status for curators with active drops this week, or urgent rescue CTA when streak is at risk.",
+        "Widget tests verify modal presentation, button interactions, and dismiss logic."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/weekly_retrospective_modal_test.dart"
+      ],
+      "riskAssessment": "Low: Feed screen overlay modal."
+    },
+    {
+      "id": "P20-03",
+      "title": "Web Companion District Crown Leaderboard & Local Legend Showcase",
+      "domain": "Social Graph & Distribution",
+      "description": "CuratorLeaderboard.tsx in src/components/ rendering district crown holders, streak rankings, and direct passport link previews with Vitest tests.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P20-02"
+      ],
+      "affectedPaths": [
+        "src/components/CuratorLeaderboard.tsx",
+        "src/__tests__/curatorLeaderboard.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders district filter tabs and top curators per district (Mirabad, Central, Yakkasaray).",
+        "Shows crown badges, drop counts, and discovery streak flairs.",
+        "Vitest test suite verifies district filtering and curator item rendering."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion leaderboard view."
+    },
+    {
+      "id": "P20-04",
+      "title": "Reactive Offline Outbox Sync Bus & Network Reconnection Flush",
+      "domain": "Resilience & Offline Experience",
+      "description": "OfflineOutboxSyncBus in lib/core/services/offline_outbox_sync_bus.dart listening to network reconnection events and triggering automatic outbox flushes with localized telemetry.",
+      "ownerRole": "Core Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P20-03"
+      ],
+      "affectedPaths": [
+        "lib/core/services/offline_outbox_sync_bus.dart",
+        "test/unit/offline_outbox_sync_bus_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Detects online transitions and triggers automatic outbox queue synchronization.",
+        "Dispatches broadcast event upon completion with count of uploaded items.",
+        "Unit tests verify online event handling, idempotency, and flush delegation."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/offline_outbox_sync_bus_test.dart"
+      ],
+      "riskAssessment": "Low: Outbox coordination service."
     }
   ],
   "loopConfig": {
