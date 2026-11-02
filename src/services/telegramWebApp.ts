@@ -28,6 +28,31 @@ export interface TelegramHapticFeedback {
   selectionChanged: () => void;
 }
 
+export interface TelegramMainButton {
+  text: string;
+  color: string;
+  textColor: string;
+  isVisible: boolean;
+  isActive: boolean;
+  isProgressVisible: boolean;
+  setText: (text: string) => TelegramMainButton;
+  onClick: (callback: () => void) => TelegramMainButton;
+  offClick: (callback: () => void) => TelegramMainButton;
+  show: () => TelegramMainButton;
+  hide: () => TelegramMainButton;
+  enable: () => TelegramMainButton;
+  disable: () => TelegramMainButton;
+  showProgress: (leaveActive?: boolean) => TelegramMainButton;
+  hideProgress: () => TelegramMainButton;
+  setParams: (params: {
+    text?: string;
+    color?: string;
+    text_color?: string;
+    is_active?: boolean;
+    is_visible?: boolean;
+  }) => TelegramMainButton;
+}
+
 export interface TelegramWebAppObject {
   initData?: string;
   initDataUnsafe?: {
@@ -54,6 +79,7 @@ export interface TelegramWebAppObject {
   offEvent?: (eventType: string, eventHandler: () => void) => void;
   sendData?: (data: string) => void;
   HapticFeedback?: TelegramHapticFeedback;
+  MainButton?: TelegramMainButton;
 }
 
 declare global {
@@ -173,7 +199,7 @@ export function parseTelegramStartParam(rawParam: string): {
  * Triggers safe haptic impact on Telegram Mobile client if available.
  */
 export function triggerTelegramHaptic(
-  type: 'light' | 'medium' | 'heavy' | 'selection' | 'success' | 'warning' | 'error' = 'medium'
+  type: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft' | 'selection' | 'success' | 'warning' | 'error' = 'medium'
 ): boolean {
   const webApp = getTelegramWebApp();
   if (!webApp?.HapticFeedback) return false;
@@ -186,6 +212,83 @@ export function triggerTelegramHaptic(
     } else {
       webApp.HapticFeedback.impactOccurred(type);
     }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+let activeMainButtonCallback: (() => void) | null = null;
+
+export function isTelegramMainButtonAvailable(): boolean {
+  const webApp = getTelegramWebApp();
+  return Boolean(webApp?.MainButton);
+}
+
+/**
+ * Configures the native Telegram MainButton at the bottom of the Mini App screen.
+ */
+export function setTelegramMainButton(params: {
+  text: string;
+  color?: string;
+  textColor?: string;
+  onClick: () => void;
+  isVisible?: boolean;
+}): boolean {
+  const webApp = getTelegramWebApp();
+  if (!webApp?.MainButton) return false;
+
+  try {
+    const mb = webApp.MainButton;
+
+    if (activeMainButtonCallback && typeof mb.offClick === 'function') {
+      mb.offClick(activeMainButtonCallback);
+    }
+
+    activeMainButtonCallback = () => {
+      triggerTelegramHaptic('selection');
+      params.onClick();
+    };
+
+    if (typeof mb.setParams === 'function') {
+      mb.setParams({
+        text: params.text,
+        color: params.color || '#ff4800',
+        text_color: params.textColor || '#ffffff',
+        is_active: true,
+        is_visible: params.isVisible !== false,
+      });
+    } else {
+      if (typeof mb.setText === 'function') mb.setText(params.text);
+      if (params.isVisible !== false && typeof mb.show === 'function') mb.show();
+      if (typeof mb.enable === 'function') mb.enable();
+    }
+
+    if (typeof mb.onClick === 'function') {
+      mb.onClick(activeMainButtonCallback);
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Hides and cleans up click listeners on the native Telegram MainButton.
+ */
+export function hideTelegramMainButton(): boolean {
+  const webApp = getTelegramWebApp();
+  if (!webApp?.MainButton) return false;
+
+  try {
+    const mb = webApp.MainButton;
+    if (activeMainButtonCallback && typeof mb.offClick === 'function') {
+      mb.offClick(activeMainButtonCallback);
+      activeMainButtonCallback = null;
+    }
+    if (typeof mb.hide === 'function') mb.hide();
+    if (typeof mb.disable === 'function') mb.disable();
     return true;
   } catch {
     return false;

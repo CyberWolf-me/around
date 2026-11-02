@@ -1519,7 +1519,7 @@
       "description": "Upgrade src/services/telegramWebApp.ts and PlaceDetailModal with native Telegram.WebApp.MainButton controls, clipboard link sync, and Vitest test assertions.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P15-02"
       ],
@@ -1545,7 +1545,7 @@
       "description": "Compute top explorer for each Tashkent district over the rolling 30-day window, awarding visible Local Legend profile badge flair.",
       "ownerRole": "Backend & Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P15-03"
       ],

@@ -8,6 +8,9 @@ import {
   parseTelegramStartParam,
   triggerTelegramHaptic,
   initTelegramWebApp,
+  isTelegramMainButtonAvailable,
+  setTelegramMainButton,
+  hideTelegramMainButton,
 } from '../services/telegramWebApp';
 import { resolveInitialRoute } from '../router';
 
@@ -262,5 +265,72 @@ describe('P13-03: Telegram WebApp (TWA) Mini App Bridge & Direct Invite Injectio
     const directPlace = resolveInitialRoute('/places/canti');
     expect(directPlace.type).toBe('place');
     expect(directPlace.params.id).toBe('canti');
+  });
+
+  it('configures and controls native Telegram MainButton lifecycle', () => {
+    expect(isTelegramMainButtonAvailable()).toBe(false);
+    expect(setTelegramMainButton({ text: 'Share', onClick: vi.fn() })).toBe(false);
+    expect(hideTelegramMainButton()).toBe(false);
+
+    let clickHandler: (() => void) | null = null;
+    const setTextMock = vi.fn();
+    const showMock = vi.fn();
+    const hideMock = vi.fn();
+    const enableMock = vi.fn();
+    const disableMock = vi.fn();
+    const onClickMock = vi.fn((cb) => {
+      clickHandler = cb;
+    });
+    const offClickMock = vi.fn();
+    const setParamsMock = vi.fn();
+
+    mockWindow.Telegram = {
+      WebApp: {
+        ready: vi.fn(),
+        expand: vi.fn(),
+        close: vi.fn(),
+        MainButton: {
+          setText: setTextMock,
+          show: showMock,
+          hide: hideMock,
+          enable: enableMock,
+          disable: disableMock,
+          onClick: onClickMock,
+          offClick: offClickMock,
+          setParams: setParamsMock,
+        },
+      },
+    };
+
+    expect(isTelegramMainButtonAvailable()).toBe(true);
+
+    const onAction = vi.fn();
+    const ok = setTelegramMainButton({
+      text: 'Gather Circle at Breadly',
+      color: '#ff4800',
+      onClick: onAction,
+    });
+
+    expect(ok).toBe(true);
+    expect(setParamsMock).toHaveBeenCalledWith({
+      text: 'Gather Circle at Breadly',
+      color: '#ff4800',
+      text_color: '#ffffff',
+      is_active: true,
+      is_visible: true,
+    });
+    expect(onClickMock).toHaveBeenCalled();
+
+    // Trigger click handler and ensure user callback runs
+    expect(clickHandler).not.toBeNull();
+    clickHandler!();
+    expect(onAction).toHaveBeenCalled();
+
+    // Hide MainButton
+    const hideOk = hideTelegramMainButton();
+    expect(hideOk).toBe(true);
+    expect(offClickMock).toHaveBeenCalled();
+    expect(hideMock).toHaveBeenCalled();
+    expect(disableMock).toHaveBeenCalled();
   });
 });
