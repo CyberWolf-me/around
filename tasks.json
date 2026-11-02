@@ -2216,7 +2216,7 @@
       "description": "SubwayProximityEngine in lib/core/services/subway_proximity_engine.dart calculating distance and walking time to Tashkent metro stations (Chilonzor, O'zbekiston, Yunusobod lines) with metro badge indicators.",
       "ownerRole": "Spatial Engineer & Mobile Engineering",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P21-04"
       ],
@@ -2243,7 +2243,7 @@
       "description": "GroupMeetupCoordinationSheet in lib/features/plans/widgets/group_meetup_coordination_sheet.dart enabling seamless group coffee/dining coordination with venue, time, and pre-formatted Telegram RSVP links.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P22-01"
       ],
