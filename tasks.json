@@ -2533,7 +2533,7 @@
       "description": "CuratedRouteEngine in lib/core/services/curated_route_engine.dart computing route distance, walking minutes, metro connectors, and stop completion state.",
       "ownerRole": "Mobile Engineering",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P24-04"
       ],
