@@ -2740,6 +2740,113 @@
         "flutter test test/unit/group_crawl_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P27-01",
+      "title": "Curator Visit Postcard & Cultural Receipt Engine",
+      "domain": "Engagement & Growth",
+      "description": "CuratorPostcardEngine in lib/core/services/curator_postcard_engine.dart computing postcard metadata, aesthetic theme palettes, stamp text, and receipt formatting.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P26-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/curator_postcard_engine.dart",
+        "test/unit/curator_postcard_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Defines CuratorPostcard model with place metadata, verified seal, metro beacon, and curator level badge.",
+        "Generates editorial receipt formatting with receipt number, items visited, and total XP.",
+        "Supports customizable aspect ratios (1:1 and 9:16) and color themes (warmPaper, darkCarbon, matchaMint).",
+        "Unit test validates model serialization, metric calculations, and localizations."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/curator_postcard_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart presentation and layout calculation service."
+    },
+    {
+      "id": "P27-02",
+      "title": "Interactive Curator Postcard & Visual Stamp Exporter Widget",
+      "domain": "Engagement & Growth",
+      "description": "CuratorPostcardCard in lib/features/explore/widgets/curator_postcard_card.dart rendering the aesthetic paper receipt with perforated borders, seal stamp, and Telegram share actions.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P27-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/curator_postcard_card.dart",
+        "test/widget/curator_postcard_card_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders editorial receipt card with paper borders, barcode, and verified visit seal stamp.",
+        "Displays venue name, district, nearest metro station, and curator XP score.",
+        "Provides one-tap Telegram story export and copy link actions.",
+        "Widget test verifies rendering, seal display, and interaction callbacks."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/curator_postcard_card_test.dart"
+      ],
+      "riskAssessment": "Low: UI presentation widget."
+    },
+    {
+      "id": "P27-03",
+      "title": "Web Companion Curator Postcard Generator & Story Styler",
+      "domain": "Engagement & Growth",
+      "description": "CuratorPostcardGenerator.tsx in src/components/ rendering interactive postcard previews with 1:1 vs 9:16 aspect ratio toggling and audio-tactile haptic feedback.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P27-02"
+      ],
+      "affectedPaths": [
+        "src/components/CuratorPostcardGenerator.tsx",
+        "src/__tests__/curatorPostcardGenerator.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders responsive live postcard preview with aspect ratio switcher (1:1 square vs 9:16 story).",
+        "Provides theme switcher (Paper, Carbon, Mint) with Web Audio sound effects.",
+        "Vitest test suite verifies receipt calculations, theme switching, and localization."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P27-04",
+      "title": "Supabase SQL Schema & Postcard Share Telemetry RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00018_curator_postcards_and_viral_telemetry.sql adding postcard_shares table with RLS and idempotent RPC record_postcard_share awarding +25 XP.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P27-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00018_curator_postcards_and_viral_telemetry.sql",
+        "test/unit/curator_postcard_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates postcard_shares table with foreign keys to places and profiles.",
+        "Creates idempotent record_postcard_share RPC rewarding +25 XP to the curator profile.",
+        "Enforces RLS policies with auth.uid() caller invariants.",
+        "Unit test validates SQL syntax and RPC signature."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/curator_postcard_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {

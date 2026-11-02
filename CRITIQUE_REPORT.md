@@ -576,3 +576,33 @@ Crucially, this must respect our non-negotiable **Rule C & Dual-Layer Privacy In
    - `GroupCrawlRoomViewer.tsx` in `src/components/` rendering real-time group crawl participants, stop badges, and Web Audio tactile feedback.
 4. **Supabase SQL Schema & Group Crawl Session RPC Migration (`P26-04`)**:
    - `00017_group_crawl_sessions_and_live_beacons.sql` creating session tables, RLS participant isolation, and idempotent `join_or_update_group_crawl` RPC.
+
+
+---
+
+## Autonomous Product Audit & Replenishment — Phase 27 (November 3, 2026)
+
+### Strategic Evaluation: Milestone 2.6 Complete & Curator Postcard Engine
+With Phase 26 delivered and tagged as `v2.6.0-staging.1` (351 Flutter tests, 90 Web tests, zero static analysis warnings), Around has established the group crawl session and live presence beacon system.
+
+### The Adversarial Growth Audit for Phase 27:
+In Strava, the viral distribution flywheel is driven by the post-workout activity card: runners and cyclists share high-contrast graphics featuring their route map, pace, and segment PRs to Instagram Stories and Strava clubs.
+Currently in Around, when a curator checks in at Breadly or completes the Mirabad Coffee Crawl, their achievement stays trapped within the app:
+- Curators in Tashkent love sharing aesthetic food photography and coffee receipts to Telegram channels and Instagram Stories.
+- Without a native, branded **Curator Visit Postcard & Cultural Receipt Generator**, Around misses its #1 organic growth channel (viral visual exports).
+- The postcard must combine:
+  1. The venue name and district stamp.
+  2. The cryptographic verified visit seal (`AR-XXXX-XXXX`).
+  3. The curator's level tier badge and total Tashkent XP.
+  4. Nearest Tashkent Metro station beacon.
+  5. Perforated editorial receipt styling fitting the Around visual design language.
+
+### Phase 27 Work Breakdown:
+1. **Curator Visit Postcard & Cultural Receipt Engine (`P27-01`)**:
+   - `CuratorPostcardEngine` in `lib/core/services/curator_postcard_engine.dart` computing postcard metadata, aesthetic theme palettes, stamp text, and receipt formatting.
+2. **Interactive Curator Postcard & Visual Stamp Exporter Widget (`P27-02`)**:
+   - `CuratorPostcardCard` in `lib/features/explore/widgets/curator_postcard_card.dart` rendering the aesthetic paper receipt with perforated borders, seal stamp, and Telegram share actions.
+3. **Web Companion Curator Postcard Generator & Story Styler (`P27-03`)**:
+   - `CuratorPostcardGenerator.tsx` in `src/components/` rendering interactive postcard previews with 1:1 vs 9:16 aspect ratio toggling and audio-tactile haptic feedback.
+4. **Supabase SQL Schema & Postcard Share Telemetry RPC Migration (`P27-04`)**:
+   - `00018_curator_postcards_and_viral_telemetry.sql` adding `postcard_shares` table with RLS and idempotent RPC `record_postcard_share` awarding `+25 XP`.
