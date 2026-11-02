@@ -1885,6 +1885,117 @@
         "flutter test test/unit/crown_rivalry_test.dart"
       ],
       "riskAssessment": "Low: Local rivalry calculation."
+    },
+    {
+      "id": "P19-01",
+      "title": "Curator Trophy Cabinet & Achievement Grid Widget",
+      "domain": "Gamification & Identity",
+      "description": "TrophyCabinetWidget on TastePassportScreen displaying filterable grid of District Crowns, Streak Badges, and Quest Medals with locked progress indicators and haptic interactions.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P0",
+      "status": "READY",
+      "dependencies": [
+        "P18-04"
+      ],
+      "affectedPaths": [
+        "lib/features/profile/widgets/trophy_cabinet_widget.dart",
+        "lib/features/profile/screens/taste_passport_screen.dart",
+        "test/widget/trophy_cabinet_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "TrophyCabinetWidget renders category filter chips (All, Crowns, Streaks, Quests).",
+        "Displays earned badges in high contrast with earned date, and locked badges with progress indicators.",
+        "Tapping any trophy triggers tactile haptic feedback and details sheet.",
+        "Widget tests verify category filtering, badge counts, and empty/locked states."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/trophy_cabinet_test.dart"
+      ],
+      "riskAssessment": "Low: Profile presentation widget."
+    },
+    {
+      "id": "P19-02",
+      "title": "Venue Rhythm Sparkline & Peak Atmosphere Indicator",
+      "domain": "Places Catalog & Intelligence",
+      "description": "VenueRhythmSparkline widget on PlaceDetailScreen displaying 24h activity curve, friend drop density, and peak hours based on real drop timestamps.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P19-01"
+      ],
+      "affectedPaths": [
+        "lib/features/places/widgets/venue_rhythm_sparkline.dart",
+        "lib/features/places/screens/place_detail_screen.dart",
+        "test/widget/venue_rhythm_sparkline_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Calculates hourly density bucket (0-23h) from venue posts/drops.",
+        "Renders smooth custom painted sparkline or bar chart with current hour indicator.",
+        "Highlights peak atmosphere window (e.g. 'Peak Vibe: 19:00 - 22:00').",
+        "Widget tests verify rendering across empty, sparse, and dense drop distributions."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/venue_rhythm_sparkline_test.dart"
+      ],
+      "riskAssessment": "Low: Place detail presentation widget."
+    },
+    {
+      "id": "P19-03",
+      "title": "Web Companion Audio-Tactile UI Component Integration",
+      "domain": "Social Graph & Distribution",
+      "description": "Connect playSoundWithHaptic into AudienceBadge, StarRating, and PassportShareModal with Vitest assertions.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P19-02"
+      ],
+      "affectedPaths": [
+        "src/components/ui/AudienceBadge.tsx",
+        "src/components/ui/StarRating.tsx",
+        "src/components/PassportShareModal.tsx",
+        "src/__tests__/uiAudioTactile.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Interactions on interactive badges, rating controls, and share modals trigger playSoundWithHaptic.",
+        "Respects mute/disabled preferences and degrades gracefully when AudioContext is blocked.",
+        "Vitest test suite validates synthetic audio calls on component interactions."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion UI enhancement."
+    },
+    {
+      "id": "P19-04",
+      "title": "Curator Mutual Discovery & Taste Overlap Engine",
+      "domain": "Social Graph & Engagement",
+      "description": "CuratorRecommendationEngine in lib/core/services/curator_recommendation_engine.dart computing taste similarity, shared favorite districts, and mutual venue bookmarks.",
+      "ownerRole": "Backend & Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P19-03"
+      ],
+      "affectedPaths": [
+        "lib/core/services/curator_recommendation_engine.dart",
+        "test/unit/curator_recommendation_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Computes Jaccard similarity index across curated place tags, visited districts, and saved collections.",
+        "Ranks candidate curators by taste compatibility score (0-100%).",
+        "Generates localized overlap highlights ('Shared favorite: Mirabad coffee spots').",
+        "Unit tests verify edge cases: zero overlap, identical taste profiles, and disjoint sets."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/curator_recommendation_test.dart"
+      ],
+      "riskAssessment": "Low: In-memory taste compatibility algorithm."
     }
   ],
   "loopConfig": {
