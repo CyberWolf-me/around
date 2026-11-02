@@ -1348,6 +1348,112 @@
         "flutter test"
       ],
       "riskAssessment": "Medium: Destructive deletion strictly scoped to auth.uid()."
+    },
+    {
+      "id": "P14-01",
+      "title": "Map District Heat Integration & Smooth Centroid Navigation",
+      "domain": "Spatial Data & Discovery",
+      "description": "Integrate DistrictDensityOverlay and dynamic district heat circles into ExploreScreen and CityMapWidget with animated camera navigation to neighborhood centroids.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P0",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P13-04"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/city_map_widget.dart",
+        "lib/features/explore/screens/explore_screen.dart",
+        "test/widget/map_density_integration_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "ExploreScreen renders DistrictDensityOverlay when map mode is active.",
+        "Tapping a district chip navigates map camera smoothly to the district spatial centroid.",
+        "Widget tests verify camera recentering and overlay interaction."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/map_density_integration_test.dart"
+      ],
+      "riskAssessment": "Low: Purely additive UI/map enhancement."
+    },
+    {
+      "id": "P14-02",
+      "title": "Multilingual Cyrillic/Latin Uzbek & Russian Spatial Search Normalizer",
+      "domain": "Places Catalog & Intelligence",
+      "description": "Implement searchPlacesMultilingual in PlacesRepository supporting bidirectional Uzbek Cyrillic-to-Latin transliteration and Russian category synonyms.",
+      "ownerRole": "Mobile Engineering & Core Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P14-01"
+      ],
+      "affectedPaths": [
+        "lib/data/repositories/places_repository.dart",
+        "lib/core/services/transliteration_service.dart",
+        "test/unit/multilingual_search_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "TransliterationService maps Uzbek Cyrillic to Latin equivalents and handles apostrophe variants.",
+        "PlacesRepository.searchPlacesMultilingual matches Russian and Uzbek queries against canonical venue metadata.",
+        "Unit tests verify cross-script queries return accurate venues."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/multilingual_search_test.dart"
+      ],
+      "riskAssessment": "Low: Query normalization layer without schema mutations."
+    },
+    {
+      "id": "P14-03",
+      "title": "Viral Story & Passport Card Visual Exporter (9:16 Story Canvas)",
+      "domain": "Social Graph & Distribution",
+      "description": "Create high-aesthetic 9:16 story preview widget with clipboard export and deep link QR for Telegram and Instagram Stories.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P14-02"
+      ],
+      "affectedPaths": [
+        "lib/features/places/widgets/story_card_exporter.dart",
+        "test/widget/story_card_exporter_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders 9:16 vertical card with venue photo, rating, district badge, and user drop quote.",
+        "Includes Around watermark and deep link QR code.",
+        "Widget test validates rendering and export callbacks."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/story_card_exporter_test.dart"
+      ],
+      "riskAssessment": "Low: Presentation layer component."
+    },
+    {
+      "id": "P14-04",
+      "title": "Local Weekly Rhythm Digest & Weekend Social Re-engagement Trigger",
+      "domain": "Retention & Engagement",
+      "description": "Implement WeeklyDigestEngine computing weekly district drop volumes, peak atmosphere hours, and inviting friends to weekend meetups.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P14-03"
+      ],
+      "affectedPaths": [
+        "lib/core/services/weekly_digest_engine.dart",
+        "test/unit/weekly_digest_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "WeeklyDigestEngine calculates total drops, top active district, and trending venue for the past 7 days.",
+        "Generates weekend social coordination prompt for Friday evening and Saturday morning.",
+        "Unit tests verify weekly aggregation and message templating."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/weekly_digest_test.dart"
+      ],
+      "riskAssessment": "Low: Local computation engine."
     }
   ],
   "loopConfig": {

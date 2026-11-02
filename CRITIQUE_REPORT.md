@@ -75,3 +75,55 @@ Now that our closed beta cohort (Tashkent 50) is entering the product, the prima
   - Atomic deletion of all user visit logs, reactions, and check-ins while preserving account integrity.
   - UI action in `SettingsScreen` with double confirmation and haptic warning.
   - pgTap and Dart unit tests.
+
+
+---
+
+# Phase 14 Audit — Viral Social Story Cards, Multilingual Search, District Heat Navigation & Weekly Rhythm Digest
+
+**Audit Date**: November 3, 2026  
+**Auditor Personas**: CTO & Autonomous Loop Orchestrator, Product Growth Lead, Senior Mobile Engineer  
+**Target Milestone**: Phase 14 — Viral Social Proof, Multilingual Spatial Intelligence & Map Heat Navigation  
+**Branch**: `feat/phase-12-strava-for-places`  
+
+## Executive Summary & Strategic Position
+
+With Phase 13 fully delivered (Taste Quests, District Density RPC, Telegram TWA SDK, and Cryptographic Purge, tagged `v1.3.0-staging.1`):
+- **161 / 161 Flutter tests** passing with zero errors.
+- **30 / 30 Web Vitest tests** passing with zero errors.
+- **0 static analysis warnings** across all Dart & TypeScript code.
+
+### The Adversarial Growth Audit
+
+1. **Map Exploration Friction**:
+   - `DistrictDensityOverlay` was engineered and tested, but users on `ExploreScreen` and `CityMapWidget` still lack a direct toggle between Venue Pins and District Social Heat rings with smooth camera fly-to animations when tapping a district chip.
+2. **Multilingual Uzbek Cyrillic/Latin & Russian Search Invariant**:
+   - In Uzbekistan, users query venues using Latin Uzbek (`Choyxona`), Cyrillic Uzbek (`Чойхона`), Russian (`Чайхана`), and English (`Tea House`). A naive substring match fails when users type Cyrillic characters into Latin catalog fields. We must implement a bidirectional transliteration & multilingual fuzzy normalizer in `PlacesRepository.searchPlacesMultilingual`.
+3. **Viral Social Story Cards for Telegram & Instagram**:
+   - In Tashkent, youth and young professionals share discoveries on 9:16 Telegram and Instagram Stories. Users need a high-aesthetic, branded story card exporter widget rendering venue photo, user drop quote, rating, district badge, and Around watermark.
+4. **Local Weekly Rhythm Digest & Weekend Social Re-engagement**:
+   - Strava drives Sunday evening engagement via weekly summaries. In Tashkent, Friday evening ("Juma oqshomi") and Saturday morning are the prime socializing peaks. We need `WeeklyDigestEngine` to aggregate weekly neighborhood stats and generate notification digests for weekend planning.
+
+---
+
+## Phase 14 Backlog Roadmap (`tasks.json`)
+
+### `P14-01`: Map District Heat Integration & Smooth Centroid Navigation
+- **Domain**: Spatial Data & Discovery
+- **Owner**: Mobile Engineering
+- **Deliverables**: Wire `DistrictDensityOverlay` into `ExploreScreen` and `CityMapWidget`, animating camera center to district centroids with haptic feedback.
+
+### `P14-02`: Multilingual Cyrillic/Latin Uzbek & Russian Spatial Search Normalizer
+- **Domain**: Places Catalog & Intelligence
+- **Owner**: Mobile Engineering & Core Engineering
+- **Deliverables**: Implement `searchPlacesMultilingual` in `PlacesRepository` supporting bidirectional Uzbek Cyrillic-to-Latin transliteration and Russian category synonyms.
+
+### `P14-03`: Viral Story & Passport Card Visual Exporter (9:16 Story Canvas)
+- **Domain**: Social Graph & Distribution
+- **Owner**: Flutter & Web Product Engineer
+- **Deliverables**: Tactical 9:16 story preview widget with clipboard export and deep link QR for Telegram and Instagram Stories.
+
+### `P14-04`: Local Weekly Rhythm Digest & Weekend Social Re-engagement Trigger
+- **Domain**: Retention & Engagement
+- **Owner**: Mobile Engineering
+- **Deliverables**: `WeeklyDigestEngine` computing weekly district drop volumes, peak atmosphere hours, and inviting friends to weekend meetups.
