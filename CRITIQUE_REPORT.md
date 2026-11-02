@@ -181,3 +181,59 @@ With Phase 14 fully delivered (Map Heat Navigation, Multilingual Transliteration
 - **Domain**: Social Graph & Reputation
 - **Owner**: Backend & Mobile Engineering
 - **Deliverables**: `DistrictLegendEngine` computing per-district drop rankings and awarding "Mirabad Legend", "Old City Nomad", and "Yunusabad Pioneer" badges.
+
+
+---
+
+# Phase 16 Audit — District Leaderboard UI, TWA BackButton Navigation, Low-Bandwidth Image Cache & Ambient Friend Presence
+
+**Audit Date**: November 3, 2026  
+**Auditor Personas**: CTO & Autonomous Loop Orchestrator, Growth & Viral Mechanics Lead, Senior Mobile Engineer  
+**Target Milestone**: Phase 16 — Social Competition, Telegram Navigation, Network Resilience & Ambient Presence  
+**Branch**: `feat/phase-12-strava-for-places`  
+
+## Executive Summary & Strategic Position
+
+With Phase 15 fully delivered (Weekend Rhythm UI, Multi-Axis Taste Radar, Telegram MainButton Bridge, and District Legend Engine, tagged `v1.5.0-staging.1`):
+- **186 / 186 Flutter tests** passing with zero errors.
+- **31 / 31 Web Vitest tests** passing with zero errors.
+- **0 static analysis warnings** across all Dart & TypeScript code.
+
+### The Adversarial Growth Audit
+
+1. **Unsurfaced Local Legend Status in Mobile UI**:
+   - `DistrictLegendEngine` (`P15-04`) calculates who reigns supreme in each district, but the mobile profile and taste passport don't visually render the `👑 Local Legend` crown badge or a district leaderboard sheet where users can see rankings and fight for the top spot.
+   - **Remedy**: Create `DistrictLeaderboardCard` and profile crown flair displaying neighborhood rankings and drops needed to claim the crown.
+2. **Telegram Mini App BackButton & Direct Place Share**:
+   - Inside Telegram Mini Apps, Android hardware back buttons or Telegram header back buttons should seamlessly close sheets or navigate back to the discovery grid without exiting the bot.
+   - **Remedy**: Wire `Telegram.WebApp.BackButton` into `src/services/telegramWebApp.ts` and `src/router.tsx`.
+3. **Uzbekistan Cellular Network Resilience & Image Caching**:
+   - Mobile network latency across Tashkent subway lines and basements causes repeated image reloads.
+   - **Remedy**: Build `LowBandwidthImageCache` ensuring venue photos and story assets are stored in memory and local app storage with instant offline fallback.
+4. **Ambient Friend Presence & Social Momentum**:
+   - Users need immediate visual cues that friends are actively exploring Tashkent.
+   - **Remedy**: Implement `FriendPresenceEngine` computing ambient activity badges ("Active today in Mirabad", "Dropped 2h ago at Breadly") without revealing exact private coordinates.
+
+---
+
+## Phase 16 Backlog Roadmap (`tasks.json`)
+
+### `P16-01`: District Leaderboard & Local Legend Profile Crown Flair
+- **Domain**: Gamification & Reputation
+- **Owner**: Mobile Engineering
+- **Deliverables**: `DistrictLeaderboardSheet` and `LocalLegendBadge` widgets displaying Tashkent neighborhood rankings, crown flair, and drop count progress.
+
+### `P16-02`: Telegram WebApp Native BackButton & Modal Navigation Bridge
+- **Domain**: Social Graph & Distribution
+- **Owner**: Web Companion Engineer
+- **Deliverables**: Wire `Telegram.WebApp.BackButton` lifecycle and deep-linked place sharing into `src/services/telegramWebApp.ts` and `src/router.tsx` with Vitest test assertions.
+
+### `P16-03`: Low-Bandwidth Asset Cache & Subway Offline Image Store
+- **Domain**: Platform & Performance
+- **Owner**: Mobile Engineering
+- **Deliverables**: `LowBandwidthCacheService` with memory caching, cache eviction, and offline placeholder fallback for low-connectivity subway commutes in Tashkent.
+
+### `P16-04`: Ambient Friend Presence & Neighborhood Rhythm Indicator
+- **Domain**: Social Graph & Engagement
+- **Owner**: Mobile Engineering
+- **Deliverables**: `FriendPresenceEngine` computing recency and neighborhood activity indicators for friend cards without raw GPS leakage.

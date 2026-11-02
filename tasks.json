@@ -1563,6 +1563,112 @@
         "flutter test test/unit/district_legend_test.dart"
       ],
       "riskAssessment": "Low: In-memory calculation with local caching."
+    },
+    {
+      "id": "P16-01",
+      "title": "District Leaderboard & Local Legend Profile Crown Flair",
+      "domain": "Gamification & Reputation",
+      "description": "DistrictLeaderboardSheet and LocalLegendBadge widgets displaying Tashkent neighborhood rankings, crown flair, and drop count progress.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P15-04"
+      ],
+      "affectedPaths": [
+        "lib/features/profile/widgets/district_leaderboard_sheet.dart",
+        "lib/features/profile/screens/profile_screen.dart",
+        "test/widget/district_leaderboard_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders LocalLegendBadge on profile header when user holds one or more district crowns.",
+        "DistrictLeaderboardSheet displays top curators per district (Mirabad, Yunusabad, etc.) with drop counts.",
+        "Tapping crown flair opens leaderboard sheet with haptic feedback.",
+        "Widget tests validate crown rendering, empty states, and modal interactions."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/widget/district_leaderboard_test.dart"
+      ],
+      "riskAssessment": "Low: UI presentation layer."
+    },
+    {
+      "id": "P16-02",
+      "title": "Telegram WebApp Native BackButton & Modal Navigation Bridge",
+      "domain": "Social Graph & Distribution",
+      "description": "Wire Telegram.WebApp.BackButton lifecycle and deep-linked place sharing into src/services/telegramWebApp.ts and src/router.tsx with Vitest test assertions.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P16-01"
+      ],
+      "affectedPaths": [
+        "src/services/telegramWebApp.ts",
+        "src/__tests__/telegramWebApp.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "BackButton helpers configure show, hide, and click callback handlers.",
+        "Automatic integration hides BackButton on root and shows on place modal.",
+        "Vitest test suite validates BackButton lifecycle."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion TWA enhancements."
+    },
+    {
+      "id": "P16-03",
+      "title": "Low-Bandwidth Asset Cache & Subway Offline Image Store",
+      "domain": "Platform & Performance",
+      "description": "LowBandwidthCacheService with memory caching, cache eviction, and offline placeholder fallback for low-connectivity subway commutes in Tashkent.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P16-02"
+      ],
+      "affectedPaths": [
+        "lib/core/services/low_bandwidth_cache_service.dart",
+        "test/unit/low_bandwidth_cache_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Stores image metadata and cached keys with LRU eviction policy.",
+        "Handles offline subway mode with instantaneous cached asset retrieval.",
+        "Unit tests verify cache hits, misses, and capacity bounds."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/low_bandwidth_cache_test.dart"
+      ],
+      "riskAssessment": "Low: Local in-memory caching engine."
+    },
+    {
+      "id": "P16-04",
+      "title": "Ambient Friend Presence & Neighborhood Rhythm Indicator",
+      "domain": "Social Graph & Engagement",
+      "description": "FriendPresenceEngine computing recency and neighborhood activity indicators for friend cards without raw GPS leakage.",
+      "ownerRole": "Mobile Engineering",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P16-03"
+      ],
+      "affectedPaths": [
+        "lib/core/services/friend_presence_engine.dart",
+        "test/unit/friend_presence_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Computes ambient activity status from recent drops within 24 hours.",
+        "Generates privacy-preserving labels ('Active in Mirabad', 'Active 2h ago').",
+        "Unit tests verify time boundaries and privacy preservation."
+      ],
+      "verificationCommands": [
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test test/unit/friend_presence_test.dart"
+      ],
+      "riskAssessment": "Low: Non-sensitive status aggregation."
     }
   ],
   "loopConfig": {
