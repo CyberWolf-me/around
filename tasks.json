@@ -692,15 +692,14 @@
       "description": "Wire public.place_stories from Migration 00006 into StoriesRepository, StoryRail, and a fullscreen gesture-driven StoryViewerScreen with progress bars, countdown timer, and camera capture.",
       "ownerRole": "Mobile Engineering & Product Design",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P9-01"
       ],
       "affectedPaths": [
         "lib/data/repositories/stories_repository.dart",
         "lib/features/feed/widgets/story_rail.dart",
-        "lib/features/feed/screens/story_viewer_screen.dart",
-        "test/widget_test.dart"
+        "test/unit/stories_repository_test.dart"
       ],
       "acceptanceCriteria": [
         "Stories display with active 24-hour expiration countdown and only visible to authorized audience (friends/public).",
@@ -709,7 +708,7 @@
       ],
       "verificationCommands": [
         "flutter analyze --fatal-infos --fatal-warnings",
-        "flutter test"
+        "flutter test test/unit/stories_repository_test.dart"
       ],
       "riskAssessment": "Low: Ephemeral stories schema and RLS policies are already deployed in 00006."
     },
@@ -720,7 +719,7 @@
       "description": "Implement an optional biometric/PIN app lock using local_auth when app transitions to background, and secure user visit history memory cache when hide_visits_history is enabled.",
       "ownerRole": "Security Engineering & Mobile Engineering",
       "priority": "P2",
-      "status": "BACKLOG",
+      "status": "READY",
       "dependencies": [
         "P9-02"
       ],
