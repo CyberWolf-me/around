@@ -9,7 +9,7 @@ class AppColors {
   // Typography & Borders
   static const Color ink = Color(0xFF15130F);
   static const Color ink2 = Color(0xFF575247);
-  static const Color ink3 = Color(0xFF8E8877);
+  static const Color ink3 = Color(0xFF6B6657); // Darkened from #8E8877 to pass WCAG 2.2 AA (5.49:1 on #FBFAF6)
 
   // Accent & Brand Colors
   static const Color orange = Color(0xFFFF5A1F); // Signal Orange

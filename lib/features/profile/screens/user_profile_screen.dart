@@ -208,7 +208,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                                     Navigator.pop(ctx);
                                     context.push('/auth');
                                   },
-                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
+                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: AppColors.ink),
                                   child: const Text('Sign In'),
                                 ),
                               ],

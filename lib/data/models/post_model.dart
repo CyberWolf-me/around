@@ -21,6 +21,7 @@ class PostModel {
   final List<String> tags;
   final String? mediaUrl;
   final int savesCount;
+  final int reactionsCount;
   final int reportsCount;
   final bool isQuarantined;
   final DateTime createdAt;
@@ -45,6 +46,7 @@ class PostModel {
     this.tags = const [],
     this.mediaUrl,
     this.savesCount = 0,
+    this.reactionsCount = 0,
     this.reportsCount = 0,
     this.isQuarantined = false,
     required this.createdAt,
@@ -85,6 +87,7 @@ class PostModel {
     List<String>? tags,
     String? mediaUrl,
     int? savesCount,
+    int? reactionsCount,
     int? reportsCount,
     bool? isQuarantined,
     DateTime? createdAt,
@@ -110,6 +113,7 @@ class PostModel {
       tags: tags ?? this.tags,
       mediaUrl: mediaUrl ?? this.mediaUrl,
       savesCount: savesCount ?? this.savesCount,
+      reactionsCount: reactionsCount ?? this.reactionsCount,
       reportsCount: reportsCount ?? this.reportsCount,
       isQuarantined: isQuarantined ?? this.isQuarantined,
       createdAt: createdAt ?? this.createdAt,
@@ -147,12 +151,14 @@ class PostModel {
       tags: (json['tags'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
       mediaUrl: media,
       savesCount: json['saves_count'] as int? ?? 0,
+      reactionsCount: json['reactions_count'] as int? ?? 0,
       reportsCount: json['reports_count'] as int? ?? 0,
       isQuarantined: json['is_quarantined'] as bool? ?? false,
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
           : DateTime.now(),
       isSaved: json['is_saved'] as bool? ?? false,
+      tint: json['tint_value'] != null ? Color(json['tint_value'] as int) : null,
       userReaction: json['user_reaction'] as String?,
     );
   }
@@ -175,10 +181,12 @@ class PostModel {
       'tags': tags,
       'media_url': mediaUrl,
       'saves_count': savesCount,
+      'reactions_count': reactionsCount,
       'reports_count': reportsCount,
       'is_quarantined': isQuarantined,
       'created_at': createdAt.toIso8601String(),
       'is_saved': isSaved,
+      'tint_value': tint?.toARGB32(),
       'user_reaction': userReaction,
     };
   }

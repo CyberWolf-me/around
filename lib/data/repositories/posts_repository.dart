@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/comment_model.dart';
 import '../models/post_model.dart';
@@ -207,6 +208,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
             'tags': raw['tags'] ?? const <String>[],
             'media_url': mediaUrl,
             'saves_count': raw['saves_count'] ?? 0,
+            'reactions_count': raw['reactions_count'] ?? 0,
             'created_at': raw['created_at']?.toString(),
           }));
         }
@@ -240,6 +242,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       tags: const ['artisan sourdough', 'courtyard', 'specialty coffee'],
       mediaUrl: 'assets/bakery-counter.jpg',
       savesCount: 42,
+      reactionsCount: 18,
       createdAt: DateTime.now().subtract(const Duration(hours: 2)),
     ),
     PostModel(
@@ -259,6 +262,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       tags: const ['power outlets', 'study-friendly', 'chemex'],
       mediaUrl: 'assets/study-desk.jpg',
       savesCount: 68,
+      reactionsCount: 24,
       createdAt: DateTime.now().subtract(const Duration(hours: 4)),
     ),
     PostModel(
@@ -278,6 +282,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       tags: const ['pistachio eclair', 'terrace', 'date spot'],
       mediaUrl: 'assets/patisserie.jpg',
       savesCount: 53,
+      reactionsCount: 19,
       createdAt: DateTime.now().subtract(const Duration(hours: 6)),
     ),
     PostModel(
@@ -297,6 +302,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       tags: const ['wedding plov', 'tandir somsa', 'authentic'],
       mediaUrl: 'assets/street.jpg',
       savesCount: 114,
+      reactionsCount: 42,
       createdAt: DateTime.now().subtract(const Duration(hours: 8)),
     ),
     PostModel(
@@ -317,6 +323,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       mediaUrl: null,
       tint: AppColors.butter,
       savesCount: 29,
+      reactionsCount: 11,
       createdAt: DateTime.now().subtract(const Duration(hours: 11)),
     ),
     PostModel(
@@ -336,6 +343,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       tags: const ['evening strolls', 'lake', 'matcha kiosk'],
       mediaUrl: 'assets/window-girl.jpg',
       savesCount: 77,
+      reactionsCount: 29,
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
     ),
     PostModel(
@@ -355,6 +363,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       tags: const ['craft cocktails', 'vinyl DJ', 'nightlife'],
       mediaUrl: 'assets/wine-wide.jpg',
       savesCount: 39,
+      reactionsCount: 14,
       createdAt: DateTime.now().subtract(const Duration(days: 1)),
     ),
     PostModel(
@@ -375,6 +384,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       mediaUrl: null,
       tint: AppColors.mint,
       savesCount: 61,
+      reactionsCount: 27,
       createdAt: DateTime.now().subtract(const Duration(days: 2)),
     ),
   ];
@@ -390,6 +400,7 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     required PostAudience audience,
     List<String> tags = const [],
     String? mediaPath,
+    Color? tint,
   }) async {
     final now = DateTime.now();
     _recentPublishTimestamps.removeWhere((t) => now.difference(t).inMinutes >= 5);
@@ -425,7 +436,9 @@ class PostsNotifier extends Notifier<List<PostModel>> {
       size: mediaPath != null ? PostSize.hero : PostSize.note,
       tags: tags,
       mediaUrl: mediaPath,
+      tint: tint ?? (mediaPath == null ? AppColors.butter : null),
       savesCount: 0,
+      reactionsCount: 0,
       createdAt: now,
     );
 
@@ -557,18 +570,18 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     final currentPost = state[idx];
     final isAlreadyActive = currentPost.userReaction == reaction;
 
-    final newCount = isAlreadyActive
-        ? (currentPost.savesCount > 0 ? currentPost.savesCount - 1 : 0)
-        : currentPost.savesCount + 1;
+    final newReactionsCount = isAlreadyActive
+        ? (currentPost.reactionsCount > 0 ? currentPost.reactionsCount - 1 : 0)
+        : currentPost.reactionsCount + 1;
 
-    // Optimistic state update
+    // Optimistic state update: update reactionsCount, leaving savesCount untouched
     state = [
       for (final p in state)
         if (p.id == postId)
           p.copyWith(
             userReaction: isAlreadyActive ? null : reaction,
             clearUserReaction: isAlreadyActive,
-            savesCount: newCount,
+            reactionsCount: newReactionsCount,
           )
         else
           p,

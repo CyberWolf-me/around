@@ -80,7 +80,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                     );
                 if (ctx.mounted) Navigator.pop(ctx);
               },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: AppColors.ink),
               child: const Text('Create Plan'),
             ),
           ],
@@ -272,7 +272,7 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _showCreateCollectionDialog,
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: AppColors.ink),
                   child: const Text('Create Collection'),
                 ),
               ],
@@ -333,8 +333,9 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                       const Spacer(),
                       IconButton(
                         icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.ink3),
-                        constraints: const BoxConstraints(),
-                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                        padding: const EdgeInsets.all(10),
+                        tooltip: 'Delete Collection',
                         onPressed: () {
                           HapticService.medium();
                           ref.read(collectionsRepositoryProvider.notifier).deleteCollection(col.id);
@@ -409,9 +410,10 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                                   ),
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.close, size: 14, color: AppColors.ink3),
-                                  constraints: const BoxConstraints(),
-                                  padding: const EdgeInsets.all(4),
+                                  icon: const Icon(Icons.close, size: 16, color: AppColors.ink2),
+                                  constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                                  padding: const EdgeInsets.all(12),
+                                  tooltip: 'Remove from Collection',
                                   onPressed: () {
                                     HapticService.selection();
                                     ref.read(collectionsRepositoryProvider.notifier).removePlaceFromCollection(col.id, place.id);
@@ -935,6 +937,8 @@ class _SavedScreenState extends ConsumerState<SavedScreen> {
                     const SizedBox(width: 8),
                     IconButton(
                       icon: const Icon(Icons.bookmark, color: AppColors.orange),
+                      constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                      tooltip: 'Remove from Saved',
                       onPressed: () {
                         HapticService.medium();
                         ref.read(savedPlacesProvider.notifier).remove(place.id);

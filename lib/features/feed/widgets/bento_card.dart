@@ -46,35 +46,40 @@ class BentoCard extends ConsumerWidget {
               Row(
                 children: [
                   GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () {
                       HapticService.light();
                       context.push('/users/${post.authorId}');
                     },
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                          radius: 12,
-                          backgroundColor: AppColors.ink,
-                          child: Text(
-                            post.authorAvatar ?? post.authorName[0],
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 9,
-                              fontWeight: FontWeight.bold,
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 44),
+                      alignment: Alignment.centerLeft,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 13,
+                            backgroundColor: AppColors.ink,
+                            child: Text(
+                              post.authorAvatar ?? post.authorName[0],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          post.authorName.split(' ').first,
-                          style: const TextStyle(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.ink,
+                          const SizedBox(width: 6),
+                          Text(
+                            post.authorName.split(' ').first,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.ink,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(width: 6),
@@ -164,7 +169,7 @@ class BentoCard extends ConsumerWidget {
                           ),
                           const SizedBox(width: 3),
                           Text(
-                            '${post.savesCount}',
+                            '${post.reactionsCount}',
                             style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.ink),
                           ),
                         ],
@@ -241,26 +246,32 @@ class BentoCard extends ConsumerWidget {
                   child: _AudiencePill(isFriends: post.isFriendsOnly),
                 ),
                 Positioned(
-                  top: 8,
-                  right: 8,
+                  top: 2,
+                  right: 2,
                   child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () {
                       HapticService.medium();
                       ref.read(savedPlacesProvider.notifier).toggleSave(post.placeId);
                     },
                     child: Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: isSaved ? AppColors.orange : AppColors.paper.withValues(alpha: 0.92),
-                        border: Border.all(color: AppColors.ink, width: 1.5),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: const [AppColors.shadowSm],
-                      ),
-                      child: Icon(
-                        isSaved ? Icons.bookmark : Icons.bookmark_border,
-                        size: 15,
-                        color: isSaved ? Colors.white : AppColors.ink,
+                      width: 44,
+                      height: 44,
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: isSaved ? AppColors.orange : AppColors.paper.withValues(alpha: 0.92),
+                          border: Border.all(color: AppColors.ink, width: 1.5),
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: const [AppColors.shadowSm],
+                        ),
+                        child: Icon(
+                          isSaved ? Icons.bookmark : Icons.bookmark_border,
+                          size: 16,
+                          color: AppColors.ink,
+                        ),
                       ),
                     ),
                   ),
@@ -275,27 +286,32 @@ class BentoCard extends ConsumerWidget {
                   Row(
                     children: [
                       GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () {
                           HapticService.light();
                           context.push('/users/${post.authorId}');
                         },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CircleAvatar(
-                              radius: 9,
-                              backgroundColor: AppColors.ink,
-                              child: Text(
-                                post.authorAvatar ?? post.authorName[0],
-                                style: const TextStyle(color: Colors.white, fontSize: 8),
+                        child: Container(
+                          constraints: const BoxConstraints(minHeight: 44),
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircleAvatar(
+                                radius: 10,
+                                backgroundColor: AppColors.ink,
+                                child: Text(
+                                  post.authorAvatar ?? post.authorName[0],
+                                  style: const TextStyle(color: Colors.white, fontSize: 8.5),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              post.authorName.split(' ').first,
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
-                            ),
-                          ],
+                              const SizedBox(width: 6),
+                              Text(
+                                post.authorName.split(' ').first,
+                                style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const Spacer(),
@@ -356,7 +372,7 @@ class BentoCard extends ConsumerWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                '${post.savesCount}',
+                                '${post.reactionsCount}',
                                 style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.ink),
                               ),
                             ],

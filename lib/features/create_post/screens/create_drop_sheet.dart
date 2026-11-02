@@ -26,6 +26,8 @@ class CreateDropSheet extends ConsumerStatefulWidget {
 
 class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
   int _currentStep = 0;
+  bool _isNoteOnly = false;
+  Color _selectedTint = AppColors.butter;
   String? _selectedPhoto = 'assets/bakery-counter.jpg';
   late String _selectedPlaceId;
   final TextEditingController _noteController = TextEditingController();
@@ -34,6 +36,14 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
   late PostAudience _audience;
   String _venueSearch = '';
   final ImagePicker _picker = ImagePicker();
+
+  static const List<Map<String, dynamic>> _tintOptions = [
+    {'name': 'Butter', 'color': AppColors.butter},
+    {'name': 'Mint', 'color': AppColors.mint},
+    {'name': 'Water', 'color': AppColors.water},
+    {'name': 'Blush', 'color': AppColors.blush},
+    {'name': 'Paper', 'color': AppColors.paper2},
+  ];
 
   static const List<String> _curatedPhotos = [
     'assets/bakery-counter.jpg',
@@ -149,7 +159,8 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
           rating: _rating,
           audience: _audience,
           tags: _selectedTags,
-          mediaPath: _selectedPhoto,
+          mediaPath: _isNoteOnly ? null : _selectedPhoto,
+          tint: _isNoteOnly ? _selectedTint : null,
         );
 
     if (failure != null) {
@@ -162,7 +173,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
             placeName: place?.name ?? 'Tashkent Spot',
             placeCategory: place?.category ?? 'Café',
             placeAddress: place?.streetAddress ?? 'Tashkent, Uzbekistan',
-            localPhotoPath: _selectedPhoto,
+            localPhotoPath: _isNoteOnly ? null : _selectedPhoto,
             note: effectiveNote,
             rating: _rating,
             tags: _selectedTags,
@@ -278,7 +289,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
               });
               if (ctx.mounted) Navigator.pop(ctx);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: AppColors.ink),
             child: const Text('Add Venue'),
           ),
         ],
@@ -290,10 +301,18 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
   Widget build(BuildContext context) {
     final placesRepo = ref.watch(placesRepositoryProvider);
     final PlaceModel? currentPlace = placesRepo.getPlaceById(_selectedPlaceId);
-    const stepTitles = ['Select Photo', 'Choose Venue', 'Add Note & Tags', 'Audience & Privacy'];
+    final stepTitles = [
+      _isNoteOnly ? 'Format & Color' : 'Select Photo',
+      'Choose Venue',
+      'Add Note & Tags',
+      'Audience & Privacy'
+    ];
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.88,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       decoration: const BoxDecoration(
         color: AppColors.paper,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -367,6 +386,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
           const SizedBox(height: 14),
           Expanded(
             child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: const EdgeInsets.symmetric(horizontal: 14),
               child: _buildStepContent(currentPlace),
             ),
@@ -398,6 +418,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                     onPressed: _nextStep,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.orange,
+                      foregroundColor: AppColors.ink,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -411,7 +432,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                         Text(
                           _currentStep == 3 ? 'Publish Drop' : 'Continue',
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.ink,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -420,7 +441,7 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
                         Icon(
                           _currentStep == 3 ? Icons.send : Icons.arrow_forward,
                           size: 16,
-                          color: Colors.white,
+                          color: AppColors.ink,
                         ),
                       ],
                     ),
@@ -440,91 +461,281 @@ class _CreateDropSheetState extends ConsumerState<CreateDropSheet> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: 200,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.ink, width: 2),
-                boxShadow: const [AppColors.shadow],
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: _selectedPhoto != null
-                  ? AppImage(path: _selectedPhoto!, fit: BoxFit.cover)
-                  : const Center(child: Text('No photo selected')),
-            ),
-            const SizedBox(height: 14),
+            // Format Selector: Photo vs Note Card
             Row(
               children: [
                 Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _pickPhoto(ImageSource.camera),
-                    icon: const Icon(Icons.camera_alt, size: 18),
-                    label: const Text('Take Photo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.ink,
-                      foregroundColor: AppColors.paper,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      HapticService.selection();
+                      setState(() {
+                        _isNoteOnly = false;
+                        _selectedPhoto ??= 'assets/bakery-counter.jpg';
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: !_isNoteOnly ? AppColors.butter : AppColors.paper,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: !_isNoteOnly ? AppColors.ink : AppColors.ink.withValues(alpha: 0.25),
+                          width: !_isNoteOnly ? 2 : 1.2,
+                        ),
+                        boxShadow: !_isNoteOnly ? const [AppColors.shadowSm] : null,
+                      ),
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.photo_camera_outlined, size: 16, color: !_isNoteOnly ? AppColors.ink : AppColors.ink2),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Photo Drop',
+                            style: TextStyle(
+                              color: !_isNoteOnly ? AppColors.ink : AppColors.ink2,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _pickPhoto(ImageSource.gallery),
-                    icon: const Icon(Icons.photo_library, size: 18, color: AppColors.ink),
-                    label: const Text('From Device', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.ink, width: 1.8),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      HapticService.selection();
+                      setState(() {
+                        _isNoteOnly = true;
+                        _selectedPhoto = null;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      decoration: BoxDecoration(
+                        color: _isNoteOnly ? AppColors.butter : AppColors.paper,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _isNoteOnly ? AppColors.ink : AppColors.ink.withValues(alpha: 0.25),
+                          width: _isNoteOnly ? 2 : 1.2,
+                        ),
+                        boxShadow: _isNoteOnly ? const [AppColors.shadowSm] : null,
+                      ),
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.sticky_note_2_outlined, size: 16, color: _isNoteOnly ? AppColors.ink : AppColors.ink2),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Note Card (No Photo)',
+                            style: TextStyle(
+                              color: _isNoteOnly ? AppColors.ink : AppColors.ink2,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              'OR SELECT CURATED TASHKENT PHOTO:',
-              style: GoogleFonts.spaceMono(
-                fontSize: 10,
-                color: AppColors.ink3,
-                fontWeight: FontWeight.bold,
+            const SizedBox(height: 14),
+            if (_isNoteOnly) ...[
+              // Note Card Preview
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: _selectedTint,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.ink, width: 2),
+                  boxShadow: const [AppColors.shadow],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 12,
+                          backgroundColor: AppColors.ink,
+                          child: Text(
+                            ref.read(currentProfileProvider).initials,
+                            style: const TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          ref.read(currentProfileProvider).fullName.split(' ').first,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.ink),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.ink,
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                          child: const Text('NOTE DROP', style: TextStyle(color: AppColors.paper, fontSize: 8.5, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      _noteController.text.trim().isEmpty
+                          ? '“Your personal recommendation note will appear here with this card color…”'
+                          : '“${_noteController.text.trim()}”',
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink, height: 1.35),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '· Venue: ${currentPlace?.name ?? 'Selected Spot'}',
+                      style: GoogleFonts.spaceMono(fontSize: 10, color: AppColors.ink2),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _curatedPhotos.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
+              const SizedBox(height: 16),
+              Text(
+                'PICK CARD PAPER TINT:',
+                style: GoogleFonts.spaceMono(
+                  fontSize: 10,
+                  color: AppColors.ink3,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              itemBuilder: (context, i) {
-                final photo = _curatedPhotos[i];
-                final isChosen = _selectedPhoto == photo;
-                return GestureDetector(
-                  onTap: () {
-                    HapticService.selection();
-                    setState(() => _selectedPhoto = photo);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(
-                        color: isChosen ? AppColors.orange : AppColors.ink,
-                        width: isChosen ? 2.5 : 1.5,
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: _tintOptions.map((opt) {
+                  final Color c = opt['color'] as Color;
+                  final String name = opt['name'] as String;
+                  final isSelected = _selectedTint == c;
+                  return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      HapticService.selection();
+                      setState(() => _selectedTint = c);
+                    },
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: c,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: isSelected ? AppColors.orange : AppColors.ink,
+                              width: isSelected ? 3 : 1.5,
+                            ),
+                            boxShadow: isSelected ? const [AppColors.shadowSm] : null,
+                          ),
+                          child: isSelected ? const Icon(Icons.check, size: 20, color: AppColors.ink) : null,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(name, style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.ink2)),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ] else ...[
+              Container(
+                height: 200,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.ink, width: 2),
+                  boxShadow: const [AppColors.shadow],
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: _selectedPhoto != null
+                    ? AppImage(path: _selectedPhoto!, fit: BoxFit.cover)
+                    : const Center(child: Text('No photo selected')),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () => _pickPhoto(ImageSource.camera),
+                      icon: const Icon(Icons.camera_alt, size: 18),
+                      label: const Text('Take Photo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.ink,
+                        foregroundColor: AppColors.paper,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
-                    clipBehavior: Clip.antiAlias,
-                    child: AppImage(path: photo, fit: BoxFit.cover),
                   ),
-                );
-              },
-            ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => _pickPhoto(ImageSource.gallery),
+                      icon: const Icon(Icons.photo_library, size: 18, color: AppColors.ink),
+                      label: const Text('From Device', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink)),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.ink, width: 1.8),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'OR SELECT CURATED TASHKENT PHOTO:',
+                style: GoogleFonts.spaceMono(
+                  fontSize: 10,
+                  color: AppColors.ink3,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _curatedPhotos.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
+                itemBuilder: (context, i) {
+                  final photo = _curatedPhotos[i];
+                  final isChosen = _selectedPhoto == photo;
+                  return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      HapticService.selection();
+                      setState(() => _selectedPhoto = photo);
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: isChosen ? AppColors.orange : AppColors.ink,
+                          width: isChosen ? 2.5 : 1.5,
+                        ),
+                      ),
+                      clipBehavior: Clip.antiAlias,
+                      child: AppImage(path: photo, fit: BoxFit.cover),
+                    ),
+                  );
+                },
+              ),
+            ],
           ],
         );
 

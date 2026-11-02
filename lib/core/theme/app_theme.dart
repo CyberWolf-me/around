@@ -9,9 +9,32 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.paper,
       colorScheme: const ColorScheme.light(
         primary: AppColors.orange,
+        onPrimary: AppColors.ink,
         secondary: AppColors.butter,
+        onSecondary: AppColors.ink,
         surface: AppColors.paper,
         onSurface: AppColors.ink,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.orange,
+          foregroundColor: AppColors.ink,
+          elevation: 0,
+          textStyle: GoogleFonts.instrumentSans(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.orange,
+          foregroundColor: AppColors.ink,
+          textStyle: GoogleFonts.instrumentSans(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
       textTheme: TextTheme(
         // Display - Bricolage Grotesque

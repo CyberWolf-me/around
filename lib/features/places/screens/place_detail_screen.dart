@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_image.dart';
 import '../../../data/models/place_model.dart';
@@ -129,6 +130,27 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
     );
   }
 
+  Future<void> _launchMapsUrl(BuildContext ctx, Uri nativeUri, Uri webFallbackUri) async {
+    HapticService.selection();
+    if (ctx.mounted) Navigator.pop(ctx);
+    try {
+      final launched = await launchUrl(nativeUri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        await launchUrl(webFallbackUri, mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {
+      try {
+        await launchUrl(webFallbackUri, mode: LaunchMode.externalApplication);
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open map navigation application')),
+          );
+        }
+      }
+    }
+  }
+
   void _showDirectionsDialog(PlaceModel place) {
     HapticService.light();
     final coordsText = '${place.latitude.toStringAsFixed(4)}, ${place.longitude.toStringAsFixed(4)}';
@@ -165,28 +187,63 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
               style: GoogleFonts.spaceMono(fontSize: 10.5, color: AppColors.ink3),
             ),
             const SizedBox(height: 16),
+            // Yandex Maps (Primary in Tashkent)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () async {
-                  await Clipboard.setData(ClipboardData(text: '${place.name}, ${place.streetAddress}, Tashkent ($coordsText)'));
-                  if (ctx.mounted) Navigator.pop(ctx);
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Venue address & GPS coordinates copied for Yandex / Google Maps')),
-                    );
-                  }
+                onPressed: () {
+                  final native = Uri.parse('yandexmaps://build_route_on_map?lat_to=${place.latitude}&lon_to=${place.longitude}');
+                  final web = Uri.parse('https://yandex.com/maps/?rtext=~${place.latitude}%2C${place.longitude}&rtt=pd');
+                  _launchMapsUrl(ctx, native, web);
                 },
-                icon: const Icon(Icons.copy, size: 16, color: Colors.white),
-                label: const Text('Copy Address & Coordinates', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.navigation, size: 16, color: AppColors.ink),
+                label: const Text('Open in Yandex Maps (Tashkent Standard)', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.orange,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  foregroundColor: AppColors.ink,
+                  padding: const EdgeInsets.symmetric(vertical: 13),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: const BorderSide(color: AppColors.ink, width: 2),
                   ),
                 ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Google Maps
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  final native = Uri.parse('geo:${place.latitude},${place.longitude}?q=${place.latitude},${place.longitude}(${Uri.encodeComponent(place.name)})');
+                  final web = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}');
+                  _launchMapsUrl(ctx, native, web);
+                },
+                icon: const Icon(Icons.map_outlined, size: 16, color: AppColors.ink),
+                label: const Text('Open in Google Maps', style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold)),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.ink, width: 1.8),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Copy Address & GPS
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: '${place.name}, ${place.streetAddress}, Tashkent ($coordsText)'));
+                  if (ctx.mounted) Navigator.pop(ctx);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Venue address & GPS coordinates copied to clipboard')),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.copy, size: 15, color: AppColors.ink2),
+                label: const Text('Copy Address & GPS Coordinates', style: TextStyle(color: AppColors.ink2, fontSize: 12)),
               ),
             ),
           ],
@@ -850,7 +907,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                               Navigator.pop(ctx);
                               context.push('/auth');
                             },
-                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
+                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: AppColors.ink),
                             child: const Text('Sign In'),
                           ),
                         ],

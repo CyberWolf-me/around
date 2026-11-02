@@ -76,7 +76,7 @@ class ProfileScreen extends ConsumerWidget {
                 );
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.orange, foregroundColor: AppColors.ink),
             child: const Text('Save'),
           ),
         ],
@@ -135,7 +135,7 @@ class ProfileScreen extends ConsumerWidget {
                     onPressed: () => context.push('/auth'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.orange,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.ink,
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
                     child: const Text('Sign In', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),

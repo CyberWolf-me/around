@@ -147,11 +147,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back',
+          constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
           onPressed: () {
             if (context.canPop()) {
               context.pop();
             } else {
-              _continueAsGuest();
+              context.go('/onboarding');
             }
           },
         ),
@@ -234,7 +236,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     onPressed: _isLoading ? null : _submit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.orange,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.ink,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),

@@ -245,28 +245,32 @@ void main() {
       expect(invalidType!.code, equals('INVALID_IMAGE_TYPE'));
     });
 
-    test('reactToPost toggles reactions and updates savesCount optimistically (P8-04)', () async {
+    test('reactToPost toggles reactions and updates reactionsCount optimistically without mutating savesCount (P8-04, VAL-06)', () async {
       final initialPost = notifier.state.firstWhere((p) => p.id == 'drop_tash_1');
-      final initialCount = initialPost.savesCount;
+      final initialReactions = initialPost.reactionsCount;
+      final initialSaves = initialPost.savesCount;
       expect(initialPost.userReaction, isNull);
 
       // React with heart
       await notifier.reactToPost('drop_tash_1', reaction: 'heart');
       final reactedPost = notifier.state.firstWhere((p) => p.id == 'drop_tash_1');
       expect(reactedPost.userReaction, equals('heart'));
-      expect(reactedPost.savesCount, equals(initialCount + 1));
+      expect(reactedPost.reactionsCount, equals(initialReactions + 1));
+      expect(reactedPost.savesCount, equals(initialSaves)); // Decoupled!
 
       // Toggle off by reacting with heart again
       await notifier.reactToPost('drop_tash_1', reaction: 'heart');
       final unreactedPost = notifier.state.firstWhere((p) => p.id == 'drop_tash_1');
       expect(unreactedPost.userReaction, isNull);
-      expect(unreactedPost.savesCount, equals(initialCount));
+      expect(unreactedPost.reactionsCount, equals(initialReactions));
+      expect(unreactedPost.savesCount, equals(initialSaves));
 
       // React with fire
       await notifier.reactToPost('drop_tash_1', reaction: 'fire');
       final firePost = notifier.state.firstWhere((p) => p.id == 'drop_tash_1');
       expect(firePost.userReaction, equals('fire'));
-      expect(firePost.savesCount, equals(initialCount + 1));
+      expect(firePost.reactionsCount, equals(initialReactions + 1));
+      expect(firePost.savesCount, equals(initialSaves));
     });
 
     test('addCommentToPost validates length and caches comments for authorized drops (P8-04)', () async {

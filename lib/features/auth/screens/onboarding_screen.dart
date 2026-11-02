@@ -16,6 +16,28 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   int _step = 0;
+  String _selectedDistrict = 'Mirabad';
+
+  static const List<Map<String, String>> _districts = [
+    {
+      'id': 'Mirabad',
+      'name': 'Mirabad District',
+      'tagline': 'Specialty coffee, artisan bakeries & evening social spots',
+      'badge': 'Most Active',
+    },
+    {
+      'id': 'Yakkasaray',
+      'name': 'Yakkasaray District',
+      'tagline': 'Quiet tree-lined streets, local roasters & green promenades',
+      'badge': 'Walkable',
+    },
+    {
+      'id': 'Central Tashkent',
+      'name': 'Central Tashkent (All)',
+      'tagline': 'Explore all curated venues across Mirabad, Yakkasaray & downtown',
+      'badge': 'Complete Map',
+    },
+  ];
 
   static const List<Map<String, String>> _steps = [
     {
@@ -38,10 +60,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     },
   ];
 
-  Future<void> _finishOnboarding() async {
+  Future<void> _finishOnboarding({bool asGuest = false}) async {
     await StorageService.setOnboarded(true);
-    if (mounted) {
-      context.go('/auth');
+    if (asGuest) {
+      await StorageService.setGuestMode(true);
+      if (mounted) {
+        context.go('/feed');
+      }
+    } else {
+      if (mounted) {
+        context.go('/auth');
+      }
     }
   }
 
@@ -147,6 +176,102 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     },
                   ),
                 )
+              else if (_step == 2)
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.paper2,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: AppColors.ink, width: 2),
+                    boxShadow: const [AppColors.shadowSm],
+                  ),
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: _districts.map((d) {
+                      final isSelected = _selectedDistrict == d['id'];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            HapticService.selection();
+                            setState(() => _selectedDistrict = d['id']!);
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 160),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: isSelected ? AppColors.butter : AppColors.paper,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected ? AppColors.ink : AppColors.ink.withValues(alpha: 0.3),
+                                width: isSelected ? 2 : 1.2,
+                              ),
+                              boxShadow: isSelected ? const [AppColors.shadowSm] : null,
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 26,
+                                  height: 26,
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? AppColors.orange : AppColors.paper2,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: AppColors.ink, width: 1.5),
+                                  ),
+                                  child: isSelected
+                                      ? const Icon(Icons.check, size: 15, color: AppColors.ink)
+                                      : const Icon(Icons.location_on_outlined, size: 14, color: AppColors.ink2),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            d['name']!,
+                                            style: GoogleFonts.bricolageGrotesque(
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 13,
+                                              color: AppColors.ink,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: isSelected ? AppColors.orange.withValues(alpha: 0.2) : AppColors.paper3,
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              d['badge']!,
+                                              style: GoogleFonts.spaceMono(
+                                                fontSize: 8.5,
+                                                fontWeight: FontWeight.bold,
+                                                color: AppColors.ink,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        d['tagline']!,
+                                        style: const TextStyle(fontSize: 10.5, color: AppColors.ink2, height: 1.25),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                )
               else
                 Center(
                   child: Container(
@@ -185,50 +310,97 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 s['body']!,
                 style: const TextStyle(fontSize: 13.5, color: AppColors.ink2, height: 1.4),
               ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Row(
-                    children: List.generate(3, (i) {
-                      return Container(
-                        margin: const EdgeInsets.only(right: 5),
-                        width: i == _step ? 18 : 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: i == _step ? AppColors.ink : const Color(0x3015130F),
-                          borderRadius: BorderRadius.circular(99),
+              const SizedBox(height: 20),
+              if (_step == 2) ...[
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          HapticService.light();
+                          _finishOnboarding(asGuest: true);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.ink, width: 1.8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                      );
-                    }),
-                  ),
-                  const Spacer(),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      HapticService.medium();
-                      if (_step < 2) {
-                        setState(() => _step++);
-                      } else {
-                        _finishOnboarding();
-                      }
-                    },
-                    iconAlignment: IconAlignment.end,
-                    icon: const Icon(Icons.arrow_forward, size: 16, color: Colors.white),
-                    label: Text(
-                      _step == 2 ? 'Launch Tashkent' : 'Next',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.orange,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: const BorderSide(color: AppColors.ink, width: 2),
+                        child: const Text(
+                          'Browse as Guest',
+                          style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold, fontSize: 12),
+                        ),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      flex: 2,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          HapticService.medium();
+                          _finishOnboarding(asGuest: false);
+                        },
+                        iconAlignment: IconAlignment.end,
+                        icon: const Icon(Icons.arrow_forward, size: 16, color: AppColors.ink),
+                        label: Text(
+                          'Launch $_selectedDistrict',
+                          style: const TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.orange,
+                          foregroundColor: AppColors.ink,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(color: AppColors.ink, width: 2),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ] else ...[
+                Row(
+                  children: [
+                    Row(
+                      children: List.generate(3, (i) {
+                        return Container(
+                          margin: const EdgeInsets.only(right: 5),
+                          width: i == _step ? 18 : 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: i == _step ? AppColors.ink : const Color(0x3015130F),
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                        );
+                      }),
+                    ),
+                    const Spacer(),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        HapticService.medium();
+                        setState(() => _step++);
+                      },
+                      iconAlignment: IconAlignment.end,
+                      icon: const Icon(Icons.arrow_forward, size: 16, color: AppColors.ink),
+                      label: const Text(
+                        'Next',
+                        style: TextStyle(color: AppColors.ink, fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.orange,
+                        foregroundColor: AppColors.ink,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: const BorderSide(color: AppColors.ink, width: 2),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),
