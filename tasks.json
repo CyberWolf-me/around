@@ -2084,7 +2084,7 @@
       "description": "OfflineOutboxSyncBus in lib/core/services/offline_outbox_sync_bus.dart listening to network reconnection events and triggering automatic outbox flushes with localized telemetry.",
       "ownerRole": "Core Engineering",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P20-03"
       ],
