@@ -717,3 +717,22 @@ Now that curators can compete in monthly seasons and earn permanent district cro
    - `WebTrophyCabinet.tsx` in `src/components/` rendering responsive accolades cabinet with audio tactile cues and Vitest coverage.
 4. **Supabase SQL Schema & Accolades Aggregation RPC Migration (`P31-04`)**:
    - `00022_curator_accolades_aggregation.sql` creating `get_curator_accolades` RPC with `auth.uid()` caller safety and repository offline fallback.
+
+
+---
+
+## Autonomous Product Audit & Replenishment — Phase 32 (November 3, 2026)
+
+### Strategic Evaluation: Milestone 3.1 Complete & Real-World Integration
+With Phase 31 delivered and tagged as `v3.1.0-staging.1` (433 Flutter tests, 115 Web tests, zero static analysis warnings), Around has shipped the curator accolades engine, trophy cabinet widget, web companion trophy cabinet, and Supabase accolades aggregation RPC.
+
+### The Adversarial Growth Audit for Phase 32:
+Now that the trophy cabinet exists as an isolated component, it must be integrated into the core product surfaces and bridged directly with Telegram bot commands:
+1. **Curator Showcase in Core Flows (`P32-01`)**:
+   - `TastePassportScreen` and `UserProfileScreen` must prominently feature `CuratorTrophyCabinet`, allowing users to inspect the live accolades of any curator across Tashkent.
+2. **Web Companion Profile Integration (`P32-02`)**:
+   - `ProfileScreen.tsx` on the web must render `WebTrophyCabinet` with responsive layout and interactive Web Audio feedback.
+3. **Telegram Bot Interactive Command Dispatcher (`P32-03`)**:
+   - In Uzbekistan, Telegram bots are the primary entry point. When users text `/start`, `/passport`, `/trophies`, or `/routes`, the bot should reply with rich Markdown formatting and inline keyboard buttons opening the Around Telegram Mini App directly to those views.
+4. **Supabase SQL Schema & Bot Command Telemetry Migration (`P32-04`)**:
+   - `00023_telegram_bot_telemetry.sql` recording bot interactions with rate limiting and caller privacy.
