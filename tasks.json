@@ -4119,7 +4119,7 @@
       "description": "00030_metro_station_stamps.sql creating user_metro_stamps table, RLS policies, and claim_metro_station_stamp RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P39-03"
       ],
