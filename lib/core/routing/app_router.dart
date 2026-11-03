@@ -12,6 +12,8 @@ import '../../features/explore/screens/explore_screen.dart';
 import '../../features/saved_places/screens/saved_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../features/profile/screens/user_profile_screen.dart';
+import '../../features/profile/screens/taste_passport_screen.dart';
+import '../../features/profile/screens/friend_invite_screen.dart';
 import '../../features/places/screens/place_detail_screen.dart';
 import '../../features/create_post/screens/create_drop_sheet.dart';
 import '../../features/settings/screens/settings_screen.dart';
@@ -142,6 +144,22 @@ final GoRouter appRouter = GoRouter(
         final userId = state.pathParameters['id'] ?? '';
         if (userId == 'you') return const ProfileScreen();
         return UserProfileScreen(userId: userId);
+      },
+    ),
+    GoRoute(
+      path: '/passport/:username',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) {
+        final username = state.pathParameters['username'] ?? '';
+        return TastePassportScreen(username: username);
+      },
+    ),
+    GoRoute(
+      path: '/invite/:code',
+      parentNavigatorKey: _rootNavigatorKey,
+      builder: (context, state) {
+        final code = state.pathParameters['code'] ?? '';
+        return FriendInviteScreen(inviteCode: code);
       },
     ),
     GoRoute(

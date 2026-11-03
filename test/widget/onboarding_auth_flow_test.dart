@@ -17,7 +17,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify Onboarding screen is shown
-    expect(find.text('Where should\nwe go?'), findsOneWidget);
+    expect(find.text('Where friends\nactually go.'), findsOneWidget);
     expect(find.text('Skip'), findsOneWidget);
 
     // Tap Skip to complete onboarding

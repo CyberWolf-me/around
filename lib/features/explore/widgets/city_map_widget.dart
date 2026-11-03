@@ -5,18 +5,27 @@ import 'package:latlong2/latlong.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/bouncing_widget.dart';
 import '../../../data/models/place_model.dart';
+import '../../../data/repositories/places_repository.dart';
 import '../../../data/services/haptic_service.dart';
 
 class CityMapWidget extends StatefulWidget {
   final List<PlaceModel> places;
   final String? selectedPlaceId;
   final Function(String placeId) onSelectPlace;
+  final List<DistrictDensityModel>? districtDensities;
+  final bool showDensityHeat;
+  final LatLng? targetLocation;
+  final ValueChanged<bool>? onToggleHeat;
 
   const CityMapWidget({
     super.key,
     required this.places,
     this.selectedPlaceId,
     required this.onSelectPlace,
+    this.districtDensities,
+    this.showDensityHeat = true,
+    this.targetLocation,
+    this.onToggleHeat,
   });
 
   @override
@@ -26,6 +35,7 @@ class CityMapWidget extends StatefulWidget {
 class _CityMapWidgetState extends State<CityMapWidget> {
   final MapController _mapController = MapController();
   static const LatLng _tashkentCenter = LatLng(41.3111, 69.2797);
+  late bool _heatActive;
 
   static const String _tileUrlTemplate = String.fromEnvironment(
     'MAP_TILE_URL',
@@ -33,14 +43,33 @@ class _CityMapWidgetState extends State<CityMapWidget> {
   );
 
   @override
+  void initState() {
+    super.initState();
+    _heatActive = widget.showDensityHeat;
+  }
+
+  @override
   void didUpdateWidget(covariant CityMapWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.selectedPlaceId != oldWidget.selectedPlaceId && widget.selectedPlaceId != null) {
+    if (widget.showDensityHeat != oldWidget.showDensityHeat) {
+      _heatActive = widget.showDensityHeat;
+    }
+    if (widget.targetLocation != null && widget.targetLocation != oldWidget.targetLocation) {
+      _mapController.move(widget.targetLocation!, 14.0);
+    } else if (widget.selectedPlaceId != oldWidget.selectedPlaceId && widget.selectedPlaceId != null) {
       final match = widget.places.where((p) => p.id == widget.selectedPlaceId).firstOrNull;
       if (match != null) {
         _mapController.move(LatLng(match.latitude, match.longitude), 14.5);
       }
     }
+  }
+
+  void _toggleHeat() {
+    HapticService.selection();
+    setState(() {
+      _heatActive = !_heatActive;
+    });
+    widget.onToggleHeat?.call(_heatActive);
   }
 
   void _zoomIn() {
@@ -88,6 +117,20 @@ class _CityMapWidgetState extends State<CityMapWidget> {
                 userAgentPackageName: 'com.around.around_app',
                 maxZoom: 19,
               ),
+              if (_heatActive && widget.districtDensities != null && widget.districtDensities!.isNotEmpty)
+                CircleLayer(
+                  circles: widget.districtDensities!.map((d) {
+                    final radiusMeters = 800.0 + (d.relativeDensity * 1200.0);
+                    return CircleMarker(
+                      point: LatLng(d.centroidLat, d.centroidLng),
+                      radius: radiusMeters,
+                      useRadiusInMeter: true,
+                      color: AppColors.orange.withValues(alpha: 0.12 * d.relativeDensity + 0.05),
+                      borderColor: AppColors.orange.withValues(alpha: 0.35 * d.relativeDensity + 0.15),
+                      borderStrokeWidth: 1.5,
+                    );
+                  }).toList(),
+                ),
               MarkerLayer(
                 markers: widget.places.map((place) {
                   final isSelected = place.id == widget.selectedPlaceId;
@@ -196,6 +239,13 @@ class _CityMapWidgetState extends State<CityMapWidget> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _MapControlButton(
+                  icon: _heatActive ? Icons.local_fire_department : Icons.local_fire_department_outlined,
+                  tooltip: _heatActive ? 'Hide Social Heat' : 'Show Social Heat',
+                  iconColor: _heatActive ? AppColors.orange : AppColors.ink3,
+                  onTap: _toggleHeat,
+                ),
+                const SizedBox(height: 6),
+                _MapControlButton(
                   icon: Icons.add_rounded,
                   tooltip: 'Zoom In',
                   onTap: _zoomIn,
@@ -224,11 +274,13 @@ class _CityMapWidgetState extends State<CityMapWidget> {
 class _MapControlButton extends StatelessWidget {
   final IconData icon;
   final String tooltip;
+  final Color? iconColor;
   final VoidCallback onTap;
 
   const _MapControlButton({
     required this.icon,
     required this.tooltip,
+    this.iconColor,
     required this.onTap,
   });
 
@@ -248,7 +300,7 @@ class _MapControlButton extends StatelessWidget {
             border: Border.all(color: AppColors.borderHairline),
             boxShadow: const [AppColors.shadowSubtle],
           ),
-          child: Icon(icon, size: 18, color: AppColors.ink),
+          child: Icon(icon, size: 18, color: iconColor ?? AppColors.ink),
         ),
       ),
     );

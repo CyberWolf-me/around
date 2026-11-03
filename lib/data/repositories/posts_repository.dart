@@ -174,6 +174,13 @@ class PostsNotifier extends Notifier<List<PostModel>> {
     }
   }
 
+  /// Atomically purges user's authored drops from memory and local storage (`P13-04`).
+  Future<void> purgeUserDrops([String? authorId]) async {
+    final targetId = authorId ?? ref.read(currentProfileProvider).id;
+    state = state.where((p) => !_isCurrentUserAuthor(p.authorId) && p.authorId != targetId && p.authorId != 'you').toList();
+    await StorageService.persistDrops(state);
+  }
+
   /// Fetches authorized Friends & Public drops for a specific venue from Supabase (`INT-02` Journey D).
   Future<void> syncRemotePlaceDrops(String placeId) async {
     if (!SupabaseService.isInitialized || !SupabaseService.isAuthenticated) return;

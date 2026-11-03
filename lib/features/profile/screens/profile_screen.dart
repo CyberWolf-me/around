@@ -10,6 +10,17 @@ import '../../../data/repositories/profiles_repository.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../../../data/services/haptic_service.dart';
 import '../../../data/services/supabase_service.dart';
+import '../../../core/services/deep_link_service.dart';
+import '../../../core/services/friend_invite_service.dart';
+import '../../../core/services/telegram_share_service.dart';
+import '../../../data/models/place_model.dart';
+import '../../../data/repositories/places_repository.dart';
+import '../../../data/repositories/quests_repository.dart';
+import '../widgets/taste_passport_card.dart';
+import '../widgets/city_passport_section.dart';
+import '../widgets/taste_quests_card.dart';
+import '../widgets/district_leaderboard_sheet.dart';
+import '../widgets/streak_progress_card.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -142,9 +153,18 @@ class ProfileScreen extends ConsumerWidget {
     final posts = ref.watch(postsRepositoryProvider);
     final followedFriends = ref.watch(followedFriendsProvider);
     final savedPlaces = ref.watch(savedPlacesProvider);
+    final placesRepo = ref.watch(placesRepositoryProvider);
+    final allPlaces = placesRepo.getAllPlaces();
+    final topPlaces = savedPlaces
+        .map((id) => allPlaces.where((p) => p.id == PlacesRepository.resolveCanonicalId(id)).firstOrNull)
+        .whereType<PlaceModel>()
+        .take(3)
+        .toList();
 
     final currentUserId = SupabaseService.currentUser?.id ?? profile.id;
     final myDrops = posts.where((p) => p.authorId == currentUserId || p.authorId == profile.id || p.authorId == 'you').toList();
+    final leaderboard = ref.watch(districtLegendLeaderboardProvider);
+    final userLegends = leaderboard.getLegendsForUser(currentUserId);
 
     return Scaffold(
       backgroundColor: AppColors.paper,
@@ -310,6 +330,18 @@ class ProfileScreen extends ConsumerWidget {
                               style: const TextStyle(fontSize: 12.5, color: AppColors.ink2, height: 1.35),
                             ),
                           ],
+                          if (userLegends.isNotEmpty)
+                            LocalLegendBadge(
+                              legends: userLegends,
+                              onTap: () {
+                                showModalBottomSheet<void>(
+                                  context: context,
+                                  backgroundColor: Colors.transparent,
+                                  isScrollControlled: true,
+                                  builder: (ctx) => const DistrictLeaderboardSheet(),
+                                );
+                              },
+                            ),
                         ],
                       ),
                     ),
@@ -422,6 +454,44 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ],
             ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Tashkent Taste Passport & Official Curator Badge
+          TastePassportCard(
+            profile: profile,
+            topPlaces: topPlaces,
+            totalDrops: myDrops.length,
+            totalSaved: savedPlaces.length,
+            onShare: () {
+              DeepLinkService.copyPassportShareLink(profile.username);
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Unified City Passport: District Stamps & Territory Crowns (P50-02)
+          CityPassportSection(
+            profile: profile,
+          ),
+
+          const SizedBox(height: 16),
+
+          // Tashkent Taste Quests & Local Legend Badges (P13-01)
+          TasteQuestsCard(
+            quests: ref.watch(questsRepositoryProvider).getQuests(),
+            visitedPlaceIds: {
+              ...savedPlaces,
+              ...myDrops.map((d) => d.placeId),
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Weekly Discovery Streak Card (P18-01)
+          StreakProgressCard(
+            userId: profile.id,
           ),
 
           const SizedBox(height: 24),
@@ -570,6 +640,7 @@ class ProfileScreen extends ConsumerWidget {
         builder: (ctx, dialogRef, __) {
           final relations = dialogRef.watch(friendshipStatusesProvider);
           final relationNotifier = dialogRef.read(friendshipStatusesProvider.notifier);
+          final currentProfile = dialogRef.watch(currentProfileProvider);
 
           return AlertDialog(
             backgroundColor: AppColors.paper,
@@ -604,7 +675,119 @@ class ProfileScreen extends ConsumerWidget {
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: kTashkentCommunityMembers.map((member) {
+                  children: [
+                    // Quick Invite Link Card
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 14),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.butter,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: AppColors.ink, width: 1.2),
+                        boxShadow: const [AppColors.shadowTactile],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.qr_code_2, size: 20, color: AppColors.ink),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Invite Friends via Link',
+                                  style: GoogleFonts.bricolageGrotesque(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: AppColors.ink,
+                                  ),
+                                ),
+                                const Text(
+                                  'Connect instantly with 1 tap',
+                                  style: TextStyle(fontSize: 11, color: AppColors.ink2),
+                                ),
+                              ],
+                            ),
+                          ),
+                          BouncingWidget(
+                            onTap: () async {
+                              HapticService.selection();
+                              final link = await FriendInviteService.copyInviteLink(
+                                inviterId: currentProfile.id,
+                                username: currentProfile.username,
+                                fullName: currentProfile.fullName,
+                                neighborhood: currentProfile.neighborhood,
+                              );
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('✓ Invite link copied: $link'),
+                                    backgroundColor: AppColors.ink,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.ink,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Text(
+                                'Copy',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          BouncingWidget(
+                            onTap: () async {
+                              HapticService.medium();
+                              await TelegramShareService.shareInviteToTelegram(
+                                inviterId: currentProfile.id,
+                                username: currentProfile.username,
+                                fullName: currentProfile.fullName,
+                                neighborhood: currentProfile.neighborhood,
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF229ED9),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.send_rounded, size: 12, color: Colors.white),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Telegram',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ...kTashkentCommunityMembers.map((member) {
                     final rel = relations[member.id] ?? FriendshipRelation.none;
                     String label;
                     Color btnBg;
@@ -706,9 +889,10 @@ class ProfileScreen extends ConsumerWidget {
                         ],
                       ),
                     );
-                  }).toList(),
-                ),
+                  }),
+                ],
               ),
+            ),
             ),
             actions: [
               TextButton(

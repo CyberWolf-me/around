@@ -55,6 +55,11 @@ class SavedPlaceStatusesNotifier extends Notifier<Map<String, String>> {
       }
     }
   }
+
+  Future<void> purgeAllStatuses() async {
+    state = {};
+    await StorageService.savePlaceStatuses({});
+  }
 }
 
 class SavedPlacesNotifier extends Notifier<List<String>> {
@@ -154,6 +159,11 @@ class SavedPlacesNotifier extends Notifier<List<String>> {
     final updated = state.where((id) => id != canonical && id != placeId).toList();
     state = updated;
     StorageService.savePlaceIds(updated);
+  }
+
+  Future<void> purgeAllSaved() async {
+    state = [];
+    await StorageService.savePlaceIds([]);
   }
 }
 
@@ -272,5 +282,10 @@ class FriendPlansNotifier extends Notifier<List<FriendPlanModel>> {
     final updated = state.where((p) => p.id != id).toList();
     state = updated;
     await StorageService.persistPlans(updated);
+  }
+
+  Future<void> purgeAllPlans() async {
+    state = [];
+    await StorageService.persistPlans([]);
   }
 }

@@ -23,6 +23,10 @@ class StorageService {
   static const _guestModeKey = 'around_guest_mode_v1';
   static const _notificationsKey = 'around_notifications_v1';
   static const _biometricLockKey = 'around_biometric_lock_v1';
+  static const _appLanguageKey = 'around_app_language_v1';
+  static const _userNeighborhoodKey = 'around_user_neighborhood_v1';
+  static const _betaAccessKey = 'around_beta_access_v1';
+  static const _betaCohortKey = 'around_beta_cohort_v1';
 
   static SharedPreferences? _prefs;
   static final Map<String, Object> _memoryFallback = {};
@@ -54,6 +58,36 @@ class StorageService {
   static Future<void> setGuestMode(bool value) async {
     _memoryFallback[_guestModeKey] = value;
     await _prefs?.setBool(_guestModeKey, value);
+  }
+
+  // Closed Beta access and cohort activation
+  static bool hasBetaAccess() {
+    return _prefs?.getBool(_betaAccessKey) ?? (_memoryFallback[_betaAccessKey] as bool? ?? false);
+  }
+
+  static Future<void> setBetaAccess(bool value) async {
+    _memoryFallback[_betaAccessKey] = value;
+    await _prefs?.setBool(_betaAccessKey, value);
+  }
+
+  static String? getBetaCohort() {
+    return _prefs?.getString(_betaCohortKey) ?? (_memoryFallback[_betaCohortKey] as String?);
+  }
+
+  static Future<void> setBetaCohort(String cohort) async {
+    _memoryFallback[_betaCohortKey] = cohort;
+    await _prefs?.setString(_betaCohortKey, cohort);
+  }
+
+  // User neighborhood selection
+  static String getUserNeighborhood() {
+    return _prefs?.getString(_userNeighborhoodKey) ??
+        (_memoryFallback[_userNeighborhoodKey] as String? ?? 'Mirabad');
+  }
+
+  static Future<void> setUserNeighborhood(String neighborhood) async {
+    _memoryFallback[_userNeighborhoodKey] = neighborhood;
+    await _prefs?.setString(_userNeighborhoodKey, neighborhood);
   }
 
   // Authenticated session email
@@ -88,6 +122,15 @@ class StorageService {
   static Future<void> setString(String key, String value) async {
     _memoryFallback[key] = value;
     await _prefs?.setString(key, value);
+  }
+
+  static int getInt(String key, [int fallback = 0]) {
+    return _prefs?.getInt(key) ?? (_memoryFallback[key] as int? ?? fallback);
+  }
+
+  static Future<void> setInt(String key, int value) async {
+    _memoryFallback[key] = value;
+    await _prefs?.setInt(key, value);
   }
 
   static Future<void> removeString(String key) async {
@@ -316,6 +359,16 @@ class StorageService {
 
   static void purgeSensitiveMemoryVault() {
     _sensitiveVisitVault.clear();
+  }
+
+  // Trilingual App Language Preference
+  static String getAppLanguage() {
+    return _prefs?.getString(_appLanguageKey) ?? (_memoryFallback[_appLanguageKey] as String? ?? 'en');
+  }
+
+  static Future<void> setAppLanguage(String langCode) async {
+    _memoryFallback[_appLanguageKey] = langCode;
+    await _prefs?.setString(_appLanguageKey, langCode);
   }
 
   static Future<void> clearAll() async {

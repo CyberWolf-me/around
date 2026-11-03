@@ -28,6 +28,8 @@ Before implementing or modifying any feature, every agent or engineer must:
 - **Rule E — No Premature Abstractions:** Keep the Riverpod repository -> service -> model architecture clean and direct.
 - **Rule F — Preserve Data Integrity:** Use canonical UUID identifiers in PostgreSQL and slug/UUID resolution in `PlacesRepository.resolveCanonicalId`. Always add corrective migrations (`00005_security_and_rls_remediation.sql`) rather than destructively breaking deployed environments.
 - **Rule G — Evidence-Based Completion:** Every completed task must record modified files, verification commands executed, test outputs, and any remaining risks in `tasks.json`.
+- **Rule H — Data Over Bespoke Engines (Anti-Bloat Guardrail):** NEVER create dedicated SQL tables, migrations, Dart services, or custom UI widgets for individual venue categories, cultural themes, food items, or crafts (e.g., tea pouring, bread stamping, paper burnishing, synth sequencers, coal heat monitors). New city themes, trails, and cultural highlights must ALWAYS be represented as data rows inside existing `public.places`, `public.collections`, `public.collection_items`, and `public.curated_crawls` schemas.
+- **Rule I — Strict 4-Tab Surface & Complexity Cap:** The app must maintain a maximum of 4 top-level tabs (`Feed`, `Explore`, `Saved`, `Profile`). Before proposing any new task in `tasks.json`, verify whether an existing screen or table can support the use case via configuration or seed data, prioritizing bug fixes, performance, localization (`UZ/RU/EN`), and test reliability over new UI widgets.
 
 ## 4. Role Ownership Matrix
 

@@ -138,4 +138,11 @@ class NotificationsNotifier extends Notifier<List<NotificationModel>> {
       }
     }
   }
+
+  Future<void> addNotification(NotificationModel notif) async {
+    if (state.any((n) => n.id == notif.id)) return;
+    final updated = [notif, ...state];
+    state = updated;
+    await StorageService.persistNotifications(updated);
+  }
 }

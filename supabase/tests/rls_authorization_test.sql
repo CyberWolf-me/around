@@ -230,6 +230,36 @@ BEGIN
     RAISE EXCEPTION 'FAIL [Scenario 9B]: get_nearby_places keyset query returned 0 places!';
   END IF;
 
+  -- ==========================================================================
+  -- SCENARIO 10: Metro Station Passport Stamps RLS & User Isolation (P50-02/P50-03)
+  -- ==========================================================================
+  PERFORM set_config('request.jwt.claim.sub', alice_id::TEXT, TRUE);
+  INSERT INTO public.user_metro_stamps (user_id, station_id, line)
+  VALUES (alice_id, 'kosmonavtlar', 'uzbekistan');
+
+  -- Bob cannot insert a stamp on behalf of Alice
+  PERFORM set_config('request.jwt.claim.sub', bob_id::TEXT, TRUE);
+  op_rejected := FALSE;
+  BEGIN
+    INSERT INTO public.user_metro_stamps (user_id, station_id, line)
+    VALUES (alice_id, 'mustaqillik_maydoni', 'chilanzar');
+  EXCEPTION WHEN OTHERS THEN
+    op_rejected := TRUE;
+  END;
+  IF NOT op_rejected THEN
+    RAISE EXCEPTION 'FAIL [Scenario 10A]: Bob inserted a metro stamp under Alice user_id!';
+  END IF;
+
+  -- Bob CAN insert a stamp for himself
+  INSERT INTO public.user_metro_stamps (user_id, station_id, line)
+  VALUES (bob_id, 'chorsu', 'uzbekistan');
+
+  -- Bob can read his own stamp
+  SELECT COUNT(*) INTO visible_count FROM public.user_metro_stamps WHERE user_id = bob_id;
+  IF visible_count <> 1 THEN
+    RAISE EXCEPTION 'FAIL [Scenario 10B]: Bob could not view his own metro stamp!';
+  END IF;
+
   RAISE NOTICE 'ALL MULTI-USER RLS & AUTHORIZATION SCENARIOS PASSED UNDER ROLE authenticated.';
 END $$;
 

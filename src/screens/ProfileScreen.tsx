@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { Icon } from '../components/ui/Icon';
 import { Avatar } from '../components/ui/Avatar';
 import { AudienceBadge } from '../components/ui/AudienceBadge';
+import { WebCityPassport } from '../components/WebCityPassport';
 import { INITIAL_PEOPLE } from '../data/mockData';
 import { PlaceDrop, UserProfile } from '../types';
 import { canViewVisitHistory } from '../services/privacyFilter';
@@ -184,6 +185,18 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ userId }) => {
           </button>
         </div>
       )}
+
+      {/* City Passport: District Stamps & Territory Crowns Section */}
+      <div style={{ marginBottom: 18 }}>
+        <WebCityPassport
+          username={user.handle}
+          neighborhood={user.neighborhood}
+          dropsCount={myDrops.length}
+          visitedDistricts={[user.neighborhood || 'Mirabad']}
+          crownsCount={isOwnProfile ? 2 : (myDrops.length >= 5 ? 1 : 0)}
+          locale="en"
+        />
+      </div>
 
       {/* Drops Section */}
       <div className="sectionhead" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
