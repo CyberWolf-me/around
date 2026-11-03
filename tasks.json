@@ -2989,7 +2989,7 @@
       "description": "TelegramShareSheet widget in lib/features/explore/widgets/ rendering direct Telegram Mini App links, copy actions, and preview cards.",
       "ownerRole": "Mobile Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P29-01"
       ],
