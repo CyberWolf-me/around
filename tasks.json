@@ -4254,7 +4254,7 @@
       "description": "ArchitecturalBadgeEngine modeling Soviet Modernism, Silk Road Heritage, and Contemporary Architecture discovery quests in Tashkent with badge unlock criteria, stop completion, and XP calculations.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P40-04"
       ],
@@ -4281,7 +4281,7 @@
       "description": "ArchitecturalBadgeCardWidget rendering quest badge artwork, progress ring, landmark chip checklist (visited vs locked), and share / claim reward action.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P41-01"
       ],
