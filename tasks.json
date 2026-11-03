@@ -5063,7 +5063,7 @@
       "description": "00039_tandoor_bakeries.sql creating tandoor_bakeries, bread_varieties, and user_bread_reservations tables, RLS policies, and reserve_fresh_bread_batch RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P48-03"
       ],
@@ -5080,6 +5080,110 @@
       "verificationCommands": [
         "flutter analyze lib/ test/ --no-pub",
         "flutter test test/unit/tandoor_bakery_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P49-01",
+      "title": "Tashkent State Puppet Theater & Marionette Craft Engine",
+      "domain": "Experiences",
+      "description": "PuppetTheaterEngine modeling Tashkent puppet masters, glove puppet (chodir jamol) vs string marionette (simli qo'g'irchoq) mechanics, chinor woodcarving taxonomy, and show repertoire schedules.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P48-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/puppet_theater_engine.dart",
+        "test/unit/puppet_theater_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Domain models for PuppetTheaterStage, MarionetteFigure, PuppetPerformance, and WoodcarvingWood (chinor plane tree, walnut, apricot).",
+        "Pure Dart PuppetTheaterEngine with performance schedule queries, string tension calculations, and +35 XP reservation logic.",
+        "Comprehensive unit test coverage verifying puppet types, showtimes, and booking logic."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/puppet_theater_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart domain service."
+    },
+    {
+      "id": "P49-02",
+      "title": "Marionette Performance & Woodcarving Showcase Card Widget",
+      "domain": "Experiences",
+      "description": "PuppetTheaterCardWidget displaying theater showtimes, marionette woodcarver credentials, puppet style badges, interactive ticket seat booking, and craft masterclass reservation CTA.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P49-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/puppet_theater_card_widget.dart",
+        "test/widget/puppet_theater_card_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Themed Flutter widget with puppet stage curtain styling, performance time badges, and puppet craft specs.",
+        "Interactive performance selector and seat reservation CTA with +35 XP feedback.",
+        "Passing widget tests verifying render hierarchy, selection toggles, and callback dispatches."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/puppet_theater_card_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P49-03",
+      "title": "Web Companion Marionette String Control & Puppet Stage Simulator",
+      "domain": "Experiences",
+      "description": "WebPuppetTheaterStage.tsx rendering interactive marionette cross-brace string controller, stage lighting simulator, and theater repertory schedule inspector.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P49-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebPuppetTheaterStage.tsx",
+        "src/__tests__/webPuppetTheaterStage.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Interactive marionette cross-brace controller simulating arm, head, and leg string tensions.",
+        "Vitest tests verifying puppet figures, wood varieties, and repertory showtime calculations."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P49-04",
+      "title": "Supabase SQL Schema & Puppet Theater Ticket Reservation RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00040_puppet_theater.sql creating puppet_theaters, puppet_performances, and user_puppet_tickets tables, RLS policies, and reserve_puppet_theater_ticket RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P49-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00040_puppet_theater.sql",
+        "lib/data/repositories/puppet_theater_repository.dart",
+        "test/unit/puppet_theater_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates puppet_theaters, puppet_performances, and user_puppet_tickets tables with RLS and dual-layer privacy invariant.",
+        "Security Definer RPC reserve_puppet_theater_ticket deriving caller identity from auth.uid() and awarding +35 XP.",
+        "PuppetTheaterRepository implements offline fallback with default Tashkent puppet stages."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/puppet_theater_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
