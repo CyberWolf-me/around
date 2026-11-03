@@ -3311,7 +3311,7 @@
       "description": "Render WebTrophyCabinet inside src/screens/ProfileScreen.tsx with interactive audio tactile responses.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P32-01"
       ],
@@ -3337,7 +3337,7 @@
       "description": "TelegramBotCommandHandler in lib/core/services/telegram_bot_command_handler.dart parsing commands and generating rich Mini App launch payloads.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P32-02"
       ],
