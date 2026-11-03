@@ -4032,6 +4032,113 @@
         "flutter test test/unit/place_sound_bite_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P39-01",
+      "title": "Metro Stamp & Line Completion Engine",
+      "domain": "Experiences",
+      "description": "MetroStampEngine managing Tashkent metro stations, line completion calculations, proximity detection, and ceramic stamp metadata.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "DONE",
+      "dependencies": [
+        "P38-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/metro_stamp_engine.dart",
+        "test/unit/metro_stamp_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Defines MetroStation and MetroStamp models across Chilanzar, Uzbekistan, and Yunusabad lines.",
+        "Engine calculates line completion percentages and unlocks line explorer badges (e.g., Chilanzar Line Nomad).",
+        "Detects stations within 600m proximity threshold of venue coordinates.",
+        "Unit tests verify proximity calculation, line completion percentage, and trilingual names."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/metro_stamp_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service with comprehensive unit tests."
+    },
+    {
+      "id": "P39-02",
+      "title": "Metro Passport Stamp Book & Seal Widget",
+      "domain": "Experiences",
+      "description": "MetroStampBookWidget displaying circular ceramic stamp seals, line completion progress rings, and stamp detail inspection sheet.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P39-01"
+      ],
+      "affectedPaths": [
+        "lib/features/profile/widgets/metro_stamp_book_widget.dart",
+        "test/widget/metro_stamp_book_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders ceramic seal stamps with line-themed colors (red, blue, green).",
+        "Tapping a stamp triggers haptic feedback and invokes onStampTap callback.",
+        "Widget test validates line filter tabs, lock/unlock visuals, and localized titles."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/metro_stamp_book_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P39-03",
+      "title": "Web Companion Metro Stamp Shelf Component",
+      "domain": "Experiences",
+      "description": "WebMetroStampShelf.tsx rendering responsive SVG ceramic seals, line filter tabs, and Web Audio stamp click effects.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P39-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebMetroStampShelf.tsx",
+        "src/__tests__/webMetroStampShelf.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders responsive ceramic seals grouped by Tashkent metro lines.",
+        "Interactive line tabs and stamp inspection cards with ceramic color styling.",
+        "Vitest tests verify line filtering, lock/unlock states, and completion counters."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P39-04",
+      "title": "Supabase SQL Schema & Metro Station Stamps RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00030_metro_station_stamps.sql creating user_metro_stamps table, RLS policies, and claim_metro_station_stamp RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P39-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00030_metro_station_stamps.sql",
+        "lib/data/repositories/metro_stamp_repository.dart",
+        "test/unit/metro_stamp_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates user_metro_stamps table with unique constraint on (user_id, station_id) and RLS policies.",
+        "Idempotent claim_metro_station_stamp RPC awards +25 XP and records stamp timestamp.",
+        "MetroStampRepository implements offline fallback with central Tashkent seed stations.",
+        "Unit test validates SQL syntax and repository methods."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/metro_stamp_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
