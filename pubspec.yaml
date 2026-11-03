@@ -1,7 +1,7 @@
 name: around_app
 description: "Around - Places-first social discovery platform"
 publish_to: 'none'
-version: 4.8.0+1
+version: 4.9.0+1
 
 environment:
   sdk: ^3.5.0

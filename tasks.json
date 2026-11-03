@@ -5167,7 +5167,7 @@
       "description": "00040_puppet_theater.sql creating puppet_theaters, puppet_performances, and user_puppet_tickets tables, RLS policies, and reserve_puppet_theater_ticket RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P49-03"
       ],
@@ -5184,6 +5184,110 @@
       "verificationCommands": [
         "flutter analyze lib/ test/ --no-pub",
         "flutter test test/unit/puppet_theater_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P50-01",
+      "title": "Tashkent Herbal Apothecary & Copper Alembic Distillation Engine",
+      "domain": "Experiences",
+      "description": "HerbalApothecaryEngine modeling centuries-old folk phytotherapy, wild mountain botanicals (yalpiz, dalachoy, kiyiko't, atirgul), copper alembic distillation mechanics, and consultation bookings.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P49-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/herbal_apothecary_engine.dart",
+        "test/unit/herbal_apothecary_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Domain models for HerbalApothecaryShop, BotanicalHerb, DistillationHydrosol, and HerbalRemedyConsultation.",
+        "Pure Dart HerbalApothecaryEngine with steam condensation yield calculations, herb filtering, and +30 XP booking logic.",
+        "Comprehensive unit test coverage verifying herb medicinal qualities, distillation physics, and booking records."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/herbal_apothecary_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart domain service."
+    },
+    {
+      "id": "P50-02",
+      "title": "Botanical Elixir & Alembic Hydrosol Card Widget",
+      "domain": "Experiences",
+      "description": "HerbalApothecaryCardWidget displaying botanical apothecary credentials, live copper still distillation status, remedy blend selector, and consultation booking CTA.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P50-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/herbal_apothecary_card_widget.dart",
+        "test/widget/herbal_apothecary_card_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Herbal green & copper alembic styled Flutter card with botanical taxonomy tags and distillation temperature indicators.",
+        "Interactive botanical blend selector and consultation reservation CTA with +30 XP feedback.",
+        "Passing widget tests verifying render hierarchy, selection toggles, and callback dispatches."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/herbal_apothecary_card_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P50-03",
+      "title": "Web Companion Copper Alembic Steam Distillation Simulator",
+      "domain": "Experiences",
+      "description": "WebHerbalDistilleryViewer.tsx rendering interactive copper alembic condenser cooling gauge, botanical oil extraction monitor, and apothecary trail inspector.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P50-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebHerbalDistilleryViewer.tsx",
+        "src/__tests__/webHerbalDistilleryViewer.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Interactive copper still boiler temperature & steam condensation yield simulator.",
+        "Vitest tests verifying botanical herbs, medicinal uses, distillation yield math, and price formatting."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P50-04",
+      "title": "Supabase SQL Schema & Botanical Remedy Consultation RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00041_herbal_apothecary.sql creating herbal_apothecaries, botanical_herbs, and user_apothecary_consultations tables, RLS policies, and book_apothecary_consultation RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P50-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00041_herbal_apothecary.sql",
+        "lib/data/repositories/herbal_apothecary_repository.dart",
+        "test/unit/herbal_apothecary_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates herbal_apothecaries, botanical_herbs, and user_apothecary_consultations tables with RLS and dual-layer privacy invariant.",
+        "Security Definer RPC book_apothecary_consultation deriving caller identity from auth.uid() and awarding +30 XP.",
+        "HerbalApothecaryRepository implements offline fallback with default Tashkent apothecary shops."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/herbal_apothecary_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
