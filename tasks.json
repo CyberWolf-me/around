@@ -3229,7 +3229,7 @@
       "description": "WebTrophyCabinet.tsx in src/components/ rendering responsive accolades cabinet with audio tactile cues and Vitest coverage.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P31-02"
       ],
@@ -3256,7 +3256,7 @@
       "description": "00022_curator_accolades_aggregation.sql creating get_curator_accolades RPC with auth.uid() caller safety and repository offline fallback.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P31-03"
       ],
