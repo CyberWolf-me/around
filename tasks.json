@@ -4729,7 +4729,7 @@
       "description": "WebChaykhanaBrewBar.tsx rendering 3-pour Kaytarish kettle aeration animation, herbal infusion timer, and tapchan availability schedule.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P45-02"
       ],
@@ -4754,7 +4754,7 @@
       "description": "00036_chaykhana_tea_rituals.sql creating chaykhana_venues, tea_blends, and user_chaykhana_gatherings tables, RLS policies, and host_chaykhana_gathering RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P45-03"
       ],
