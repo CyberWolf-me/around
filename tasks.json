@@ -4414,7 +4414,7 @@
       "description": "WebTastingFlightSampler.tsx rendering tasting flight itinerary, flavor note cloud, cupping rating meter, and Web Audio sensory sips.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P42-02"
       ],
@@ -4440,7 +4440,7 @@
       "description": "00033_artisan_tasting_flights.sql creating tasting_flights, tasting_flight_items, and user_tasting_logs tables, RLS policies, and record_tasting_log RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P42-03"
       ],
