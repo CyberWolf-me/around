@@ -4884,7 +4884,7 @@
       "description": "SilkPaperCalligraphyEngine modeling mulberry bark pulp fermentation, agate polishing stages, calligraphy scripts (Nastaliq, Thuluth, Kufic), and atelier masterclass credentials.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P46-04"
       ],
@@ -4910,7 +4910,7 @@
       "description": "SilkPaperCardWidget rendering atelier credentials, mulberry pulp paper stages, calligraphy script preview, and masterclass reservation CTA.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P47-01"
       ],
