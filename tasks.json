@@ -2935,7 +2935,7 @@
       "description": "00019_curator_seasons_and_trophy_wall.sql adding seasonal_trophies table with RLS and idempotent RPC claim_seasonal_trophy awarding bonus XP.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P28-03"
       ],
