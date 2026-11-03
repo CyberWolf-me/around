@@ -4388,7 +4388,7 @@
       "description": "TastingFlightCardWidget rendering flight banner, aroma/taste note tags, stop stepper checklist, cupping score slider, and completion certificate with haptic feedback.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P42-01"
       ],
@@ -4414,7 +4414,7 @@
       "description": "WebTastingFlightSampler.tsx rendering tasting flight itinerary, flavor note cloud, cupping rating meter, and Web Audio sensory sips.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P42-02"
       ],
