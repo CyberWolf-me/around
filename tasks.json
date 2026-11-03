@@ -5090,7 +5090,7 @@
       "description": "PuppetTheaterEngine modeling Tashkent puppet masters, glove puppet (chodir jamol) vs string marionette (simli qo'g'irchoq) mechanics, chinor woodcarving taxonomy, and show repertoire schedules.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P48-04"
       ],
@@ -5116,7 +5116,7 @@
       "description": "PuppetTheaterCardWidget displaying theater showtimes, marionette woodcarver credentials, puppet style badges, interactive ticket seat booking, and craft masterclass reservation CTA.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P49-01"
       ],
