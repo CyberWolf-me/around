@@ -5142,7 +5142,7 @@
       "description": "WebPuppetTheaterStage.tsx rendering interactive marionette cross-brace string controller, stage lighting simulator, and theater repertory schedule inspector.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P49-02"
       ],
@@ -5167,7 +5167,7 @@
       "description": "00040_puppet_theater.sql creating puppet_theaters, puppet_performances, and user_puppet_tickets tables, RLS policies, and reserve_puppet_theater_ticket RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P49-03"
       ],
