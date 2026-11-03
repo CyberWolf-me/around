@@ -4281,7 +4281,7 @@
       "description": "ArchitecturalBadgeCardWidget rendering quest badge artwork, progress ring, landmark chip checklist (visited vs locked), and share / claim reward action.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P41-01"
       ],
@@ -4307,7 +4307,7 @@
       "description": "WebArchitecturalBadgeShowcase.tsx rendering architectural quest grid, progress bars, landmark checklist, and Web Audio unlock fanfare chime.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P41-02"
       ],
