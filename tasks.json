@@ -5116,7 +5116,7 @@
       "description": "PuppetTheaterCardWidget displaying theater showtimes, marionette woodcarver credentials, puppet style badges, interactive ticket seat booking, and craft masterclass reservation CTA.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P49-01"
       ],
@@ -5142,7 +5142,7 @@
       "description": "WebPuppetTheaterStage.tsx rendering interactive marionette cross-brace string controller, stage lighting simulator, and theater repertory schedule inspector.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P49-02"
       ],
