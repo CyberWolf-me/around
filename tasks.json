@@ -2882,7 +2882,7 @@
       "description": "SeasonTrophyCard widget in lib/features/explore/widgets/ displaying active season status, challenge progression meters, and earned trophy badges.",
       "ownerRole": "Mobile Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P28-01"
       ],
