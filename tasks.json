@@ -3554,7 +3554,7 @@
       "description": "WebActivityTicker.tsx in src/components/ rendering horizontal ticker stream with pause-on-hover and sound effects.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P34-02"
       ],
@@ -3581,7 +3581,7 @@
       "description": "00025_district_activity_ticker.sql creating get_district_activity_ticker RPC with repository offline fallback.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P34-03"
       ],
