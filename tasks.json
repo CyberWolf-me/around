@@ -3364,7 +3364,7 @@
       "description": "00023_telegram_bot_telemetry.sql creating bot_command_logs table and record_bot_command RPC with repository offline fallback.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P32-03"
       ],
