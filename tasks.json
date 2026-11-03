@@ -4987,7 +4987,7 @@
       "description": "TandoorBakeryEngine modeling traditional Uzbek bread varieties (Obi Non, Patir, Shirmoy, Jizzali), clay tandoor thermal dynamics, and chekich pattern stamps.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P47-04"
       ],
@@ -5013,7 +5013,7 @@
       "description": "TandoorBreadCardWidget rendering fresh batch countdown timer, bread variety pill tags, chekich geometric stamp selector, and hot loaf reservation CTA.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P48-01"
       ],
