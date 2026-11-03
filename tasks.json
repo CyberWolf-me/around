@@ -4601,7 +4601,7 @@
       "description": "CraftWorkshopCardWidget rendering master artisan portrait, craft discipline badge, interactive material tag chips, and instant masterclass RSVP button.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P44-01"
       ],
@@ -4626,7 +4626,7 @@
       "description": "WebCraftStudioShowcase.tsx rendering interactive pottery wheel rotation, mineral glaze color inspector, and masterclass slot picker.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P44-02"
       ],
