@@ -3709,6 +3709,114 @@
         "flutter test test/unit/curated_walk_waypoint_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P36-01",
+      "title": "Venue Atmosphere Soundscape Engine",
+      "domain": "Discovery",
+      "description": "VenueSoundscapeEngine in lib/core/services/venue_soundscape_engine.dart managing ambient sound presets, volume curve multipliers, and venue mood matching.",
+      "ownerRole": "Product & Algorithms Engineer",
+      "priority": "P1",
+      "status": "DONE",
+      "dependencies": [
+        "P35-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/venue_soundscape_engine.dart",
+        "test/unit/venue_soundscape_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Defines 5 core ambient soundscape presets (espressoMurmur, orientalBazaar, courtyardFountain, jazzLounge, quietLibrary).",
+        "Maps venue category and time of day to recommended soundscape preset.",
+        "Generates trilingual localized soundscape titles and descriptions.",
+        "Unit test validates preset mapping, volume gain limits, and localization."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/venue_soundscape_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service."
+    },
+    {
+      "id": "P36-02",
+      "title": "Venue Atmosphere Soundscape Player Widget",
+      "domain": "Discovery",
+      "description": "VenueSoundscapePlayerWidget in lib/features/explore/widgets/venue_soundscape_player_widget.dart rendering floating sound capsule with animated waveform and preset selector.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P36-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/venue_soundscape_player_widget.dart",
+        "test/widget/venue_soundscape_player_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders floating ambient capsule with play/pause button and animated equalizer wave.",
+        "Includes volume control slider and soundscape preset switcher.",
+        "Tapping controls triggers haptic feedback.",
+        "Widget test verifies play/pause state transitions and waveform rendering."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/venue_soundscape_player_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P36-03",
+      "title": "Web Companion Soundscape Controller Component",
+      "domain": "Discovery",
+      "description": "WebSoundscapeController.tsx in src/components/ rendering responsive ambient sound player with Web Audio synthesizer integration.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P36-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebSoundscapeController.tsx",
+        "src/__tests__/webSoundscapeController.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders ambient sound player with volume slider and preset switcher.",
+        "Plays Web Audio synthesized ambient noise/harmonics or preview tones.",
+        "Vitest tests verify state management, preset selection, and localization."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P36-04",
+      "title": "Supabase SQL Schema & Venue Soundscape Presets Migration",
+      "domain": "Backend & Security",
+      "description": "00027_venue_soundscape_presets.sql adding soundscape metadata to places table with get_venue_soundscape_preset RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P36-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00027_venue_soundscape_presets.sql",
+        "lib/data/repositories/venue_soundscape_repository.dart",
+        "test/unit/venue_soundscape_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Migration adds soundscape_preset column to places table with default mappings.",
+        "RPC get_venue_soundscape_preset returns venue soundscape configuration.",
+        "VenueSoundscapeRepository provides clean offline fallback and Riverpod providers.",
+        "Unit test validates SQL syntax and repository methods."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/venue_soundscape_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
