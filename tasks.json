@@ -3276,6 +3276,114 @@
         "flutter test test/unit/curator_accolades_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P32-01",
+      "title": "Taste Passport & Profile Trophy Cabinet Integration",
+      "domain": "Engagement & Growth",
+      "description": "Integrate CuratorTrophyCabinet into TastePassportScreen and UserProfileScreen for both personal and community curator views.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "DONE",
+      "dependencies": [
+        "P31-04"
+      ],
+      "affectedPaths": [
+        "lib/features/profile/screens/taste_passport_screen.dart",
+        "lib/features/profile/screens/user_profile_screen.dart",
+        "test/widget/taste_passport_accolades_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "TastePassportScreen renders CuratorTrophyCabinet with live/offline accolades.",
+        "UserProfileScreen displays CuratorTrophyCabinet for visited curators.",
+        "Widget test verifies rendering of crowns and trophies on passport screen."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/taste_passport_accolades_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI integration."
+    },
+    {
+      "id": "P32-02",
+      "title": "Web Companion Profile Screen Trophy Cabinet Integration",
+      "domain": "Engagement & Growth",
+      "description": "Render WebTrophyCabinet inside src/screens/ProfileScreen.tsx with interactive audio tactile responses.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P32-01"
+      ],
+      "affectedPaths": [
+        "src/screens/ProfileScreen.tsx",
+        "src/__tests__/webProfileTrophyCabinet.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "ProfileScreen renders WebTrophyCabinet component for own and visited profiles.",
+        "Plays Web Audio cues on trophy interaction.",
+        "Vitest test suite verifies presence and interaction in ProfileScreen."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web UI integration."
+    },
+    {
+      "id": "P32-03",
+      "title": "Telegram Bot Interactive Command Dispatcher",
+      "domain": "Engagement & Growth",
+      "description": "TelegramBotCommandHandler in lib/core/services/telegram_bot_command_handler.dart parsing commands and generating rich Mini App launch payloads.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P32-02"
+      ],
+      "affectedPaths": [
+        "lib/core/services/telegram_bot_command_handler.dart",
+        "test/unit/telegram_bot_command_handler_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Handles /start, /passport, /trophies, /routes, and /help bot commands.",
+        "Generates Telegram Bot API compliant Markdown and inline keyboard JSON.",
+        "Supports trilingual responses across UZ, RU, and EN.",
+        "Unit test validates command routing and button URL formats."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/telegram_bot_command_handler_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service."
+    },
+    {
+      "id": "P32-04",
+      "title": "Supabase SQL Schema & Bot Command Telemetry Migration",
+      "domain": "Backend & Security",
+      "description": "00023_telegram_bot_telemetry.sql creating bot_command_logs table and record_bot_command RPC with repository offline fallback.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P32-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00023_telegram_bot_telemetry.sql",
+        "lib/data/repositories/telegram_bot_repository.dart",
+        "test/unit/telegram_bot_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates bot_command_logs table with indexes and RLS policies.",
+        "Defines idempotent record_bot_command RPC.",
+        "TelegramBotRepository implements clean offline fallback.",
+        "Unit test verifies SQL syntax and repository methods."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/telegram_bot_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
