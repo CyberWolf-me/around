@@ -3016,7 +3016,7 @@
       "description": "telegramLaunchBridge.ts in src/services/ extracting start_param from window.Telegram.WebApp or query parameters and routing directly to content.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P29-02"
       ],
