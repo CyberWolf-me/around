@@ -4910,7 +4910,7 @@
       "description": "SilkPaperCardWidget rendering atelier credentials, mulberry pulp paper stages, calligraphy script preview, and masterclass reservation CTA.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P47-01"
       ],
@@ -4935,7 +4935,7 @@
       "description": "WebSilkPaperWorkshop.tsx rendering 4-step mulberry paper crafting simulator (Soaking, Mashing, Sieve Pressing, Agate Stone Burnishing) and calligraphy scroll generator.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P47-02"
       ],
