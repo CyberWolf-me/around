@@ -3817,6 +3817,114 @@
         "flutter test test/unit/venue_soundscape_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P37-01",
+      "title": "Neighborhood Heatmap & Spatial Clustering Engine",
+      "domain": "Discovery",
+      "description": "NeighborhoodClusterEngine in lib/core/services/neighborhood_cluster_engine.dart clustering spatial drops into privacy-safe neighborhood activity hotspots.",
+      "ownerRole": "Product & Algorithms Engineer",
+      "priority": "P1",
+      "status": "DONE",
+      "dependencies": [
+        "P36-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/neighborhood_cluster_engine.dart",
+        "test/unit/neighborhood_cluster_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Clusters geographic coordinates into 350m grid cells without exposing private exact coordinates.",
+        "Calculates cluster heat intensity (serene, lively, buzzing, peak).",
+        "Generates trilingual localized cluster summaries across Uzbek, Russian, and English.",
+        "Unit test validates clustering math, intensity thresholds, and localization."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/neighborhood_cluster_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service."
+    },
+    {
+      "id": "P37-02",
+      "title": "Neighborhood Cluster Map Overlay Widget",
+      "domain": "Discovery",
+      "description": "NeighborhoodClusterOverlayWidget in lib/features/explore/widgets/neighborhood_cluster_overlay_widget.dart rendering animated hotspot badges with heat intensity halos.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P37-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/neighborhood_cluster_overlay_widget.dart",
+        "test/widget/neighborhood_cluster_overlay_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders animated cluster badge with heat intensity halo and drop count.",
+        "Tapping cluster emits haptic feedback and invokes onClusterTap callback.",
+        "Widget test validates heat styling, badge numbers, and tap callbacks."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/neighborhood_cluster_overlay_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P37-03",
+      "title": "Web Companion Cluster Heatmap Component",
+      "domain": "Discovery",
+      "description": "WebNeighborhoodHeatmap.tsx in src/components/ rendering responsive SVG grid heatmap with hover inspection and Web Audio effects.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P37-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebNeighborhoodHeatmap.tsx",
+        "src/__tests__/webNeighborhoodHeatmap.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders SVG/Canvas heat grid representing Tashkent districts.",
+        "Displays hover inspection card showing top venues and intensity.",
+        "Plays Web Audio sound effect on hotspot click.",
+        "Vitest tests verify cluster calculations and interactive states."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P37-04",
+      "title": "Supabase SQL Schema & Spatial Cluster Aggregation RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00028_neighborhood_drop_clusters.sql creating get_neighborhood_drop_clusters RPC with PostGIS spatial grid aggregation.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P37-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00028_neighborhood_drop_clusters.sql",
+        "lib/data/repositories/neighborhood_cluster_repository.dart",
+        "test/unit/neighborhood_cluster_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates get_neighborhood_drop_clusters RPC utilizing PostGIS spatial grid aggregation.",
+        "Enforces RLS privacy filters (hide_visits_history = false, privacy = 'public').",
+        "NeighborhoodClusterRepository implements clean offline fallback and Riverpod providers.",
+        "Unit test validates SQL syntax and repository methods."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/neighborhood_cluster_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
