@@ -1,4 +1,4 @@
--- Migration 00028: Neighborhood Drop Clusters RPC
+-- Migration 00027: Neighborhood Drop Clusters RPC
 -- Computes privacy-safe spatial grid clusters of community activity across Tashkent districts.
 
 CREATE OR REPLACE FUNCTION public.get_neighborhood_drop_clusters(

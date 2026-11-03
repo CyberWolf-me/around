@@ -6,8 +6,8 @@ import 'package:around_app/data/repositories/metro_stamp_repository.dart';
 
 void main() {
   group('P39-04: Metro Station Stamps RPC & Repository Tests', () {
-    test('migration 00030_metro_station_stamps.sql is syntactically hardened', () {
-      final file = File('supabase/migrations/00030_metro_station_stamps.sql');
+    test('migration 00028_metro_station_stamps.sql is syntactically hardened', () {
+      final file = File('supabase/migrations/00028_metro_station_stamps.sql');
       expect(file.existsSync(), isTrue);
 
       final sql = file.readAsStringSync();

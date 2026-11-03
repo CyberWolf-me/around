@@ -6,8 +6,8 @@ import 'package:around_app/data/repositories/neighborhood_cluster_repository.dar
 
 void main() {
   group('P37-04: Neighborhood Drop Clusters RPC & Repository Tests', () {
-    test('migration 00028_neighborhood_drop_clusters.sql is syntactically hardened', () {
-      final file = File('supabase/migrations/00028_neighborhood_drop_clusters.sql');
+    test('migration 00027_neighborhood_drop_clusters.sql is syntactically hardened', () {
+      final file = File('supabase/migrations/00027_neighborhood_drop_clusters.sql');
       expect(file.existsSync(), isTrue);
 
       final sql = file.readAsStringSync();

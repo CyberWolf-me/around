@@ -1,4 +1,4 @@
--- Migration 00030: Metro Station Passport Stamps & Check-In Seals Schema & RPC
+-- Migration 00028: Metro Station Passport Stamps & Check-In Seals Schema & RPC
 -- Enables explorers to collect ceramic stamps for visiting stations and venues across the Tashkent Metro network.
 
 CREATE TABLE IF NOT EXISTS public.user_metro_stamps (
