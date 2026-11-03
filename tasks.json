@@ -4832,7 +4832,7 @@
       "description": "WebMetroMosaicGallery.tsx rendering metro line navigation tabs, station mosaic zoom inspector, architectural spotlight, and exploration stats.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P46-02"
       ],
@@ -4857,7 +4857,7 @@
       "description": "00037_metro_mosaic_stamps.sql creating metro_stations and metro_mosaic_stamps tables, RLS policies, and collect_metro_mosaic_stamp RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P46-03"
       ],
