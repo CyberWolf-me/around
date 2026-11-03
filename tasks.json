@@ -4093,7 +4093,7 @@
       "description": "WebMetroStampShelf.tsx rendering responsive SVG ceramic seals, line filter tabs, and Web Audio stamp click effects.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P39-02"
       ],
@@ -4119,7 +4119,7 @@
       "description": "00030_metro_station_stamps.sql creating user_metro_stamps table, RLS policies, and claim_metro_station_stamp RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P39-03"
       ],
