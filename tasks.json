@@ -4960,7 +4960,7 @@
       "description": "00038_silk_paper_calligraphy.sql creating silk_paper_ateliers, calligraphy_scripts, and user_paper_workshops tables, RLS policies, and reserve_silk_paper_workshop RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P47-03"
       ],
@@ -4977,6 +4977,109 @@
       "verificationCommands": [
         "flutter analyze lib/ test/ --no-pub",
         "flutter test test/unit/silk_paper_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P48-01",
+      "title": "Tashkent Traditional Bread (Non) Guild & Tandoor Bakeries Engine",
+      "domain": "Experiences",
+      "description": "TandoorBakeryEngine modeling traditional Uzbek bread varieties (Obi Non, Patir, Shirmoy, Jizzali), clay tandoor thermal dynamics, and chekich pattern stamps.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P47-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/tandoor_bakery_engine.dart",
+        "test/unit/tandoor_bakery_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Models BreadVariety, ChekichPattern, and TandoorBakeryVenue with baking temperature and batch timing telemetry.",
+        "Calculates fresh batch readiness timer and awards +30 XP per bakery discovery.",
+        "Pure Dart service with unit test coverage."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/tandoor_bakery_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service."
+    },
+    {
+      "id": "P48-02",
+      "title": "Tandoor Bread Stamp & Fresh Batch Card Widget",
+      "domain": "Experiences",
+      "description": "TandoorBreadCardWidget rendering fresh batch countdown timer, bread variety pill tags, chekich geometric stamp selector, and hot loaf reservation CTA.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P48-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/tandoor_bread_card_widget.dart",
+        "test/widget/tandoor_bread_card_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Interactive bakery card with fresh hot batch countdown, chekich pattern inspector, and instant reservation CTA.",
+        "Widget test validates tap interactions, countdown timer, and trilingual copy."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/tandoor_bread_card_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P48-03",
+      "title": "Web Companion Chekich Bread Stamp & Tandoor Heat Simulator",
+      "domain": "Experiences",
+      "description": "WebTandoorBakeryViewer.tsx rendering interactive chekich bread center puncture stamping simulator, clay tandoor heat monitoring, and neighborhood bakery trails.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P48-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebTandoorBakeryViewer.tsx",
+        "src/__tests__/webTandoorBakeryViewer.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Interactive chekich geometric stamp tool with tactile center puncture animation.",
+        "Vitest tests verify bread varieties, baking temperatures, and hot batch inventory states."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P48-04",
+      "title": "Supabase SQL Schema & Tandoor Bakeries Fresh Batch RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00039_tandoor_bakeries.sql creating tandoor_bakeries, bread_varieties, and user_bread_reservations tables, RLS policies, and reserve_fresh_bread_batch RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P48-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00039_tandoor_bakeries.sql",
+        "lib/data/repositories/tandoor_bakery_repository.dart",
+        "test/unit/tandoor_bakery_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates tandoor_bakeries, bread_varieties, and user_bread_reservations tables with RLS and dual-layer privacy invariant.",
+        "Security Definer RPC reserve_fresh_bread_batch deriving caller identity from auth.uid() and awarding +30 XP.",
+        "TandoorBakeryRepository implements offline fallback with default Tashkent bakeries."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/tandoor_bakery_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
