@@ -3601,6 +3601,114 @@
         "flutter test test/unit/district_activity_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P35-01",
+      "title": "Curated Walk Waypoint Progress Engine",
+      "domain": "Experiences",
+      "description": "CuratedWalkWaypointEngine in lib/core/services/curated_walk_waypoint_engine.dart calculating sequential route checkpoint verification, progress percentages, and waypoint badges.",
+      "ownerRole": "Product & Algorithms Engineer",
+      "priority": "P1",
+      "status": "DONE",
+      "dependencies": [
+        "P34-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/curated_walk_waypoint_engine.dart",
+        "test/unit/curated_walk_waypoint_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Evaluates completed vs. remaining waypoints for a route.",
+        "Calculates progress percentage, next target stop, and completion bonus XP.",
+        "Generates trilingual waypoint status copy across Uzbek, Russian, and English.",
+        "Unit test validates progress calculation, route completion detection, and badge metadata."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/curated_walk_waypoint_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service."
+    },
+    {
+      "id": "P35-02",
+      "title": "Curated Walk Trail Progress Stepper Widget",
+      "domain": "Experiences",
+      "description": "CuratedWalkTrailWidget in lib/features/explore/widgets/curated_walk_trail_widget.dart rendering vertical stepper with checkmarks, glowing current target, and tap interaction.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P35-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/curated_walk_trail_widget.dart",
+        "test/widget/curated_walk_trail_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders vertical stepper showing visited, current target, and locked waypoints.",
+        "Shows completion progress bar and total XP reward badge.",
+        "Tapping a waypoint emits haptic feedback and invokes onWaypointTap.",
+        "Widget test validates stepper states, progress rendering, and interaction."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/curated_walk_trail_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P35-03",
+      "title": "Web Companion Trail Stepper Component",
+      "domain": "Experiences",
+      "description": "WebTrailProgressStepper.tsx in src/components/ rendering responsive route checkpoints with progress bar and sound effects.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P35-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebTrailProgressStepper.tsx",
+        "src/__tests__/webTrailProgressStepper.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders horizontal/vertical trail progress stepper with checkpoint pins.",
+        "Plays Web Audio click sound on checkpoint inspection.",
+        "Vitest tests verify progress calculation and interactive states."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P35-04",
+      "title": "Supabase SQL Schema & Waypoint Progress RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00026_curated_walk_waypoints.sql creating record_route_waypoint_progress RPC with repository offline fallback.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P35-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00026_curated_walk_waypoints.sql",
+        "lib/data/repositories/curated_walk_waypoint_repository.dart",
+        "test/unit/curated_walk_waypoint_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates record_route_waypoint_progress RPC validating caller identity via auth.uid().",
+        "Atomically checks in to waypoint and awards bonus XP upon full route completion.",
+        "CuratedWalkWaypointRepository implements clean offline fallback and Riverpod providers.",
+        "Unit test validates SQL syntax and repository methods."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/curated_walk_waypoint_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
