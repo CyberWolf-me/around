@@ -4547,7 +4547,7 @@
       "description": "00034_district_radio_channels.sql creating district_radio_channels and radio_listening_sessions tables, RLS policies, and tune_into_district_radio RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P43-03"
       ],
@@ -4565,6 +4565,109 @@
       "verificationCommands": [
         "flutter analyze lib/ test/ --no-pub",
         "flutter test test/unit/district_radio_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P44-01",
+      "title": "Artisan Craft Workshop & Pottery Studio Engine",
+      "domain": "Experiences",
+      "description": "CraftWorkshopEngine modeling traditional Tashkent ceramic studios, Rishtan blue glaze pottery, wood carving workshops, and silk weaving masterclasses with master credentials and materials taxonomy.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P43-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/craft_workshop_engine.dart",
+        "test/unit/craft_workshop_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Defines CraftStudio, WorkshopMasterclass, and MaterialTag models with master artisan profiles and district anchors.",
+        "Evaluates available masterclass reservation slots, skill level, and completion bonus (+40 XP).",
+        "Pure Dart service with unit test coverage."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/craft_workshop_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service."
+    },
+    {
+      "id": "P44-02",
+      "title": "Artisan Workshop Booking & Studio Showcase Card Widget",
+      "domain": "Experiences",
+      "description": "CraftWorkshopCardWidget rendering master artisan portrait, craft discipline badge, interactive material tag chips, and instant masterclass RSVP button.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P44-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/craft_workshop_card_widget.dart",
+        "test/widget/craft_workshop_card_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Displays studio imagery, artisan master title, materials list, and reservation button.",
+        "Widget test validates tap interactions and trilingual localization."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/craft_workshop_card_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P44-03",
+      "title": "Web Companion Ceramic Studio Sampler & Glaze Palette Inspector",
+      "domain": "Experiences",
+      "description": "WebCraftStudioShowcase.tsx rendering interactive pottery wheel rotation, mineral glaze color inspector, and masterclass slot picker.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P44-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebCraftStudioShowcase.tsx",
+        "src/__tests__/webCraftStudioShowcase.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Interactive mineral glaze swatch selector with color hex codes and artisan notes.",
+        "Vitest tests verify studio metrics, glaze palettes, and masterclass slots."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P44-04",
+      "title": "Supabase SQL Schema & Craft Workshop Reservations RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00035_craft_workshops.sql creating craft_workshops, workshop_masterclasses, and user_workshop_reservations tables, RLS policies, and reserve_craft_masterclass RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P44-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00035_craft_workshops.sql",
+        "lib/data/repositories/craft_workshop_repository.dart",
+        "test/unit/craft_workshop_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates craft_workshops, workshop_masterclasses, and user_workshop_reservations tables with RLS.",
+        "Security Definer RPC reserve_craft_masterclass deriving caller identity from auth.uid() and awarding +40 XP.",
+        "CraftWorkshopRepository implements offline fallback with default Tashkent studios."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/craft_workshop_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
