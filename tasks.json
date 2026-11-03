@@ -5013,7 +5013,7 @@
       "description": "TandoorBreadCardWidget rendering fresh batch countdown timer, bread variety pill tags, chekich geometric stamp selector, and hot loaf reservation CTA.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P48-01"
       ],
@@ -5038,7 +5038,7 @@
       "description": "WebTandoorBakeryViewer.tsx rendering interactive chekich bread center puncture stamping simulator, clay tandoor heat monitoring, and neighborhood bakery trails.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P48-02"
       ],
