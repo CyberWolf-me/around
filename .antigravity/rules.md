@@ -8,3 +8,10 @@
    - `flutter test` exits `0`
    - `npm run lint && npm test` exits `0`
    - `PRODUCT_CAPABILITIES.md` and `tasks.json` are updated in the same commit.
+5. **Rule H — Data Over Bespoke Engines (Anti-Bloat Guardrail)**:
+   - NEVER create dedicated SQL tables, migrations, Dart services, or custom UI widgets for individual venue categories, cultural themes, food items, or crafts (e.g., tea pouring, bread stamping, paper burnishing, synth sequencers, coal heat monitors).
+   - New city themes, trails, and cultural highlights must ALWAYS be represented as data rows inside existing `public.places`, `public.collections`, `public.collection_items`, and `public.curated_crawls` schemas.
+6. **Rule I — Strict 4-Tab Surface & Complexity Cap**:
+   - The app must maintain a maximum of 4 top-level tabs (`Feed`, `Explore`, `Saved`, `Profile`).
+   - Before proposing any new task in `tasks.json`, the CEO Planner must verify whether an existing screen or table can support the use case via configuration or seed data, and must prioritize bug fixes, performance, localization (`UZ/RU/EN`), and test reliability over new UI widgets.
+

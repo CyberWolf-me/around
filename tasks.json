@@ -5189,107 +5189,122 @@
     },
     {
       "id": "P50-01",
-      "title": "Tashkent Herbal Apothecary & Copper Alembic Distillation Engine",
-      "domain": "Experiences",
-      "description": "HerbalApothecaryEngine modeling centuries-old folk phytotherapy, wild mountain botanicals (yalpiz, dalachoy, kiyiko't, atirgul), copper alembic distillation mechanics, and consultation bookings.",
-      "ownerRole": "Flutter & Web Product Engineer",
-      "priority": "P1",
-      "status": "IN_PROGRESS",
+      "title": "Convert Phases 41-49 Cultural Niche Engines from Code to Data",
+      "domain": "Collections & Crawls",
+      "description": "Harvest authentic Tashkent cultural content (Modernist Architecture, Artisan Workshops, Specialty Coffee Roasteries, Open-Air Cinemas, Chaykhanas, Metro Mosaics, Silk Paper, Tandoor Bakeries, Puppet Theater) into public.places, public.collections, and public.curated_crawls seed data. Prune bespoke single-category Dart/TS engines, widgets, and tests.",
+      "ownerRole": "Principal Product Engineer",
+      "priority": "P0",
+      "status": "DONE",
       "dependencies": [
         "P49-04"
       ],
       "affectedPaths": [
-        "lib/core/services/herbal_apothecary_engine.dart",
-        "test/unit/herbal_apothecary_engine_test.dart"
+        "supabase/seed.sql",
+        "lib/data/repositories/places_repository.dart",
+        "lib/data/repositories/saved_places_repository.dart",
+        "src/data/mockData.ts",
+        "lib/core/services/",
+        "lib/features/explore/widgets/"
       ],
       "acceptanceCriteria": [
-        "Domain models for HerbalApothecaryShop, BotanicalHerb, DistillationHydrosol, and HerbalRemedyConsultation.",
-        "Pure Dart HerbalApothecaryEngine with steam condensation yield calculations, herb filtering, and +30 XP booking logic.",
-        "Comprehensive unit test coverage verifying herb medicinal qualities, distillation physics, and booking records."
+        "All authentic Tashkent venues, routes, and historical notes from Phases 41-49 converted to curated collections and crawls seed data.",
+        "Single-purpose cultural sub-engines, cards, and web preview components safely removed.",
+        "Zero broken imports, zero compile errors, all tests pass."
       ],
       "verificationCommands": [
-        "flutter analyze lib/ test/ --no-pub",
-        "flutter test test/unit/herbal_apothecary_engine_test.dart"
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm run lint",
+        "npm test -- --run"
       ],
-      "riskAssessment": "Low: Pure Dart domain service."
+      "riskAssessment": "Medium: Removing single-purpose niche engines while preserving all core application capabilities."
     },
     {
       "id": "P50-02",
-      "title": "Botanical Elixir & Alembic Hydrosol Card Widget",
-      "domain": "Experiences",
-      "description": "HerbalApothecaryCardWidget displaying botanical apothecary credentials, live copper still distillation status, remedy blend selector, and consultation booking CTA.",
-      "ownerRole": "Flutter & Web Product Engineer",
-      "priority": "P1",
-      "status": "BACKLOG",
+      "title": "70% Gamification Pruning & Unified City Passport Consolidation",
+      "domain": "Engagement & Profile",
+      "description": "Retain only the two high-signal spatial mechanics: District Passport Stamps and Territory Crowns. Prune redundant trophy walls, ceremony modals, hall-of-fame popups, web soundscape players, and Sunday retrospective popups into a unified City Passport section on ProfileScreen.",
+      "ownerRole": "Mobile & Web Product Engineer",
+      "priority": "P0",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P50-01"
       ],
       "affectedPaths": [
-        "lib/features/explore/widgets/herbal_apothecary_card_widget.dart",
-        "test/widget/herbal_apothecary_card_widget_test.dart"
+        "lib/features/profile/screens/profile_screen.dart",
+        "lib/features/profile/widgets/",
+        "src/components/"
       ],
       "acceptanceCriteria": [
-        "Herbal green & copper alembic styled Flutter card with botanical taxonomy tags and distillation temperature indicators.",
-        "Interactive botanical blend selector and consultation reservation CTA with +30 XP feedback.",
-        "Passing widget tests verifying render hierarchy, selection toggles, and callback dispatches."
+        "District Passport Stamps (12 districts + Metro seals) and Territory Crowns retained and consolidated.",
+        "Redundant trophy walls, ceremony modals, and audio fanfares cleanly pruned.",
+        "ProfileScreen renders unified City Passport cleanly with zero regression."
       ],
       "verificationCommands": [
-        "flutter analyze lib/ test/ --no-pub",
-        "flutter test test/widget/herbal_apothecary_card_widget_test.dart"
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm run lint",
+        "npm test -- --run"
       ],
-      "riskAssessment": "Low: Flutter UI widget."
+      "riskAssessment": "Low: UI consolidation and pruning."
     },
     {
       "id": "P50-03",
-      "title": "Web Companion Copper Alembic Steam Distillation Simulator",
-      "domain": "Experiences",
-      "description": "WebHerbalDistilleryViewer.tsx rendering interactive copper alembic condenser cooling gauge, botanical oil extraction monitor, and apothecary trail inspector.",
-      "ownerRole": "Web Companion Engineer",
-      "priority": "P1",
+      "title": "Supabase Migration Audit, Deduplication & Deterministic Ordering",
+      "domain": "Backend & Security",
+      "description": "Audit supabase/migrations/, eliminate dropped niche tables, deduplicate any colliding prefixes, and ensure strictly sequential 5-digit ordering with full RLS coverage.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P0",
       "status": "BACKLOG",
       "dependencies": [
         "P50-02"
       ],
       "affectedPaths": [
-        "src/components/WebHerbalDistilleryViewer.tsx",
-        "src/__tests__/webHerbalDistilleryViewer.test.ts"
+        "supabase/migrations/",
+        "supabase/tests/rls_authorization_test.sql"
       ],
       "acceptanceCriteria": [
-        "Interactive copper still boiler temperature & steam condensation yield simulator.",
-        "Vitest tests verifying botanical herbs, medicinal uses, distillation yield math, and price formatting."
+        "Strictly unique, monotonically increasing 5-digit migration prefixes.",
+        "All retained tables enforce ROW LEVEL SECURITY with auth.uid() and block precedence checks.",
+        "RLS authorization test suite passes with non-empty assertions."
       ],
       "verificationCommands": [
-        "npm run lint",
-        "npm test -- --run"
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "npm run lint"
       ],
-      "riskAssessment": "Low: Web companion component."
+      "riskAssessment": "Medium: Database migration deduplication."
     },
     {
       "id": "P50-04",
-      "title": "Supabase SQL Schema & Botanical Remedy Consultation RPC Migration",
-      "domain": "Backend & Security",
-      "description": "00041_herbal_apothecary.sql creating herbal_apothecaries, botanical_herbs, and user_apothecary_consultations tables, RLS policies, and book_apothecary_consultation RPC.",
-      "ownerRole": "Backend & Security Engineer",
-      "priority": "P1",
+      "title": "Core 4-Tab UX Polish, Documentation Sync & v5.0.0-rc.1 Tag",
+      "domain": "Platform & Release",
+      "description": "Verify core 4-tab information architecture (Feed, Explore, Saved, Profile), synchronize ROADMAP.md, PRODUCT_CAPABILITIES.md, and COMPANY_PULSE.md, pass all release gates, and tag v5.0.0-rc.1.",
+      "ownerRole": "CTO / Release Lead",
+      "priority": "P0",
       "status": "BACKLOG",
       "dependencies": [
         "P50-03"
       ],
       "affectedPaths": [
-        "supabase/migrations/00041_herbal_apothecary.sql",
-        "lib/data/repositories/herbal_apothecary_repository.dart",
-        "test/unit/herbal_apothecary_rpc_test.dart"
+        "ROADMAP.md",
+        "PRODUCT_CAPABILITIES.md",
+        "COMPANY_PULSE.md",
+        "tasks.json",
+        "pubspec.yaml",
+        "package.json"
       ],
       "acceptanceCriteria": [
-        "Creates herbal_apothecaries, botanical_herbs, and user_apothecary_consultations tables with RLS and dual-layer privacy invariant.",
-        "Security Definer RPC book_apothecary_consultation deriving caller identity from auth.uid() and awarding +30 XP.",
-        "HerbalApothecaryRepository implements offline fallback with default Tashkent apothecary shops."
+        "Strict 4-tab surface cap enforced with clean UX hierarchy.",
+        "All documentation and capability matrices synchronized.",
+        "Annotated tag v5.0.0-rc.1 created and pushed with 100% green tests."
       ],
       "verificationCommands": [
-        "flutter analyze lib/ test/ --no-pub",
-        "flutter test test/unit/herbal_apothecary_rpc_test.dart"
+        "flutter analyze --fatal-infos --fatal-warnings",
+        "flutter test",
+        "npm run lint",
+        "npm test -- --run"
       ],
-      "riskAssessment": "Low: Idempotent Supabase SQL migration."
+      "riskAssessment": "Low: Final release candidate verification."
     }
   ],
   "loopConfig": {

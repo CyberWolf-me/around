@@ -29,6 +29,26 @@ class CollectionsNotifier extends Notifier<List<CollectionModel>> {
       createdAt: DateTime.now().subtract(const Duration(days: 7)),
       placeIds: const ['steam', 'tims'],
     ),
+    CollectionModel(
+      id: 'col-modernist-1',
+      ownerId: '00000000-0000-0000-0000-000000000001',
+      title: 'Soviet Modernism & Brutalist Icons',
+      description: 'Monumental 1966-1985 concrete sun-screens, shell domes, and landmark silhouettes.',
+      audience: 'public',
+      isCollaborative: false,
+      createdAt: DateTime.now().subtract(const Duration(days: 10)),
+      placeIds: const ['hotel-uzbekistan', 'panorama-cinema', 'tashkent-tv-tower'],
+    ),
+    CollectionModel(
+      id: 'col-heritage-1',
+      ownerId: '00000000-0000-0000-0000-000000000001',
+      title: 'Old City Chaykhanas & Tandoor Guild',
+      description: 'Hot Obi non fresh from clay tandoors and shade-dappled tapchans in Old Tashkent.',
+      audience: 'public',
+      isCollaborative: true,
+      createdAt: DateTime.now().subtract(const Duration(days: 12)),
+      placeIds: const ['chorsu-kattabog-bakery', 'chorsu-chinor-chaykhana', 'chorsu'],
+    ),
   ];
 
   @override
