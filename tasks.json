@@ -3384,6 +3384,114 @@
         "flutter test test/unit/telegram_bot_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P33-01",
+      "title": "District Crown Leaderboard & Standing Engine",
+      "domain": "Gamification & Reputation",
+      "description": "DistrictCrownLeaderboardEngine in lib/core/services/district_crown_leaderboard_engine.dart computing district podiums, gap to crown, and rank deltas.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "DONE",
+      "dependencies": [
+        "P32-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/district_crown_leaderboard_engine.dart",
+        "test/unit/district_crown_leaderboard_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Ranks curators across 12 Tashkent districts by crowns, season XP, and places visited.",
+        "Calculates gap to #1 crown champion and podium status.",
+        "Supports trilingual district name resolution across UZ, RU, and EN.",
+        "Unit test validates ranking logic, tie-breakers, and edge cases."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/district_crown_leaderboard_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service."
+    },
+    {
+      "id": "P33-02",
+      "title": "District Crown Podium & Leaderboard Widget",
+      "domain": "Engagement & Growth",
+      "description": "DistrictCrownPodiumWidget in lib/features/explore/widgets/district_crown_podium_widget.dart displaying top 3 podium contenders and runner-up standings.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P33-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/district_crown_podium_widget.dart",
+        "test/widget/district_crown_podium_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders 1st/2nd/3rd podium columns with crown indicators, avatars, and XP points.",
+        "Lists runner-up curators with rank numbers and gap to next rank.",
+        "Tapping a curator triggers haptic feedback and navigates to profile.",
+        "Widget test verifies podium layout and tap interactions."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/district_crown_podium_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P33-03",
+      "title": "Web Companion District Crown Board Component",
+      "domain": "Engagement & Growth",
+      "description": "DistrictCrownBoard.tsx in src/components/ rendering responsive district switcher, podium cards, and Web Audio effects.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P33-02"
+      ],
+      "affectedPaths": [
+        "src/components/DistrictCrownBoard.tsx",
+        "src/__tests__/districtCrownBoard.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders district dropdown filter and top 3 champion podium.",
+        "Plays Web Audio sound effects on podium clicks and district change.",
+        "Vitest test suite verifies podium rendering and district filtering."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P33-04",
+      "title": "Supabase SQL Schema & District Crown Standings RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00024_district_crown_standings.sql creating get_district_crown_standings RPC with repository offline fallback.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P33-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00024_district_crown_standings.sql",
+        "lib/data/repositories/district_crown_repository.dart",
+        "test/unit/district_crown_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates get_district_crown_standings RPC returning real-time district leaderboards.",
+        "Enforces RLS caller invariants and spatial boundaries.",
+        "DistrictCrownRepository implements clean offline fallback and Riverpod providers.",
+        "Unit test validates SQL syntax and repository methods."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/district_crown_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
