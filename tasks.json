@@ -3167,6 +3167,115 @@
         "flutter test test/unit/season_hall_of_fame_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P31-01",
+      "title": "Curator Accolades & Mastery Engine",
+      "domain": "Gamification & Reputation",
+      "description": "CuratorAccoladesEngine in lib/core/services/curator_accolades_engine.dart computing mastery tiers, accolades summaries, and localized titles.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "DONE",
+      "dependencies": [
+        "P30-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/curator_accolades_engine.dart",
+        "test/unit/curator_accolades_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "CuratorAccolades model calculates crowns, seasonal trophies, and district laurels.",
+        "Computes mastery tiers: Grand Master, Tashkent Legend, District Pioneer, Neighborhood Scout.",
+        "Provides localized titles and share summary formatting across UZ, RU, and EN.",
+        "Unit test suite verifies all calculation tiers and edge cases."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/curator_accolades_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service with zero external dependencies."
+    },
+    {
+      "id": "P31-02",
+      "title": "Trophy Cabinet & Accolades Showcase Widget",
+      "domain": "Engagement & Growth",
+      "description": "CuratorTrophyCabinet in lib/features/profile/widgets/curator_trophy_cabinet.dart displaying crowns, gilded trophy cards, modal inspection, and haptic feedback.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P31-01"
+      ],
+      "affectedPaths": [
+        "lib/features/profile/widgets/curator_trophy_cabinet.dart",
+        "test/widget/curator_trophy_cabinet_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders crown count badge, mastery title, and grid of earned seasonal trophies.",
+        "Tapping a trophy opens detailed inspection bottom sheet with completion stats.",
+        "Trilingual localization and haptic tactile feedback on interaction.",
+        "Widget test verifies rendering and tap interactions."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/curator_trophy_cabinet_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P31-03",
+      "title": "Web Companion Trophy Cabinet Component",
+      "domain": "Engagement & Growth",
+      "description": "WebTrophyCabinet.tsx in src/components/ rendering responsive accolades cabinet with audio tactile cues and Vitest coverage.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P31-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebTrophyCabinet.tsx",
+        "src/__tests__/webTrophyCabinet.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders crowns badge, mastery tier badge, and seasonal trophy grid.",
+        "Provides Web Audio celebration cues on hover and selection.",
+        "Fully responsive and adheres to Tashkent design token system.",
+        "Vitest test suite verifies filtering and rendering calculations."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P31-04",
+      "title": "Supabase SQL Schema & Accolades Aggregation RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00022_curator_accolades_aggregation.sql creating get_curator_accolades RPC with auth.uid() caller safety and repository offline fallback.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P31-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00022_curator_accolades_aggregation.sql",
+        "lib/data/repositories/curator_accolades_repository.dart",
+        "test/unit/curator_accolades_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates get_curator_accolades RPC aggregating crowns, trophies, and laurels.",
+        "Enforces RLS caller invariants and least-privilege permissions.",
+        "Repository implements clean offline fallback and Riverpod providers.",
+        "Unit test validates SQL syntax and RPC signature."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/curator_accolades_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
