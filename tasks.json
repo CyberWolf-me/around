@@ -2828,7 +2828,7 @@
       "description": "00018_curator_postcards_and_viral_telemetry.sql adding postcard_shares table with RLS and idempotent RPC record_postcard_share awarding +25 XP.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P27-03"
       ],
