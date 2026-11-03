@@ -3337,7 +3337,7 @@
       "description": "TelegramBotCommandHandler in lib/core/services/telegram_bot_command_handler.dart parsing commands and generating rich Mini App launch payloads.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P32-02"
       ],
@@ -3364,7 +3364,7 @@
       "description": "00023_telegram_bot_telemetry.sql creating bot_command_logs table and record_bot_command RPC with repository offline fallback.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P32-03"
       ],
