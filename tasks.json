@@ -4067,7 +4067,7 @@
       "description": "MetroStampBookWidget displaying circular ceramic stamp seals, line completion progress rings, and stamp detail inspection sheet.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P39-01"
       ],
@@ -4093,7 +4093,7 @@
       "description": "WebMetroStampShelf.tsx rendering responsive SVG ceramic seals, line filter tabs, and Web Audio stamp click effects.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P39-02"
       ],
