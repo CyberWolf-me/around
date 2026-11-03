@@ -3419,7 +3419,7 @@
       "description": "DistrictCrownPodiumWidget in lib/features/explore/widgets/district_crown_podium_widget.dart displaying top 3 podium contenders and runner-up standings.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P33-01"
       ],
@@ -3446,7 +3446,7 @@
       "description": "DistrictCrownBoard.tsx in src/components/ rendering responsive district switcher, podium cards, and Web Audio effects.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P33-02"
       ],

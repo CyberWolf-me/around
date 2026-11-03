@@ -736,3 +736,31 @@ Now that the trophy cabinet exists as an isolated component, it must be integrat
    - In Uzbekistan, Telegram bots are the primary entry point. When users text `/start`, `/passport`, `/trophies`, or `/routes`, the bot should reply with rich Markdown formatting and inline keyboard buttons opening the Around Telegram Mini App directly to those views.
 4. **Supabase SQL Schema & Bot Command Telemetry Migration (`P32-04`)**:
    - `00023_telegram_bot_telemetry.sql` recording bot interactions with rate limiting and caller privacy.
+
+
+---
+
+## Autonomous Product Audit & Replenishment — Phase 33 (November 3, 2026)
+
+### Strategic Evaluation: Milestone 3.2 Complete & District Rivalries
+With Phase 32 delivered and tagged as `v3.2.0-staging.1` (447 Flutter tests, 117 Web tests, zero static analysis warnings), Around has shipped the embedded trophy cabinet on personal and community taste passports, web profile trophy integration, and Telegram bot command dispatching.
+
+### The Adversarial Growth Audit for Phase 33:
+In Strava, segment leaderboards create local rivalries between neighbors and friends ("Who is the local legend on this hill?"). In Tashkent, city identity is deeply rooted in districts (Mirabad vs. Chilanzar vs. Yunusabad vs. Old City).
+1. **District Crown Podiums (`P33-01` & `P33-02`)**:
+   - Each of Tashkent's 12 districts needs a live Crown Podium showing the #1 reigning champion and podium contenders (2nd and 3rd place).
+   - Curators should see exactly how many drops/XP separate them from claiming the district crown before monthly rollover.
+2. **Web Companion District Crown Board (`P33-03`)**:
+   - Web visitors and Telegram Mini App users need a responsive district leaderboard component to track district rivalries with celebration audio.
+3. **Database Aggregation RPC (`P33-04`)**:
+   - An optimized PostGIS + Profile database function `get_district_crown_standings` that computes real-time district standings with dual-layer RLS.
+
+### Phase 33 Work Breakdown:
+1. **District Crown Leaderboard & Standing Engine (`P33-01`)**:
+   - `DistrictCrownLeaderboardEngine` in `lib/core/services/district_crown_leaderboard_engine.dart` computing podium rankings, rank deltas, and gap to crown.
+2. **District Crown Podium & Leaderboard Widget (`P33-02`)**:
+   - `DistrictCrownPodiumWidget` in `lib/features/explore/widgets/district_crown_podium_widget.dart` rendering the 1st/2nd/3rd podium with crowns and haptic profile links.
+3. **Web Companion District Crown Board (`P33-03`)**:
+   - `DistrictCrownBoard.tsx` in `src/components/` rendering district switcher, podium cards, and audio tactile effects.
+4. **Supabase SQL Schema & District Crown Standings RPC Migration (`P33-04`)**:
+   - `00024_district_crown_standings.sql` creating `get_district_crown_standings` RPC with repository offline fallback.
