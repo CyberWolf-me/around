@@ -3042,7 +3042,7 @@
       "description": "00020_referral_deep_links_and_launch_telemetry.sql adding referral_launches table with RLS and idempotent RPC record_telegram_launch awarding bonus XP.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P29-03"
       ],
