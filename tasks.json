@@ -4857,7 +4857,7 @@
       "description": "00037_metro_mosaic_stamps.sql creating metro_stations and metro_mosaic_stamps tables, RLS policies, and collect_metro_mosaic_stamp RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P46-03"
       ],
@@ -4874,6 +4874,109 @@
       "verificationCommands": [
         "flutter analyze lib/ test/ --no-pub",
         "flutter test test/unit/metro_mosaic_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P47-01",
+      "title": "Tashkent Mulberry Silk Paper & Calligraphy Manuscript Engine",
+      "domain": "Experiences",
+      "description": "SilkPaperCalligraphyEngine modeling mulberry bark pulp fermentation, agate polishing stages, calligraphy scripts (Nastaliq, Thuluth, Kufic), and atelier masterclass credentials.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P46-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/silk_paper_calligraphy_engine.dart",
+        "test/unit/silk_paper_calligraphy_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Models SilkPaperAtelier, CalligraphyScript, and PaperCraftStage with botanical parameters.",
+        "Calculates paper smoothness rating, drying times, and awards +35 XP per manuscript workshop.",
+        "Pure Dart service with unit test coverage."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/silk_paper_calligraphy_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service."
+    },
+    {
+      "id": "P47-02",
+      "title": "Silk Paper Atelier & Calligraphy Masterclass Card Widget",
+      "domain": "Experiences",
+      "description": "SilkPaperCardWidget rendering atelier credentials, mulberry pulp paper stages, calligraphy script preview, and masterclass reservation CTA.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P47-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/silk_paper_card_widget.dart",
+        "test/widget/silk_paper_card_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Interactive paper studio card with script sample badges, pulp drying timeline, and tactile reservation CTA.",
+        "Widget test validates tap interactions, script selection, and trilingual copy."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/silk_paper_card_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P47-03",
+      "title": "Web Companion Mulberry Bark Soaking & Calligraphy Scroll Workshop",
+      "domain": "Experiences",
+      "description": "WebSilkPaperWorkshop.tsx rendering 4-step mulberry paper crafting simulator (Soaking, Mashing, Sieve Pressing, Agate Stone Burnishing) and calligraphy scroll generator.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P47-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebSilkPaperWorkshop.tsx",
+        "src/__tests__/webSilkPaperWorkshop.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Interactive 4-step paper craft timeline with stone burnishing smoothness meter.",
+        "Vitest tests verify paper stages, calligraphy script taxonomy, and workshop seat reservations."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P47-04",
+      "title": "Supabase SQL Schema & Silk Paper Atelier Masterclasses RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00038_silk_paper_calligraphy.sql creating silk_paper_ateliers, calligraphy_scripts, and user_paper_workshops tables, RLS policies, and reserve_silk_paper_workshop RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P47-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00038_silk_paper_calligraphy.sql",
+        "lib/data/repositories/silk_paper_repository.dart",
+        "test/unit/silk_paper_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates silk_paper_ateliers, calligraphy_scripts, and user_paper_workshops tables with RLS and dual-layer privacy invariant.",
+        "Security Definer RPC reserve_silk_paper_workshop deriving caller identity from auth.uid() and awarding +35 XP.",
+        "SilkPaperRepository implements offline fallback with default Tashkent ateliers."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/silk_paper_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
