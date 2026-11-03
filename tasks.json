@@ -2847,6 +2847,113 @@
         "flutter test test/unit/curator_postcard_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P28-01",
+      "title": "Monthly Curator Seasons & Trophy Engine",
+      "domain": "Engagement & Growth",
+      "description": "SeasonTrophyEngine in lib/core/services/ calculating current season, active monthly challenges, trophy qualification rules, and localized trophy narratives.",
+      "ownerRole": "Mobile Engineer",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P27-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/season_trophy_engine.dart",
+        "test/unit/season_trophy_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Calculates current season ID (e.g. '2026-11') and season time bounds.",
+        "Evaluates user progression against monthly challenges (District Explorer, Metro Nomad, Weekend Rhythm).",
+        "Unlocks Bronze, Silver, and Gold seasonal trophies based on target completion.",
+        "Full trilingual support across Uzbek, Russian, and English."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/season_trophy_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart domain service."
+    },
+    {
+      "id": "P28-02",
+      "title": "Interactive Season Trophy Wall Widget",
+      "domain": "Engagement & Growth",
+      "description": "SeasonTrophyCard widget in lib/features/explore/widgets/ displaying active season status, challenge progression meters, and earned trophy badges.",
+      "ownerRole": "Mobile Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P28-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/season_trophy_card.dart",
+        "test/widget/season_trophy_card_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders monthly challenge progress rings with target metrics.",
+        "Displays earned seasonal trophy icons with tier badges (Gold, Silver, Bronze).",
+        "Displays remaining days countdown in current month.",
+        "Widget tests verify rendering across all 3 languages."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/season_trophy_card_test.dart"
+      ],
+      "riskAssessment": "Low: Reusable UI component."
+    },
+    {
+      "id": "P28-03",
+      "title": "Web Companion Season Standings & Trophy Showcase",
+      "domain": "Engagement & Growth",
+      "description": "SeasonTrophyShowcase.tsx in src/components/ rendering seasonal standings, trophy showcase shelf, and Web Audio celebratory effects.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P28-02"
+      ],
+      "affectedPaths": [
+        "src/components/SeasonTrophyShowcase.tsx",
+        "src/__tests__/seasonTrophyShowcase.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders seasonal trophy shelf with unlocked and locked challenge cards.",
+        "Plays audio-tactile effects on trophy inspection.",
+        "Vitest test suite verifies season calculations and challenge completion logic."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P28-04",
+      "title": "Supabase SQL Schema & Seasonal Snapshot RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00019_curator_seasons_and_trophy_wall.sql adding seasonal_trophies table with RLS and idempotent RPC claim_seasonal_trophy awarding bonus XP.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P28-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00019_curator_seasons_and_trophy_wall.sql",
+        "test/unit/season_trophy_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates seasonal_trophies table with foreign key constraints.",
+        "Creates idempotent claim_seasonal_trophy RPC awarding seasonal XP bonuses.",
+        "Enforces RLS policies with auth.uid() caller invariants.",
+        "Unit test validates SQL syntax and RPC signature."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/season_trophy_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {

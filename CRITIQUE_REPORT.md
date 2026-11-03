@@ -606,3 +606,28 @@ Currently in Around, when a curator checks in at Breadly or completes the Miraba
    - `CuratorPostcardGenerator.tsx` in `src/components/` rendering interactive postcard previews with 1:1 vs 9:16 aspect ratio toggling and audio-tactile haptic feedback.
 4. **Supabase SQL Schema & Postcard Share Telemetry RPC Migration (`P27-04`)**:
    - `00018_curator_postcards_and_viral_telemetry.sql` adding `postcard_shares` table with RLS and idempotent RPC `record_postcard_share` awarding `+25 XP`.
+
+
+---
+
+## Autonomous Product Audit & Replenishment — Phase 28 (November 3, 2026)
+
+### Strategic Evaluation: Milestone 2.7 Complete & Monthly Seasons / Trophy Wall
+With Phase 27 delivered and tagged as `v2.7.0-staging.1` (367 Flutter tests, 95 Web tests, zero static analysis warnings), Around has shipped the viral curator postcard and cultural receipt engine.
+
+### The Adversarial Growth Audit for Phase 28:
+In Strava, the core retention mechanism that keeps athletes coming back month after month is **Monthly Challenges & Trophy Badges** (e.g. "November 50k Running Challenge", "Gran Fondo Trophy").
+Without monthly resets:
+1. All-time leaderboards inevitably stagnate. Early adopters who accumulated 5,000+ XP become permanently uncatchable, creating high churn among new users joining in Tashkent.
+2. Curators need fresh monthly objectives (e.g., *Autumn in Tashkent: Discover 5 new tea & coffee spots in Mirabad*, *Subway Explorer: Check in along Chilanzar Line*).
+3. Hard-earned monthly accomplishments must be permanently memorialized on a **Trophy Wall** on the user's profile and taste passport.
+
+### Phase 28 Work Breakdown:
+1. **Monthly Curator Seasons & Trophy Engine (`P28-01`)**:
+   - `SeasonTrophyEngine` in `lib/core/services/season_trophy_engine.dart` computing current season timeframe, monthly active challenges, trophy qualification rules, and localized trophy narratives.
+2. **Interactive Season Trophy Wall Widget (`P28-02`)**:
+   - `SeasonTrophyCard` in `lib/features/explore/widgets/season_trophy_card.dart` rendering seasonal challenge progress rings, gold/silver/bronze trophy badges, and countdown timer to season rollover.
+3. **Web Companion Season Standings & Trophy Showcase (`P28-03`)**:
+   - `SeasonTrophyShowcase.tsx` in `src/components/` rendering interactive trophy showcase, filter by season month, and Web Audio celebration sounds.
+4. **Supabase SQL Schema & Seasonal Snapshot RPC Migration (`P28-04`)**:
+   - `00019_curator_seasons_and_trophy_wall.sql` creating `seasonal_trophies` table with RLS and idempotent `claim_seasonal_trophy` RPC.
