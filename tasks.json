@@ -3492,6 +3492,115 @@
         "flutter test test/unit/district_crown_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P34-01",
+      "title": "Live District Activity Ticker Engine",
+      "domain": "Engagement & Growth",
+      "description": "DistrictActivityTickerEngine in lib/core/services/district_activity_ticker_engine.dart processing real-time community pulses across Tashkent districts.",
+      "ownerRole": "Product & Algorithms Engineer",
+      "priority": "P1",
+      "status": "DONE",
+      "dependencies": [
+        "P33-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/district_activity_ticker_engine.dart",
+        "test/unit/district_activity_ticker_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Parses activity events (drop shared, route completed, crown overtook, place visited).",
+        "Obfuscates raw timestamps to relative human-readable strings (e.g. '2m ago').",
+        "Generates trilingual localized event descriptions across Uzbek, Russian, and English.",
+        "Unit test validates event formatting, type classification, and localization."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/district_activity_ticker_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service."
+    },
+    {
+      "id": "P34-02",
+      "title": "District Activity Ticker Animated Widget",
+      "domain": "Engagement & Growth",
+      "description": "DistrictActivityTickerWidget in lib/features/explore/widgets/district_activity_ticker_widget.dart rendering animated marquee pill with live pulse indicator.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P34-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/district_activity_ticker_widget.dart",
+        "test/widget/district_activity_ticker_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders animated activity marquee with live glowing indicator badge.",
+        "Smoothly cycles through latest district events or shows calm empty state.",
+        "Tapping an event triggers haptic feedback and invokes onEventTap callback.",
+        "Widget test validates animation transitions and user interactions."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/district_activity_ticker_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P34-03",
+      "title": "Web Companion Ambient Activity Ticker Component",
+      "domain": "Engagement & Growth",
+      "description": "WebActivityTicker.tsx in src/components/ rendering horizontal ticker stream with pause-on-hover and sound effects.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P34-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebActivityTicker.tsx",
+        "src/__tests__/webActivityTicker.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders horizontal scrolling ticker of community events across Tashkent.",
+        "Pauses scrolling on cursor hover with interactive event cards.",
+        "Triggers Web Audio pop sound on click.",
+        "Vitest tests verify rendering, filtering, and localization."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P34-04",
+      "title": "Supabase SQL Schema & District Activity Ticker RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00025_district_activity_ticker.sql creating get_district_activity_ticker RPC with repository offline fallback.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P34-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00025_district_activity_ticker.sql",
+        "lib/data/repositories/district_activity_repository.dart",
+        "test/unit/district_activity_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates get_district_activity_ticker RPC aggregating sanitized public events.",
+        "Filters out private accounts and honors hide_visits_history invariant.",
+        "DistrictActivityRepository provides clean offline seed events and Riverpod providers.",
+        "Unit test validates SQL syntax and repository methods."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/district_activity_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
