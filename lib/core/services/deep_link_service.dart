@@ -1,12 +1,24 @@
 import 'package:flutter/services.dart';
+import '../../core/config/app_config.dart';
 import '../../core/services/app_logger.dart';
 
 /// Handles deep link generation, universal URL resolution, and clipboard sharing
 /// for Tashkent venues and community drops.
 class DeepLinkService {
   static const String customScheme = 'around';
-  static const String canonicalWebDomain = 'around.tashkent.app';
-  static const List<String> supportedDomains = [
+
+  /// Resolves the canonical web domain from build environment (e.g. Vercel deployment),
+  /// falling back to the standard domain if unset.
+  static String get canonicalWebDomain {
+    final configured = AppConfig.current.deepLinkDomain.trim();
+    if (configured.isNotEmpty && configured != 'dev.around.tashkent.app') {
+      return configured;
+    }
+    return 'around.tashkent.app';
+  }
+
+  static List<String> get supportedDomains => [
+    canonicalWebDomain.toLowerCase(),
     'around.tashkent.app',
     'around.app',
     'around-discovery.web.app',
@@ -89,7 +101,7 @@ class DeepLinkService {
       // 2. HTTP / HTTPS Universal Link: https://around.tashkent.app/places/:id
       if (uri.scheme == 'http' || uri.scheme == 'https') {
         final domain = uri.host.toLowerCase();
-        if (supportedDomains.contains(domain)) {
+        if (supportedDomains.contains(domain) || domain.endsWith('.vercel.app')) {
           final segments = uri.pathSegments;
           if (segments.isNotEmpty) {
             final section = segments.first.toLowerCase();
