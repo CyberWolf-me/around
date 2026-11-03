@@ -4174,7 +4174,7 @@
       "description": "CuratorTourPlayerWidget rendering album art, audio progress scrubber, tactile previous/next chapter stepper, and venue navigation button.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P40-01"
       ],
@@ -4200,7 +4200,7 @@
       "description": "WebCuratorTourNavigator.tsx rendering responsive audio timeline, chapter list with status badges, and Web Audio play effects.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P40-02"
       ],
