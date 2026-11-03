@@ -2962,7 +2962,7 @@
       "description": "TelegramDeepLinkEngine in lib/core/services/ parsing route, postcard, season, and referral payloads into structured domain navigation targets.",
       "ownerRole": "Mobile Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P28-04"
       ],
