@@ -4807,7 +4807,7 @@
       "description": "MetroMosaicCardWidget rendering line badge, mosaic preview, architectural pill badges, audio guide trigger, and stamp collection.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P46-01"
       ],
@@ -4832,7 +4832,7 @@
       "description": "WebMetroMosaicGallery.tsx rendering metro line navigation tabs, station mosaic zoom inspector, architectural spotlight, and exploration stats.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P46-02"
       ],
