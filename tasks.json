@@ -4781,7 +4781,7 @@
       "description": "MetroMosaicEngine modeling line metadata, station architectural styles, ceramic mosaic compositions, and line exploration progress badges.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P45-04"
       ],
@@ -4807,7 +4807,7 @@
       "description": "MetroMosaicCardWidget rendering line badge, mosaic preview, architectural pill badges, audio guide trigger, and stamp collection.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P46-01"
       ],
