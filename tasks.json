@@ -4468,7 +4468,7 @@
       "description": "DistrictRadioEngine modeling ambient field-recorded live radio frequencies across Tashkent districts (Old City Chorsu Echoes, Mirabad Modern Beat, Yunusabad Night Rain, Yakkasaray Park Breeze) with frequency tuning, live listener telemetry, and audio stream metadata.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P42-04"
       ],
@@ -4495,7 +4495,7 @@
       "description": "DistrictRadioPlayerWidget rendering rotary frequency dial, live animated equalizer wave bars, listener counter badge, and tactile haptic clicks.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P43-01"
       ],
