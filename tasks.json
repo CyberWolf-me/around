@@ -4440,7 +4440,7 @@
       "description": "00033_artisan_tasting_flights.sql creating tasting_flights, tasting_flight_items, and user_tasting_logs tables, RLS policies, and record_tasting_log RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P42-03"
       ],
@@ -4458,6 +4458,113 @@
       "verificationCommands": [
         "flutter analyze lib/ test/ --no-pub",
         "flutter test test/unit/tasting_flight_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P43-01",
+      "title": "District Ambient Sound Radio & Frequency Tuner Engine",
+      "domain": "Experiences",
+      "description": "DistrictRadioEngine modeling ambient field-recorded live radio frequencies across Tashkent districts (Old City Chorsu Echoes, Mirabad Modern Beat, Yunusabad Night Rain, Yakkasaray Park Breeze) with frequency tuning, live listener telemetry, and audio stream metadata.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P42-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/district_radio_engine.dart",
+        "test/unit/district_radio_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Defines RadioStation, RadioTrack, and TuningFrequency models with dial frequencies (MHz) and district anchors.",
+        "Calculates closest station frequency, tuning drift, and simulated live listener counts.",
+        "Awards +25 XP upon 10-minute uninterrupted district radio listening session.",
+        "Unit tests verify frequency tuning, channel lookup, and trilingual copy."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/district_radio_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service with exhaustive unit test coverage."
+    },
+    {
+      "id": "P43-02",
+      "title": "District Radio Dial Tuner & Equalizer Visualizer Widget",
+      "domain": "Experiences",
+      "description": "DistrictRadioPlayerWidget rendering rotary frequency dial, live animated equalizer wave bars, listener counter badge, and tactile haptic clicks.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P43-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/district_radio_player_widget.dart",
+        "test/widget/district_radio_player_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Displays frequency dial, active station callsign, and animated audio equalizer.",
+        "Smooth frequency dragging with haptic feedback ticks on channel lock-on.",
+        "Widget test validates station tuning, equalizer animation, and play/pause controls."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/district_radio_player_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P43-03",
+      "title": "Web Companion District Radio Tuner & White Noise Synthesis",
+      "domain": "Experiences",
+      "description": "WebDistrictRadioTuner.tsx rendering retro-futuristic radio tuner, Web Audio white noise static between channels, and live listener counts.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P43-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebDistrictRadioTuner.tsx",
+        "src/__tests__/webDistrictRadioTuner.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Interactive dial slider with station lock-on snaps.",
+        "Synthesizes soft Web Audio static when between stations.",
+        "Vitest tests verify station tuning, frequency calculations, and audio state."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P43-04",
+      "title": "Supabase SQL Schema & District Radio Channels RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00034_district_radio_channels.sql creating district_radio_channels and radio_listening_sessions tables, RLS policies, and tune_into_district_radio RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P43-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00034_district_radio_channels.sql",
+        "lib/data/repositories/district_radio_repository.dart",
+        "test/unit/district_radio_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates district_radio_channels and radio_listening_sessions tables with RLS policies.",
+        "RPC tune_into_district_radio logs active listener and increments station telemetry.",
+        "DistrictRadioRepository implements offline fallback with default Tashkent stations.",
+        "Unit test validates SQL syntax and repository methods."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/district_radio_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
