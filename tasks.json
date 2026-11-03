@@ -3689,7 +3689,7 @@
       "description": "00026_curated_walk_waypoints.sql creating record_route_waypoint_progress RPC with repository offline fallback.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P35-03"
       ],
