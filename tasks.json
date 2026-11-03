@@ -5281,7 +5281,7 @@
       "description": "Verify core 4-tab information architecture (Feed, Explore, Saved, Profile), synchronize ROADMAP.md, PRODUCT_CAPABILITIES.md, and COMPANY_PULSE.md, pass all release gates, and tag v5.0.0-rc.1.",
       "ownerRole": "CTO / Release Lead",
       "priority": "P0",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P50-03"
       ],
