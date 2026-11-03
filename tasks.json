@@ -3960,7 +3960,7 @@
       "description": "PlaceSoundBiteCardWidget rendering curator avatar, illuminated audio waveform visualizer, and play/pause scrubber controls.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P38-01"
       ],
@@ -3986,7 +3986,7 @@
       "description": "WebSoundBitePlayer.tsx rendering responsive SVG waveform bars with synthetic Web Audio preview generator.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P38-02"
       ],
