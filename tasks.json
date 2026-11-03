@@ -3852,7 +3852,7 @@
       "description": "NeighborhoodClusterOverlayWidget in lib/features/explore/widgets/neighborhood_cluster_overlay_widget.dart rendering animated hotspot badges with heat intensity halos.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P37-01"
       ],
@@ -3878,7 +3878,7 @@
       "description": "WebNeighborhoodHeatmap.tsx in src/components/ rendering responsive SVG grid heatmap with hover inspection and Web Audio effects.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P37-02"
       ],
