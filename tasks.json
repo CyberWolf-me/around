@@ -4012,7 +4012,7 @@
       "description": "00029_place_sound_bites.sql creating place_sound_bites table, RLS policies, and get_place_sound_bites RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P38-03"
       ],
