@@ -4307,7 +4307,7 @@
       "description": "WebArchitecturalBadgeShowcase.tsx rendering architectural quest grid, progress bars, landmark checklist, and Web Audio unlock fanfare chime.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P41-02"
       ],
@@ -4333,7 +4333,7 @@
       "description": "00032_architectural_badges.sql creating architectural_quests and user_quest_progress tables, RLS policies, and record_quest_stop_visit RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P41-03"
       ],
