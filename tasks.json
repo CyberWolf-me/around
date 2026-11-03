@@ -4521,7 +4521,7 @@
       "description": "WebDistrictRadioTuner.tsx rendering retro-futuristic radio tuner, Web Audio white noise static between channels, and live listener counts.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P43-02"
       ],
@@ -4547,7 +4547,7 @@
       "description": "00034_district_radio_channels.sql creating district_radio_channels and radio_listening_sessions tables, RLS policies, and tune_into_district_radio RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P43-03"
       ],
