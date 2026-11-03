@@ -4333,7 +4333,7 @@
       "description": "00032_architectural_badges.sql creating architectural_quests and user_quest_progress tables, RLS policies, and record_quest_stop_visit RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P41-03"
       ],
@@ -4351,6 +4351,113 @@
       "verificationCommands": [
         "flutter analyze lib/ test/ --no-pub",
         "flutter test test/unit/architectural_badge_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P42-01",
+      "title": "Artisan Tasting Flight & Cupping Profile Engine",
+      "domain": "Experiences",
+      "description": "TastingFlightEngine modeling curated artisan tasting flights across Tashkent (Specialty Coffee Cupping, Rishtan Ceramics & Tea Ceremonies, Chorsu Spices & Dried Fruit Flight) with flavor profiling, cupping ratings, and XP certificates.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P41-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/tasting_flight_engine.dart",
+        "test/unit/tasting_flight_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Defines TastingFlight, TastingStop, and TastingProfile models with flavor notes and cupping metrics.",
+        "Calculates flight completion, average rating, and flavor note distribution.",
+        "Awards curator cupping certificates (+50 XP upon 100% flight completion).",
+        "Unit tests verify cupping evaluation, progress calculation, and localization."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/tasting_flight_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service with comprehensive unit tests."
+    },
+    {
+      "id": "P42-02",
+      "title": "Tasting Flight Card & Flavor Wheel Stepper Widget",
+      "domain": "Engagement",
+      "description": "TastingFlightCardWidget rendering flight banner, aroma/taste note tags, stop stepper checklist, cupping score slider, and completion certificate with haptic feedback.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P42-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/tasting_flight_card_widget.dart",
+        "test/widget/tasting_flight_card_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders tasting flight title, flavor tags, and landmark stop stepper.",
+        "Interactive tasting logger allowing 1-10 rating and notes.",
+        "Widget test validates flight rendering, stop switching, and submit callbacks."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/tasting_flight_card_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P42-03",
+      "title": "Web Companion Tasting Flight Sampler & Audio Sip Chime",
+      "domain": "Experiences",
+      "description": "WebTastingFlightSampler.tsx rendering tasting flight itinerary, flavor note cloud, cupping rating meter, and Web Audio sensory sips.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P42-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebTastingFlightSampler.tsx",
+        "src/__tests__/webTastingFlightSampler.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders responsive tasting flight sampler with interactive stop checklist.",
+        "Visual flavor note cloud with category filtering.",
+        "Vitest tests verify cupping ratings, flavor note counts, and sound effects."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P42-04",
+      "title": "Supabase SQL Schema & Tasting Flights RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00033_artisan_tasting_flights.sql creating tasting_flights, tasting_flight_items, and user_tasting_logs tables, RLS policies, and record_tasting_log RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P42-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00033_artisan_tasting_flights.sql",
+        "lib/data/repositories/tasting_flight_repository.dart",
+        "test/unit/tasting_flight_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates tasting_flights and user_tasting_logs tables with dual-layer privacy RLS policies.",
+        "RPC record_tasting_log records rating/flavor notes and awards flight completion bonus + XP.",
+        "TastingFlightRepository implements offline fallback with default Tashkent flights.",
+        "Unit test validates SQL syntax and repository methods."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/tasting_flight_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }

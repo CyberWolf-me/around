@@ -22,18 +22,29 @@ void main() {
     test('VenueSoundscapeRepository resolves contextual soundscapes in offline mode', () async {
       final repo = VenueSoundscapeRepository();
 
-      // Coffee shop -> espresso murmur
+      // Coffee shop -> espresso murmur (daytime)
       final cafeConfig = await repo.getVenueSoundscape(
         placeId: 'pl-breadly',
         placeCategory: 'Specialty Coffee & Bakery',
+        hourOfDay: 10,
       );
       expect(cafeConfig.preset, equals(VenueSoundscapePreset.espressoMurmur));
       expect(cafeConfig.emoji, equals('☕'));
+
+      // Evening coffee shop -> jazz lounge
+      final nightCafe = await repo.getVenueSoundscape(
+        placeId: 'pl-breadly-night',
+        placeCategory: 'Specialty Coffee & Bakery',
+        hourOfDay: 22,
+      );
+      expect(nightCafe.preset, equals(VenueSoundscapePreset.jazzLounge));
+      expect(nightCafe.emoji, equals('🎷'));
 
       // Park -> courtyard fountain
       final parkConfig = await repo.getVenueSoundscape(
         placeId: 'pl-park',
         placeCategory: 'Courtyard & Botanical Garden',
+        hourOfDay: 14,
       );
       expect(parkConfig.preset, equals(VenueSoundscapePreset.courtyardFountain));
       expect(parkConfig.emoji, equals('⛲'));

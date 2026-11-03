@@ -14,9 +14,10 @@ class VenueSoundscapeRepository {
   Future<SoundscapePresetConfig> getVenueSoundscape({
     required String placeId,
     String? placeCategory,
+    int? hourOfDay,
   }) async {
     if (!SupabaseService.isInitialized) {
-      return _buildOfflineFallback(placeCategory);
+      return _buildOfflineFallback(placeCategory, hourOfDay);
     }
 
     try {
@@ -27,22 +28,22 @@ class VenueSoundscapeRepository {
 
       if (res is Map && res['success'] == true) {
         final rawPreset = res['soundscape_preset'] as String? ?? 'espresso_murmur';
-        final preset = _parsePreset(rawPreset, placeCategory);
+        final preset = _parsePreset(rawPreset, placeCategory, hourOfDay);
         return _engine.getConfig(preset);
       }
 
-      return _buildOfflineFallback(placeCategory);
+      return _buildOfflineFallback(placeCategory, hourOfDay);
     } catch (e) {
       AppLogger.warn(
         'VenueSoundscapeRepository',
         'Failed to query venue soundscape preset via RPC, using offline fallback',
         e,
       );
-      return _buildOfflineFallback(placeCategory);
+      return _buildOfflineFallback(placeCategory, hourOfDay);
     }
   }
 
-  VenueSoundscapePreset _parsePreset(String rawPreset, String? fallbackCategory) {
+  VenueSoundscapePreset _parsePreset(String rawPreset, String? fallbackCategory, int? hourOfDay) {
     switch (rawPreset.toLowerCase().trim()) {
       case 'oriental_bazaar':
       case 'orientalbazaar':
@@ -60,12 +61,12 @@ class VenueSoundscapeRepository {
       case 'espressomurmur':
         return VenueSoundscapePreset.espressoMurmur;
       default:
-        return _engine.recommendPreset(venueCategory: fallbackCategory ?? 'Cafe');
+        return _engine.recommendPreset(venueCategory: fallbackCategory ?? 'Cafe', hourOfDay: hourOfDay);
     }
   }
 
-  SoundscapePresetConfig _buildOfflineFallback(String? placeCategory) {
-    final preset = _engine.recommendPreset(venueCategory: placeCategory ?? 'Cafe');
+  SoundscapePresetConfig _buildOfflineFallback(String? placeCategory, int? hourOfDay) {
+    final preset = _engine.recommendPreset(venueCategory: placeCategory ?? 'Cafe', hourOfDay: hourOfDay);
     return _engine.getConfig(preset);
   }
 }
