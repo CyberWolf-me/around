@@ -3663,7 +3663,7 @@
       "description": "WebTrailProgressStepper.tsx in src/components/ rendering responsive route checkpoints with progress bar and sound effects.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P35-02"
       ],
@@ -3689,7 +3689,7 @@
       "description": "00026_curated_walk_waypoints.sql creating record_route_waypoint_progress RPC with repository offline fallback.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P35-03"
       ],
