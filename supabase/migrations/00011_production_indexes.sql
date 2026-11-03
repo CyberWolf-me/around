@@ -52,4 +52,4 @@ CREATE INDEX IF NOT EXISTS idx_post_comments_post_created
 
 -- 9. Friend Plans: Scheduled time ordering
 CREATE INDEX IF NOT EXISTS idx_friend_plans_scheduled
-  ON public.friend_plans(scheduled_time ASC, place_id);
+  ON public.friend_plans(schedule_time ASC, place_id);

@@ -3,6 +3,8 @@
 -- bakeries, evening lounges, cultural landmarks, and dining destinations across
 -- Mirabad, Yakkasaray, Central Tashkent, Yunusabad, Shaykhontohur, and Mirzo Ulugbek.
 
+SET search_path TO public, extensions;
+
 INSERT INTO public.places (
   id, slug, name, category, street_address, district, city, location,
   price_tier, hours, status_line, description, hero_image_url, rating_avg, rating_count, tags, photos
