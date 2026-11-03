@@ -4935,7 +4935,7 @@
       "description": "WebSilkPaperWorkshop.tsx rendering 4-step mulberry paper crafting simulator (Soaking, Mashing, Sieve Pressing, Agate Stone Burnishing) and calligraphy scroll generator.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P47-02"
       ],
@@ -4960,7 +4960,7 @@
       "description": "00038_silk_paper_calligraphy.sql creating silk_paper_ateliers, calligraphy_scripts, and user_paper_workshops tables, RLS policies, and reserve_silk_paper_workshop RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P47-03"
       ],
