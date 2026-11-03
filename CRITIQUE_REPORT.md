@@ -631,3 +631,32 @@ Without monthly resets:
    - `SeasonTrophyShowcase.tsx` in `src/components/` rendering interactive trophy showcase, filter by season month, and Web Audio celebration sounds.
 4. **Supabase SQL Schema & Seasonal Snapshot RPC Migration (`P28-04`)**:
    - `00019_curator_seasons_and_trophy_wall.sql` creating `seasonal_trophies` table with RLS and idempotent `claim_seasonal_trophy` RPC.
+
+
+---
+
+## Autonomous Product Audit & Replenishment — Phase 29 (November 3, 2026)
+
+### Strategic Evaluation: Milestone 2.8 Complete & Telegram Mini App Deep Linking
+With Phase 28 delivered and tagged as `v2.8.0-staging.1` (386 Flutter tests, 100 Web tests, zero static analysis warnings), Around has shipped the monthly curator seasons and archived trophy wall.
+
+### The Adversarial Growth Audit for Phase 29:
+In Uzbekistan, Telegram is the primary digital fabric. 90%+ of smartphone users in Tashkent communicate and consume social recommendations via Telegram channels and chats.
+When a curator in Tashkent shares a curated route (e.g. *Mirabad Specialty Coffee Crawl*) or a cultural receipt postcard, the shared link must seamlessly open the **Around Telegram Mini App** to that specific route or receipt:
+1. **Telegram `startapp` Parameter Routing**:
+   - Links formatted as `https://t.me/around_tashkent_bot/app?startapp=route_mirabad_coffee_crawl` or `startapp=postcard_REC-MIR-2026-774`.
+   - The app must parse `startapp` parameters across both native Flutter and Web Mini App environments.
+2. **Referral Attribution & Curator Growth**:
+   - Curators who share routes or postcards should receive viral telemetry attribution and bonus XP when friends launch the Mini App through their link.
+3. **Seamless In-App Share Sheet**:
+   - Mobile curators need a polished `TelegramShareSheet` to copy direct Mini App deep links and trigger Telegram system sharing with one tap.
+
+### Phase 29 Work Breakdown:
+1. **Telegram Mini App `startapp` Parameter Parser & Universal Deep Link Engine (`P29-01`)**:
+   - `TelegramDeepLinkEngine` in `lib/core/services/telegram_deep_link_engine.dart` parsing and formatting route, postcard, and curator referral deep links.
+2. **Universal Route & Postcard Telegram Share Sheet Widget (`P29-02`)**:
+   - `TelegramShareSheet` in `lib/features/explore/widgets/telegram_share_sheet.dart` rendering the viral share modal with 1-tap Telegram launch and link copying.
+3. **Web Companion Telegram Mini App Launch Router & Bridge (`P29-03`)**:
+   - `telegramLaunchBridge.ts` in `src/services/` extracting `start_param` and routing to routes, postcards, or seasons.
+4. **Supabase SQL Schema & Referral Telemetry RPC Migration (`P29-04`)**:
+   - `00020_referral_deep_links_and_launch_telemetry.sql` adding `referral_launches` table and idempotent `record_telegram_launch` RPC.

@@ -2954,6 +2954,113 @@
         "flutter test test/unit/season_trophy_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P29-01",
+      "title": "Telegram Mini App startapp Parameter Parser & Universal Deep Link Engine",
+      "domain": "Discovery & Growth",
+      "description": "TelegramDeepLinkEngine in lib/core/services/ parsing route, postcard, season, and referral payloads into structured domain navigation targets.",
+      "ownerRole": "Mobile Engineer",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P28-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/telegram_deep_link_engine.dart",
+        "test/unit/telegram_deep_link_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Parses route, postcard, season, and referral startapp parameters cleanly.",
+        "Generates canonical Telegram bot URLs (https://t.me/around_tashkent_bot/app?startapp=...).",
+        "Defensively handles unknown and malformed payloads with fallback to home explore.",
+        "Unit test validates all payload types and URI encoding."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/telegram_deep_link_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart URI parser."
+    },
+    {
+      "id": "P29-02",
+      "title": "Universal Route & Postcard Telegram Share Sheet Widget",
+      "domain": "Engagement & Growth",
+      "description": "TelegramShareSheet widget in lib/features/explore/widgets/ rendering direct Telegram Mini App links, copy actions, and preview cards.",
+      "ownerRole": "Mobile Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P29-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/telegram_share_sheet.dart",
+        "test/widget/telegram_share_sheet_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders Telegram Mini App deep link with 1-tap copy button and haptic feedback.",
+        "Displays content preview card with route or postcard metadata.",
+        "Widget tests verify rendering across English, Uzbek, and Russian.",
+        "Triggers share callbacks cleanly."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/telegram_share_sheet_test.dart"
+      ],
+      "riskAssessment": "Low: Reusable UI component."
+    },
+    {
+      "id": "P29-03",
+      "title": "Web Companion Telegram Mini App Launch Router & Bridge",
+      "domain": "Engagement & Growth",
+      "description": "telegramLaunchBridge.ts in src/services/ extracting start_param from window.Telegram.WebApp or query parameters and routing directly to content.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P29-02"
+      ],
+      "affectedPaths": [
+        "src/services/telegramLaunchBridge.ts",
+        "src/__tests__/telegramLaunchBridge.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Extracts and parses start_param from Telegram WebApp initDataUnsafe and URL parameters.",
+        "Resolves target navigation route for routes, postcards, and seasons.",
+        "Vitest test suite verifies all extraction modes and fallbacks."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: TypeScript service."
+    },
+    {
+      "id": "P29-04",
+      "title": "Supabase SQL Schema & Referral Telemetry RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00020_referral_deep_links_and_launch_telemetry.sql adding referral_launches table with RLS and idempotent RPC record_telegram_launch awarding bonus XP.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P29-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00020_referral_deep_links_and_launch_telemetry.sql",
+        "test/unit/telegram_referral_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates referral_launches table with foreign keys to profiles.",
+        "Creates idempotent record_telegram_launch RPC awarding +10 XP to referring curator.",
+        "Enforces RLS policies with auth.uid() caller invariants.",
+        "Unit test validates SQL syntax and RPC signature."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/telegram_referral_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
