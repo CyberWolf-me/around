@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:around_app/core/services/curator_accolades_engine.dart';
-import 'package:around_app/core/services/season_ceremony_engine.dart';
 import 'package:around_app/core/services/season_trophy_engine.dart';
 
 void main() {

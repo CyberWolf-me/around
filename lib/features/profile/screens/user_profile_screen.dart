@@ -13,10 +13,6 @@ import '../../../core/services/curator_recommendation_engine.dart';
 import '../../../core/services/locale_service.dart';
 import '../../../data/repositories/saved_places_repository.dart';
 import '../widgets/curator_taste_overlap_card.dart';
-import '../widgets/curator_coffee_ping_sheet.dart';
-import '../widgets/curator_trophy_cabinet.dart';
-import '../../../core/services/curator_accolades_engine.dart';
-import '../../../data/repositories/curator_accolades_repository.dart';
 
 class UserProfileScreen extends ConsumerStatefulWidget {
   final String userId;
@@ -424,34 +420,9 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 14),
-                    Builder(builder: (context) {
-                      final accoladesEngine = ref.watch(curatorAccoladesEngineProvider);
-                      final memberAccolades = ref.watch(curatorAccoladesProvider(widget.userId)).asData?.value ??
-                          accoladesEngine.buildAccolades(
-                            userId: widget.userId,
-                            username: member.handle,
-                            crownsCount: member.dropsCount >= 10 ? 1 : 0,
-                            trophies: [],
-                            laurels: [],
-                            totalCuratorXp: member.dropsCount * 25,
-                          );
-                      return CuratorTrophyCabinet(
-                        accolades: memberAccolades,
-                        locale: currentLang,
-                      );
-                    }),
-                    const SizedBox(height: 14),
                     CuratorTasteOverlapCard(
                       match: tasteMatch,
                       languageCode: currentLang,
-                      onTap: () {
-                        CuratorCoffeePingSheet.show(
-                          context: context,
-                          member: member,
-                          match: tasteMatch,
-                          languageCode: currentLang,
-                        );
-                      },
                     ),
                     const SizedBox(height: 20),
 

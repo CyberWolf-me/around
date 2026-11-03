@@ -5226,7 +5226,7 @@
       "description": "Retain only the two high-signal spatial mechanics: District Passport Stamps and Territory Crowns. Prune redundant trophy walls, ceremony modals, hall-of-fame popups, web soundscape players, and Sunday retrospective popups into a unified City Passport section on ProfileScreen.",
       "ownerRole": "Mobile & Web Product Engineer",
       "priority": "P0",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P50-01"
       ],
@@ -5255,7 +5255,7 @@
       "description": "Audit supabase/migrations/, eliminate dropped niche tables, deduplicate any colliding prefixes, and ensure strictly sequential 5-digit ordering with full RLS coverage.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P0",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P50-02"
       ],

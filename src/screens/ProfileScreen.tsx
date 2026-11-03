@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { Icon } from '../components/ui/Icon';
 import { Avatar } from '../components/ui/Avatar';
 import { AudienceBadge } from '../components/ui/AudienceBadge';
-import { WebTrophyCabinet } from '../components/WebTrophyCabinet';
+import { WebCityPassport } from '../components/WebCityPassport';
 import { INITIAL_PEOPLE } from '../data/mockData';
 import { PlaceDrop, UserProfile } from '../types';
 import { canViewVisitHistory } from '../services/privacyFilter';
@@ -186,34 +186,14 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({ userId }) => {
         </div>
       )}
 
-      {/* Trophy Cabinet Section */}
+      {/* City Passport: District Stamps & Territory Crowns Section */}
       <div style={{ marginBottom: 18 }}>
-        <WebTrophyCabinet
-          accolades={{
-            userId: targetUserId,
-            username: user.handle,
-            crownsCount: isOwnProfile ? 2 : (myDrops.length >= 5 ? 1 : 0),
-            trophies: [
-              {
-                id: `trophy-${targetUserId}-autumn`,
-                seasonId: '2026-11',
-                seasonTitle: 'Autumn in Tashkent',
-                tier: myDrops.length >= 3 ? 'gold' : (myDrops.length >= 1 ? 'silver' : 'bronze'),
-                completedChallengesCount: Math.min(3, Math.max(1, myDrops.length)),
-                xpBonus: myDrops.length >= 3 ? 150 : 75,
-                earnedAt: '2026-11-02T12:00:00Z',
-              },
-            ],
-            laurels: [
-              {
-                seasonId: '2026-10',
-                district: user.neighborhood || 'Mirabad',
-                rank: isOwnProfile ? 1 : 2,
-                laurel: isOwnProfile ? 'champion' : 'podium',
-              },
-            ],
-            totalCuratorXp: myDrops.length * 35 + (isOwnProfile ? 500 : 200),
-          }}
+        <WebCityPassport
+          username={user.handle}
+          neighborhood={user.neighborhood}
+          dropsCount={myDrops.length}
+          visitedDistricts={[user.neighborhood || 'Mirabad']}
+          crownsCount={isOwnProfile ? 2 : (myDrops.length >= 5 ? 1 : 0)}
           locale="en"
         />
       </div>

@@ -6,13 +6,11 @@ import '../../../core/services/curator_recommendation_engine.dart';
 class CuratorTasteOverlapCard extends StatelessWidget {
   final TasteOverlapMatch match;
   final String languageCode;
-  final VoidCallback? onTap;
 
   const CuratorTasteOverlapCard({
     super.key,
     required this.match,
     this.languageCode = 'en',
-    this.onTap,
   });
 
   @override
@@ -174,39 +172,6 @@ class CuratorTasteOverlapCard extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ],
-          if (onTap != null) ...[
-            const SizedBox(height: 12),
-            InkWell(
-              key: const Key('btn_curator_coffee_ping'),
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.orangeSubtle,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.orange.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('☕', style: TextStyle(fontSize: 12)),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Meet for Coffee',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.orange,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.arrow_forward_ios_rounded, size: 9, color: AppColors.orange),
-                  ],
-                ),
-              ),
             ),
           ],
         ],

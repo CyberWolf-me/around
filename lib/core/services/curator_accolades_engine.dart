@@ -1,6 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'season_ceremony_engine.dart';
 import 'season_trophy_engine.dart';
+
+/// District placement laurel tier.
+enum CuratorLaurelTier {
+  champion,
+  podium,
+  topTen,
+  explorer;
+
+  String get id => name;
+}
 
 /// Progressive status classification based on cumulative crowns, trophies, and district standing.
 enum CuratorMasteryTier {

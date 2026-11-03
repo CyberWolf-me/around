@@ -17,6 +17,7 @@ import '../../../data/models/place_model.dart';
 import '../../../data/repositories/places_repository.dart';
 import '../../../data/repositories/quests_repository.dart';
 import '../widgets/taste_passport_card.dart';
+import '../widgets/city_passport_section.dart';
 import '../widgets/taste_quests_card.dart';
 import '../widgets/district_leaderboard_sheet.dart';
 import '../widgets/streak_progress_card.dart';
@@ -466,6 +467,13 @@ class ProfileScreen extends ConsumerWidget {
             onShare: () {
               DeepLinkService.copyPassportShareLink(profile.username);
             },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Unified City Passport: District Stamps & Territory Crowns (P50-02)
+          CityPassportSection(
+            profile: profile,
           ),
 
           const SizedBox(height: 16),

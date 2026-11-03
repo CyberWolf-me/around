@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:around_app/data/models/profile_model.dart';
 import 'package:around_app/data/repositories/profiles_repository.dart';
 import 'package:around_app/features/profile/screens/taste_passport_screen.dart';
-import 'package:around_app/features/profile/widgets/curator_trophy_cabinet.dart';
+import 'package:around_app/features/profile/widgets/city_passport_section.dart';
 
 class _MockProfileNotifier extends ProfileNotifier {
   final ProfileModel _initial;
@@ -15,8 +15,8 @@ class _MockProfileNotifier extends ProfileNotifier {
 }
 
 void main() {
-  group('P32-01: TastePassportScreen Trophy Cabinet Integration Tests', () {
-    testWidgets('renders CuratorTrophyCabinet with mastery title and crown pill on personal passport', (tester) async {
+  group('P32-01: TastePassportScreen City Passport Integration Tests', () {
+    testWidgets('renders CityPassportSection with district stamps and territory crowns on personal passport', (tester) async {
       tester.view.physicalSize = const Size(800, 1600);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -48,15 +48,13 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Verify CuratorTrophyCabinet is present
-      expect(find.byType(CuratorTrophyCabinet), findsOneWidget);
+      // Verify CityPassportSection is present
+      expect(find.byType(CityPassportSection), findsOneWidget);
+      expect(find.byKey(const Key('city_passport_section')), findsOneWidget);
 
-      // Verify crown counter and mastery title widgets inside cabinet
-      expect(find.byKey(const Key('crown_count_text')), findsOneWidget);
-      expect(find.byKey(const Key('mastery_title_text')), findsOneWidget);
-
-      // Verify share accolades button exists
-      expect(find.byKey(const Key('share_accolades_button')), findsOneWidget);
+      // Verify tabs exist
+      expect(find.byKey(const Key('tab_passport_stamps')), findsOneWidget);
+      expect(find.byKey(const Key('tab_territory_crowns')), findsOneWidget);
     });
   });
 }
