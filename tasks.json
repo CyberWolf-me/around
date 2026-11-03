@@ -4575,7 +4575,7 @@
       "description": "CraftWorkshopEngine modeling traditional Tashkent ceramic studios, Rishtan blue glaze pottery, wood carving workshops, and silk weaving masterclasses with master credentials and materials taxonomy.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P43-04"
       ],
@@ -4601,7 +4601,7 @@
       "description": "CraftWorkshopCardWidget rendering master artisan portrait, craft discipline badge, interactive material tag chips, and instant masterclass RSVP button.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P44-01"
       ],
