@@ -3061,6 +3061,111 @@
         "flutter test test/unit/telegram_referral_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P30-01",
+      "title": "Monthly Curator Crown Ceremony & Season Wrap-up Engine",
+      "domain": "Gamification & Reputation",
+      "description": "SeasonCeremonyEngine in lib/core/services/ calculating user seasonal rank, district crown awards, and localized ceremony narratives.",
+      "ownerRole": "Mobile Engineer",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P29-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/season_ceremony_engine.dart",
+        "test/unit/season_ceremony_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Calculates final user standing, total seasonal XP, and top district explored.",
+        "Resolves laurel awards (Gold Laurel for rank 1, Silver for top 3, Bronze for top 10).",
+        "Full trilingual support across Uzbek, Russian, and English."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/season_ceremony_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart computational service."
+    },
+    {
+      "id": "P30-02",
+      "title": "Interactive Season Wrap-up & Crown Ceremony Dialog Widget",
+      "domain": "Engagement & Growth",
+      "description": "SeasonCeremonyDialog widget in lib/features/explore/widgets/ displaying celebration laurels, season stats summary, and celebratory haptics.",
+      "ownerRole": "Mobile Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P30-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/season_ceremony_dialog.dart",
+        "test/widget/season_ceremony_dialog_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders animated season wrap-up dialog with podium rank and crown laurel.",
+        "Displays total season XP, places visited, and top district.",
+        "Widget tests verify rendering across all 3 languages."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/season_ceremony_dialog_test.dart"
+      ],
+      "riskAssessment": "Low: Reusable UI component."
+    },
+    {
+      "id": "P30-03",
+      "title": "Web Companion Historical Hall of Fame & Season Archive",
+      "domain": "Engagement & Growth",
+      "description": "SeasonHallOfFame.tsx in src/components/ rendering historical season podiums, district champion filters, and Web Audio celebratory effects.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P30-02"
+      ],
+      "affectedPaths": [
+        "src/components/SeasonHallOfFame.tsx",
+        "src/__tests__/seasonHallOfFame.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders historical season archives with district champion podiums (1st, 2nd, 3rd).",
+        "Filters by season month and district.",
+        "Vitest test suite verifies archive filtering and ranking calculations."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P30-04",
+      "title": "Supabase SQL Schema & Season Snapshot Archiving RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00021_seasonal_snapshots_and_hall_of_fame.sql adding season_hall_of_fame table with RLS and idempotent RPC archive_season_standings.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P30-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00021_seasonal_snapshots_and_hall_of_fame.sql",
+        "test/unit/season_hall_of_fame_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates season_hall_of_fame table with foreign keys to profiles.",
+        "Creates idempotent archive_season_standings RPC persisting top district curators.",
+        "Enforces RLS policies with auth.uid() caller invariants.",
+        "Unit test validates SQL syntax and RPC signature."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/season_hall_of_fame_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
