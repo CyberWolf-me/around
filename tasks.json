@@ -3986,7 +3986,7 @@
       "description": "WebSoundBitePlayer.tsx rendering responsive SVG waveform bars with synthetic Web Audio preview generator.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P38-02"
       ],
@@ -4012,7 +4012,7 @@
       "description": "00029_place_sound_bites.sql creating place_sound_bites table, RLS policies, and get_place_sound_bites RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P38-03"
       ],
