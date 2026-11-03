@@ -5038,7 +5038,7 @@
       "description": "WebTandoorBakeryViewer.tsx rendering interactive chekich bread center puncture stamping simulator, clay tandoor heat monitoring, and neighborhood bakery trails.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P48-02"
       ],
@@ -5063,7 +5063,7 @@
       "description": "00039_tandoor_bakeries.sql creating tandoor_bakeries, bread_varieties, and user_bread_reservations tables, RLS policies, and reserve_fresh_bread_batch RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P48-03"
       ],
