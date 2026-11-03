@@ -4139,6 +4139,113 @@
         "flutter test test/unit/metro_stamp_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P40-01",
+      "title": "Curator Tour Story Track Engine",
+      "domain": "Experiences",
+      "description": "CuratorTourStoryEngine managing sequential audio tour chapters, geotargeted playback triggers, and tour completion metrics.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "DONE",
+      "dependencies": [
+        "P39-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/curator_tour_story_engine.dart",
+        "test/unit/curator_tour_story_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Defines CuratorTour and TourStopStory models with chapter sequencing, audio URLs, and transcripts.",
+        "Calculates tour completion metrics, estimated walking duration, and chapter progression.",
+        "Validates geotargeted stop arrival triggers within defined radii (30-80m).",
+        "Unit tests verify chapter advancement, completion calculation, and serialization."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/curator_tour_story_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service with comprehensive unit tests."
+    },
+    {
+      "id": "P40-02",
+      "title": "Curator Tour Player & Chapter Stepper Widget",
+      "domain": "Experiences",
+      "description": "CuratorTourPlayerWidget rendering album art, audio progress scrubber, tactile previous/next chapter stepper, and venue navigation button.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P40-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/curator_tour_player_widget.dart",
+        "test/widget/curator_tour_player_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Displays active chapter title, audio progress bar, and chapter skip buttons.",
+        "Emits haptic feedback on chapter progression and scrubber dragging.",
+        "Widget test validates chapter switching, playback state toggling, and localized text."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/curator_tour_player_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P40-03",
+      "title": "Web Companion Tour Chapter Navigator",
+      "domain": "Experiences",
+      "description": "WebCuratorTourNavigator.tsx rendering responsive audio timeline, chapter list with status badges, and Web Audio play effects.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P40-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebCuratorTourNavigator.tsx",
+        "src/__tests__/webCuratorTourNavigator.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders responsive chapter list with completion indicators.",
+        "Interactive timeline scrubber and Web Audio playback sounds.",
+        "Vitest tests verify chapter transitions, duration formatting, and click callbacks."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P40-04",
+      "title": "Supabase SQL Schema & Curator Tour Stories RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00031_curator_tour_stories.sql creating curator_tours and tour_stop_stories tables, RLS policies, and get_curator_tour_details RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P40-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00031_curator_tour_stories.sql",
+        "lib/data/repositories/curator_tour_story_repository.dart",
+        "test/unit/curator_tour_story_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates curator_tours and tour_stop_stories tables with cascading FKs and RLS policies.",
+        "RPC get_curator_tour_details returns tour metadata, chapter stories, and author profile.",
+        "CuratorTourStoryRepository implements offline fallback with iconic Tashkent tours.",
+        "Unit test validates SQL syntax and repository methods."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/curator_tour_story_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
   ],
   "loopConfig": {
