@@ -687,3 +687,33 @@ When a monthly season rolls over in Tashkent, users need emotional closure and s
    - `SeasonHallOfFame.tsx` in `src/components/` rendering archived season podiums, district champion filters, and celebratory sound effects.
 4. **Supabase SQL Schema & Season Snapshot Archiving RPC Migration (`P30-04`)**:
    - `00021_seasonal_snapshots_and_hall_of_fame.sql` creating `season_hall_of_fame` table with RLS and idempotent `archive_season_standings` RPC.
+
+
+---
+
+## Autonomous Product Audit & Replenishment — Phase 31 (November 3, 2026)
+
+### Strategic Evaluation: Milestone 3.0 Complete & Accolades Cabinet
+With Phase 30 delivered and tagged as `v3.0.0-staging.1` (417 Flutter tests, 109 Web tests, zero static analysis warnings), Around has shipped the season wrap-up ceremony, hall of fame web archive, and season snapshot database migration.
+
+### The Adversarial Growth Audit for Phase 31:
+Now that curators can compete in monthly seasons and earn permanent district crowns and laurels, their earned trophies must be prominently showcased where others can admire them:
+1. **The Trophy Cabinet on Taste Passports**:
+   - A curator's Taste Passport is their premier public identity in Tashkent. Currently, it displays visited venues and drops, but does not display their hard-earned seasonal trophies, district crowns, or Hall of Fame laurels.
+   - Curators need an aesthetic, inspectable **Trophy Cabinet** on their Taste Passport and profile screen.
+2. **Curator Mastery Tiers**:
+   - Users need a progressive status classification based on cumulative crowns and trophies: `Grand Master Curator` (3+ crowns), `Tashkent Legend` (1+ crown or gold trophy), `District Pioneer` (silver/bronze trophy), and `Neighborhood Scout`.
+3. **Web Companion Accolades Preview**:
+   - When a passport link is shared on Telegram or the web, the web companion must display the curator's trophy cabinet with crisp styling and celebratory audio.
+4. **Unified Accolades Supabase RPC**:
+   - Instead of making multiple round-trips to `profiles`, `seasonal_trophies`, and `season_hall_of_fame`, a single performant database RPC (`get_curator_accolades`) should return a unified payload with dual-layer RLS and offline fallback.
+
+### Phase 31 Work Breakdown:
+1. **Curator Accolades & Mastery Engine (`P31-01`)**:
+   - `CuratorAccoladesEngine` in `lib/core/services/curator_accolades_engine.dart` computing mastery tiers, accolades summaries, and localized titles.
+2. **Trophy Cabinet & Accolades Showcase Widget (`P31-02`)**:
+   - `CuratorTrophyCabinet` in `lib/features/profile/widgets/curator_trophy_cabinet.dart` displaying crowns, gilded trophy cards, modal inspection, and haptic feedback.
+3. **Web Companion Trophy Cabinet Component (`P31-03`)**:
+   - `WebTrophyCabinet.tsx` in `src/components/` rendering responsive accolades cabinet with audio tactile cues and Vitest coverage.
+4. **Supabase SQL Schema & Accolades Aggregation RPC Migration (`P31-04`)**:
+   - `00022_curator_accolades_aggregation.sql` creating `get_curator_accolades` RPC with `auth.uid()` caller safety and repository offline fallback.
