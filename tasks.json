@@ -4704,7 +4704,7 @@
       "description": "ChaykhanaRitualCardWidget rendering tapchan table reservations, tea blend picker, 3-step Kaytarish animation, and instant RSVP.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P45-01"
       ],
@@ -4729,7 +4729,7 @@
       "description": "WebChaykhanaBrewBar.tsx rendering 3-pour Kaytarish kettle aeration animation, herbal infusion timer, and tapchan availability schedule.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P45-02"
       ],
