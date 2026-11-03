@@ -3147,12 +3147,13 @@
       "description": "00021_seasonal_snapshots_and_hall_of_fame.sql adding season_hall_of_fame table with RLS and idempotent RPC archive_season_standings.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "DONE",
       "dependencies": [
         "P30-03"
       ],
       "affectedPaths": [
         "supabase/migrations/00021_seasonal_snapshots_and_hall_of_fame.sql",
+        "lib/data/repositories/season_hall_of_fame_repository.dart",
         "test/unit/season_hall_of_fame_rpc_test.dart"
       ],
       "acceptanceCriteria": [
