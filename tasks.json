@@ -4651,7 +4651,7 @@
       "description": "00035_craft_workshops.sql creating craft_workshops, workshop_masterclasses, and user_workshop_reservations tables, RLS policies, and reserve_craft_masterclass RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P44-03"
       ],
@@ -4668,6 +4668,109 @@
       "verificationCommands": [
         "flutter analyze lib/ test/ --no-pub",
         "flutter test test/unit/craft_workshop_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P45-01",
+      "title": "Chaykhana Tea Ritual & Brewing Protocol Engine",
+      "domain": "Experiences",
+      "description": "ChaykhanaRitualEngine modeling authentic Tashkent chaykhanas, traditional Kok-chay, Poytaxt saffron blends, 3-step Kaytarish aeration pouring protocols, and tapchan availability.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "READY",
+      "dependencies": [
+        "P44-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/chaykhana_ritual_engine.dart",
+        "test/unit/chaykhana_ritual_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Defines ChaykhanaVenue, TeaBlend, and KaytarishStep models with brewing guidelines and tapchan seating metadata.",
+        "Calculates aeration oxygenation level and awards +35 XP upon hosting or participating in tea gathering.",
+        "Pure Dart service with unit test coverage."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/chaykhana_ritual_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service."
+    },
+    {
+      "id": "P45-02",
+      "title": "Chaykhana Tapchan Reservation & Kaytarish Ritual Widget",
+      "domain": "Experiences",
+      "description": "ChaykhanaRitualCardWidget rendering tapchan table reservations, tea blend picker, 3-step Kaytarish animation, and instant RSVP.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P45-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/chaykhana_ritual_card_widget.dart",
+        "test/widget/chaykhana_ritual_card_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Interactive tapchan booking card with tea blend picker and aeration steps.",
+        "Widget test validates tap interactions, step progression, and trilingual copy."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/chaykhana_ritual_card_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P45-03",
+      "title": "Web Companion Samovar Steam & Tea Blend Aerator",
+      "domain": "Experiences",
+      "description": "WebChaykhanaBrewBar.tsx rendering 3-pour Kaytarish kettle aeration animation, herbal infusion timer, and tapchan availability schedule.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P45-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebChaykhanaBrewBar.tsx",
+        "src/__tests__/webChaykhanaBrewBar.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Interactive 3-pour Kaytarish progress meter with Web Audio steam hiss and pouring sound.",
+        "Vitest tests verify tea blends, brewing durations, and reservation states."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P45-04",
+      "title": "Supabase SQL Schema & Chaykhana Tea Gatherings RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00036_chaykhana_tea_rituals.sql creating chaykhana_venues, tea_blends, and user_chaykhana_gatherings tables, RLS policies, and host_chaykhana_gathering RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P45-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00036_chaykhana_tea_rituals.sql",
+        "lib/data/repositories/chaykhana_ritual_repository.dart",
+        "test/unit/chaykhana_ritual_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates chaykhana_venues, tea_blends, and user_chaykhana_gatherings tables with RLS.",
+        "Security Definer RPC host_chaykhana_gathering deriving caller identity from auth.uid() and awarding +35 XP.",
+        "ChaykhanaRitualRepository implements offline fallback with default Tashkent chaykhanas."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/chaykhana_ritual_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
