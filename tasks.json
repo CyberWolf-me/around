@@ -4226,7 +4226,7 @@
       "description": "00031_curator_tour_stories.sql creating curator_tours and tour_stop_stories tables, RLS policies, and get_curator_tour_details RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P40-03"
       ],
@@ -4244,6 +4244,113 @@
       "verificationCommands": [
         "flutter analyze lib/ test/ --no-pub",
         "flutter test test/unit/curator_tour_story_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P41-01",
+      "title": "Architectural Discovery Quest Engine & Progress Calculation",
+      "domain": "Experiences",
+      "description": "ArchitecturalBadgeEngine modeling Soviet Modernism, Silk Road Heritage, and Contemporary Architecture discovery quests in Tashkent with badge unlock criteria, stop completion, and XP calculations.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P40-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/architectural_badge_engine.dart",
+        "test/unit/architectural_badge_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Defines ArchitecturalQuest and QuestStop models with required stop counts, badge artwork, and XP rewards.",
+        "Calculates completion percentage, unlocked status, and remaining stops per quest.",
+        "Awards curator prestige badges upon 100% stop verification (+50 XP per quest).",
+        "Unit tests verify progress calculation, unlock triggers, and trilingual copy."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/architectural_badge_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service with exhaustive unit test coverage."
+    },
+    {
+      "id": "P41-02",
+      "title": "Architectural Quest Badge Card & Landmark Stepper Widget",
+      "domain": "Engagement",
+      "description": "ArchitecturalBadgeCardWidget rendering quest badge artwork, progress ring, landmark chip checklist (visited vs locked), and share / claim reward action.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P41-01"
+      ],
+      "affectedPaths": [
+        "lib/features/profile/widgets/architectural_badge_card_widget.dart",
+        "test/widget/architectural_badge_card_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Renders architectural badge header, visual progress ring, and landmark stop chips.",
+        "Shows locked vs unlocked visual states with tactile haptic feedback on interaction.",
+        "Widget test validates state rendering, progress percentage, and tap callbacks."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/architectural_badge_card_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P41-03",
+      "title": "Web Companion Architectural Badge Showcase & Audio Chime",
+      "domain": "Experiences",
+      "description": "WebArchitecturalBadgeShowcase.tsx rendering architectural quest grid, progress bars, landmark checklist, and Web Audio unlock fanfare chime.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P41-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebArchitecturalBadgeShowcase.tsx",
+        "src/__tests__/webArchitecturalBadgeShowcase.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Renders responsive grid of architectural badge quests with landmark chips.",
+        "Includes interactive quest filter (All / In Progress / Completed).",
+        "Vitest tests verify filter behavior, progress calculations, and sound triggering."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P41-04",
+      "title": "Supabase SQL Schema & Architectural Badges RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00032_architectural_badges.sql creating architectural_quests and user_quest_progress tables, RLS policies, and record_quest_stop_visit RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P41-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00032_architectural_badges.sql",
+        "lib/data/repositories/architectural_badge_repository.dart",
+        "test/unit/architectural_badge_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates architectural_quests and user_quest_progress tables with dual-layer privacy RLS policies.",
+        "RPC record_quest_stop_visit atomically records landmark visit and awards badge + XP if all stops completed.",
+        "ArchitecturalBadgeRepository implements offline fallback with default Tashkent quests.",
+        "Unit test validates SQL syntax and repository methods."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/architectural_badge_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
