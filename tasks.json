@@ -3771,7 +3771,7 @@
       "description": "WebSoundscapeController.tsx in src/components/ rendering responsive ambient sound player with Web Audio synthesizer integration.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P36-02"
       ],
@@ -3797,7 +3797,7 @@
       "description": "00027_venue_soundscape_presets.sql adding soundscape metadata to places table with get_venue_soundscape_preset RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P36-03"
       ],
