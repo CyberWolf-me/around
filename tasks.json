@@ -4361,7 +4361,7 @@
       "description": "TastingFlightEngine modeling curated artisan tasting flights across Tashkent (Specialty Coffee Cupping, Rishtan Ceramics & Tea Ceremonies, Chorsu Spices & Dried Fruit Flight) with flavor profiling, cupping ratings, and XP certificates.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P41-04"
       ],
@@ -4388,7 +4388,7 @@
       "description": "TastingFlightCardWidget rendering flight banner, aroma/taste note tags, stop stepper checklist, cupping score slider, and completion certificate with haptic feedback.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P42-01"
       ],
