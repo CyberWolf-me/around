@@ -3202,7 +3202,7 @@
       "description": "CuratorTrophyCabinet in lib/features/profile/widgets/curator_trophy_cabinet.dart displaying crowns, gilded trophy cards, modal inspection, and haptic feedback.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P31-01"
       ],
@@ -3229,7 +3229,7 @@
       "description": "WebTrophyCabinet.tsx in src/components/ rendering responsive accolades cabinet with audio tactile cues and Vitest coverage.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P31-02"
       ],
