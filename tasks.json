@@ -4495,7 +4495,7 @@
       "description": "DistrictRadioPlayerWidget rendering rotary frequency dial, live animated equalizer wave bars, listener counter badge, and tactile haptic clicks.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P43-01"
       ],
@@ -4521,7 +4521,7 @@
       "description": "WebDistrictRadioTuner.tsx rendering retro-futuristic radio tuner, Web Audio white noise static between channels, and live listener counts.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P43-02"
       ],

@@ -29,6 +29,46 @@ class RadioStation {
     required this.curatorName,
   });
 
+  String get districtSlug => district.toLowerCase().replaceAll(' ', '_');
+
+  String localizedTitle({String locale = 'en'}) {
+    switch (locale) {
+      case 'uz':
+        if (id == 'station-chorsu-fm') return 'Eski Shahar Chorsu Sadolari';
+        if (id == 'station-mirabad-beat') return 'Mirobod Zamonaviy Ritmi';
+        if (id == 'station-yunusabad-rain') return 'Yunusobod Tungi Yomg\'iri';
+        if (id == 'station-yakkasaray-breeze') return 'Yakkasaroy Park Shabadasi';
+        return title;
+      case 'ru':
+        if (id == 'station-chorsu-fm') return 'Эхо Старого Города Чорсу';
+        if (id == 'station-mirabad-beat') return 'Современный Ритм Мирабада';
+        if (id == 'station-yunusabad-rain') return 'Ночной Дождь Юнусабада';
+        if (id == 'station-yakkasaray-breeze') return 'Парковый Бриз Яккасарая';
+        return title;
+      default:
+        return title;
+    }
+  }
+
+  String localizedGenre({String locale = 'en'}) {
+    switch (locale) {
+      case 'uz':
+        if (id == 'station-chorsu-fm') return 'Tandir non va azon aks-sadosi';
+        if (id == 'station-mirabad-beat') return 'Espresso va lo-fi bitlari';
+        if (id == 'station-yunusabad-rain') return 'Teleminora va yomg\'ir';
+        if (id == 'station-yakkasaray-breeze') return 'Anhor to\'lqini va dombira';
+        return genreDescription;
+      case 'ru':
+        if (id == 'station-chorsu-fm') return 'Тандыры и утреннее эхо';
+        if (id == 'station-mirabad-beat') return 'Эспрессо и вечерний lo-fi';
+        if (id == 'station-yunusabad-rain') return 'Телебашня и дождь';
+        if (id == 'station-yakkasaray-breeze') return 'Рябь Анхора и домбра';
+        return genreDescription;
+      default:
+        return genreDescription;
+    }
+  }
+
   Map<String, dynamic> toJson() => {
     'id': id,
     'frequency_mhz': frequencyMhz,
@@ -75,10 +115,49 @@ class TuningResult {
     required this.isClearReception,
     required this.staticNoiseVolume,
   });
+
+  bool get isLocked => lockedStation != null && isClearReception;
+  double get receptionQuality => signalStrength;
+  int get liveListeners => lockedStation != null
+      ? DistrictRadioEngine().calculateLiveListeners(lockedStation!)
+      : 14;
 }
 
 /// Core engine for district radio station tuning, frequency drift, and session tracking.
 class DistrictRadioEngine {
+  double get minFrequency => 88.0;
+  double get maxFrequency => 108.0;
+
+  String formatReceptionLabel(double quality, {String locale = 'en'}) {
+    if (quality >= 0.75) {
+      switch (locale) {
+        case 'uz':
+          return 'Aniq signal';
+        case 'ru':
+          return 'Четкий сигнал';
+        default:
+          return 'Clear Signal';
+      }
+    } else if (quality >= 0.35) {
+      switch (locale) {
+        case 'uz':
+          return 'Zaif signal';
+        case 'ru':
+          return 'Слабый сигнал';
+        default:
+          return 'Weak Signal';
+      }
+    } else {
+      switch (locale) {
+        case 'uz':
+          return 'Statik shovqin';
+        case 'ru':
+          return 'Статический шум';
+        default:
+          return 'Static Noise';
+      }
+    }
+  }
   /// Default catalog of curated Tashkent district field-recording stations.
   static const List<RadioStation> defaultStations = [
     RadioStation(
