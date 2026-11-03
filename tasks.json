@@ -3527,7 +3527,7 @@
       "description": "DistrictActivityTickerWidget in lib/features/explore/widgets/district_activity_ticker_widget.dart rendering animated marquee pill with live pulse indicator.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P34-01"
       ],
@@ -3554,7 +3554,7 @@
       "description": "WebActivityTicker.tsx in src/components/ rendering horizontal ticker stream with pause-on-hover and sound effects.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P34-02"
       ],
