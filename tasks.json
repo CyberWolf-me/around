@@ -3446,7 +3446,7 @@
       "description": "DistrictCrownBoard.tsx in src/components/ rendering responsive district switcher, podium cards, and Web Audio effects.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P33-02"
       ],
@@ -3472,7 +3472,7 @@
       "description": "00024_district_crown_standings.sql creating get_district_crown_standings RPC with repository offline fallback.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P33-03"
       ],
