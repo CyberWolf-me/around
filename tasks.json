@@ -4626,7 +4626,7 @@
       "description": "WebCraftStudioShowcase.tsx rendering interactive pottery wheel rotation, mineral glaze color inspector, and masterclass slot picker.",
       "ownerRole": "Web Companion Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P44-02"
       ],
@@ -4651,7 +4651,7 @@
       "description": "00035_craft_workshops.sql creating craft_workshops, workshop_masterclasses, and user_workshop_reservations tables, RLS policies, and reserve_craft_masterclass RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P44-03"
       ],
