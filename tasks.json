@@ -4678,7 +4678,7 @@
       "description": "ChaykhanaRitualEngine modeling authentic Tashkent chaykhanas, traditional Kok-chay, Poytaxt saffron blends, 3-step Kaytarish aeration pouring protocols, and tapchan availability.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "READY",
+      "status": "DONE",
       "dependencies": [
         "P44-04"
       ],
@@ -4704,7 +4704,7 @@
       "description": "ChaykhanaRitualCardWidget rendering tapchan table reservations, tea blend picker, 3-step Kaytarish animation, and instant RSVP.",
       "ownerRole": "Flutter & Web Product Engineer",
       "priority": "P1",
-      "status": "BACKLOG",
+      "status": "IN_PROGRESS",
       "dependencies": [
         "P45-01"
       ],
