@@ -4754,7 +4754,7 @@
       "description": "00036_chaykhana_tea_rituals.sql creating chaykhana_venues, tea_blends, and user_chaykhana_gatherings tables, RLS policies, and host_chaykhana_gathering RPC.",
       "ownerRole": "Backend & Security Engineer",
       "priority": "P1",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "dependencies": [
         "P45-03"
       ],
@@ -4771,6 +4771,109 @@
       "verificationCommands": [
         "flutter analyze lib/ test/ --no-pub",
         "flutter test test/unit/chaykhana_ritual_rpc_test.dart"
+      ],
+      "riskAssessment": "Low: Idempotent Supabase SQL migration."
+    },
+    {
+      "id": "P46-01",
+      "title": "Tashkent Metro Architecture & Ceramic Mosaics Guide Engine",
+      "domain": "Experiences",
+      "description": "MetroMosaicEngine modeling line metadata, station architectural styles, ceramic mosaic compositions, and line exploration progress badges.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "IN_PROGRESS",
+      "dependencies": [
+        "P45-04"
+      ],
+      "affectedPaths": [
+        "lib/core/services/metro_mosaic_engine.dart",
+        "test/unit/metro_mosaic_engine_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Models MetroLine (Chilanzar, Uzbekistan, Yunusabad, Circle), MetroStationModel, and MetroVisitStamp.",
+        "Calculates line completion percentage, stamps collected, and awards +30 XP per station exploration.",
+        "Pure Dart service with unit test coverage."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/metro_mosaic_engine_test.dart"
+      ],
+      "riskAssessment": "Low: Pure Dart service."
+    },
+    {
+      "id": "P46-02",
+      "title": "Metro Mosaic & Station Architecture Card Widget",
+      "domain": "Experiences",
+      "description": "MetroMosaicCardWidget rendering line badge, mosaic preview, architectural pill badges, audio guide trigger, and stamp collection.",
+      "ownerRole": "Flutter & Web Product Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P46-01"
+      ],
+      "affectedPaths": [
+        "lib/features/explore/widgets/metro_mosaic_card_widget.dart",
+        "test/widget/metro_mosaic_card_widget_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Interactive station card displaying line badge, architectural style, mosaic artist, and stamp collection CTA.",
+        "Widget test validates tap interactions, audio playback trigger, and trilingual copy."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/widget/metro_mosaic_card_widget_test.dart"
+      ],
+      "riskAssessment": "Low: Flutter UI widget."
+    },
+    {
+      "id": "P46-03",
+      "title": "Web Companion Metro Line Map & Mosaic Gallery Viewer",
+      "domain": "Experiences",
+      "description": "WebMetroMosaicGallery.tsx rendering metro line navigation tabs, station mosaic zoom inspector, architectural spotlight, and exploration stats.",
+      "ownerRole": "Web Companion Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P46-02"
+      ],
+      "affectedPaths": [
+        "src/components/WebMetroMosaicGallery.tsx",
+        "src/__tests__/webMetroMosaicGallery.test.ts"
+      ],
+      "acceptanceCriteria": [
+        "Interactive line switcher across Chilanzar, Uzbekistan, Yunusabad, and Circle lines with station mosaic cards.",
+        "Vitest tests verify station filtering, audio guide toggle, and stamp collection state."
+      ],
+      "verificationCommands": [
+        "npm run lint",
+        "npm test -- --run"
+      ],
+      "riskAssessment": "Low: Web companion component."
+    },
+    {
+      "id": "P46-04",
+      "title": "Supabase SQL Schema & Metro Station Mosaic Stamp RPC Migration",
+      "domain": "Backend & Security",
+      "description": "00037_metro_mosaic_stamps.sql creating metro_stations and metro_mosaic_stamps tables, RLS policies, and collect_metro_mosaic_stamp RPC.",
+      "ownerRole": "Backend & Security Engineer",
+      "priority": "P1",
+      "status": "BACKLOG",
+      "dependencies": [
+        "P46-03"
+      ],
+      "affectedPaths": [
+        "supabase/migrations/00037_metro_mosaic_stamps.sql",
+        "lib/data/repositories/metro_mosaic_repository.dart",
+        "test/unit/metro_mosaic_rpc_test.dart"
+      ],
+      "acceptanceCriteria": [
+        "Creates metro_stations and metro_mosaic_stamps tables with RLS and dual-layer privacy invariant.",
+        "Security Definer RPC collect_metro_mosaic_stamp deriving caller identity from auth.uid() and awarding +30 XP.",
+        "MetroMosaicRepository implements offline fallback with default Tashkent metro stations."
+      ],
+      "verificationCommands": [
+        "flutter analyze lib/ test/ --no-pub",
+        "flutter test test/unit/metro_mosaic_rpc_test.dart"
       ],
       "riskAssessment": "Low: Idempotent Supabase SQL migration."
     }
